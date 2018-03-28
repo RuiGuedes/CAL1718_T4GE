@@ -18,7 +18,6 @@ template <class T> class Vertex;
 
 #define INF std::numeric_limits<double>::max()
 
-
 template <class T>
 class Graph {
 	vector<Vertex<T> *> vertexSet;    // vertex set
