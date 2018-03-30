@@ -8,6 +8,7 @@
 #include <list>
 #include <limits>
 #include <cmath>
+#include <algorithm>
 #include "MutablePriorityQueue.h"
 
 using namespace std;
@@ -22,10 +23,13 @@ template <class T> class Vertex;
 
 template <class T>
 class Graph {
-	vector<Vertex<T> *> vertexSet;    // vertex set
+	vector<Vertex<T> *> vertexSet;    			// vertex set
+	vector<Vertex<T> *> accidentedVertexSet;	// accidented vertex set
 public:
 	Vertex<T> *findVertex(const T &in) const;
 	bool addVertex(const T &in);
+	void removeVertex(T info);
+	void removeAccidentedVertex(T info);
 	bool addEdge(const T &sourc, const T &dest, double w);
 	int getNumVertex() const;
 	vector<Vertex<T> *> getVertexSet() const;
@@ -38,12 +42,40 @@ public:
 
 template <class T>
 int Graph<T>::getNumVertex() const {
-	return vertexSet.size();
+	return vertexSet.size() + accidentedVertexSet.size();
 }
 
 template <class T>
 vector<Vertex<T> *> Graph<T>::getVertexSet() const {
 	return vertexSet;
+}
+
+template <class T>
+void Graph<T>::removeVertex(T info) {
+	typename vector<Vertex<T> *>::iterator vertexIterator = this->vertexSet.begin();
+
+	while(vertexIterator != this->vertexSet.end()) {
+		if((*vertexIterator)->getInfo() == info) {
+			this->accidentedVertexSet.push_back(*vertexIterator);
+			this->vertexSet.erase(vertexIterator);
+			return;
+		}
+		vertexIterator++;
+	}
+}
+
+template <class T>
+void Graph<T>::removeAccidentedVertex(T info) {
+	typename vector<Vertex<T> *>::iterator vertexIterator = this->accidentedVertexSet.begin();
+
+	while(vertexIterator != this->accidentedVertexSet.end()) {
+		if((*vertexIterator)->getInfo() == info) {
+			this->vertexSet.push_back(*vertexIterator);
+			this->accidentedVertexSet.erase(vertexIterator);
+			return;
+		}
+		vertexIterator++;
+	}
 }
 
 /*
@@ -89,7 +121,6 @@ bool Graph<T>::addEdge(const T &sourc, const T &dest, double w) {
 
 template<class T>
 void Graph<T>::dijkstraShortestPath(const T &origin) {
-	// TODO
 	MutablePriorityQueue<Vertex<T> > q;
 	for(auto v : vertexSet) {
 		if(v->info == origin) {
@@ -128,11 +159,11 @@ template<class T>
 vector<T> Graph<T>::getPath(const T &origin, const T &dest) const{
 	vector<T> res;
 	auto v = findVertex(dest);
-	if (v == nullptr || v->dist == INF) // missing or disconnected
+	if(v == nullptr || v->dist == INF) // missing or disconnected
 		return res;
 	for ( ; v != nullptr; v = v->path)
 		res.push_back(v->info);
-	//reverse(res.begin(), res.end());
+	reverse(res.begin(), res.end());
 
 	return res;
 }
