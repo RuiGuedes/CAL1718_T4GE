@@ -174,6 +174,7 @@ template <class T>
 class Vertex {
 	T info;                // contents
 	vector<Edge<T> > adj;  // outgoing edges
+	vector<Edge<T> > accidentedAdj;
 	bool visited;          // auxiliary field
 	double dist = 0;
 	Vertex<T> *path = NULL;
@@ -181,11 +182,12 @@ class Vertex {
 
 	bool processing = false;
 	void addEdge(Vertex<T> *dest, double w);
-
 public:
 	Vertex(T in);
 	bool operator<(Vertex<T> & vertex) const; // // required by MutablePriorityQueue
+	void removeEdge(Vertex<T> *dest);
 	T getInfo() const;
+	vector<Edge<T> > getAdj() const;
 	double getDist() const;
 	Vertex *getPath() const;
 	friend class Graph<T>;
@@ -205,6 +207,17 @@ void Vertex<T>::addEdge(Vertex<T> *d, double w) {
 }
 
 template <class T>
+void Vertex<T>::removeEdge(Vertex<T> *d) {
+	for(unsigned int i = 0; i < this->adj.size(); i++) {
+		if(this->adj.at(i).getDest()->getInfo() == d->getInfo()) {
+			accidentedAdj.push_back(this->adj.at(i));
+			this->adj.erase(this->adj.begin() + i);
+			return;
+		}
+	}
+}
+
+template <class T>
 bool Vertex<T>::operator<(Vertex<T> & vertex) const {
 	return this->dist < vertex.dist;
 }
@@ -212,6 +225,11 @@ bool Vertex<T>::operator<(Vertex<T> & vertex) const {
 template <class T>
 T Vertex<T>::getInfo() const {
 	return this->info;
+}
+
+template <class T>
+vector<Edge<T> > Vertex<T>::getAdj() const {
+	return this->adj;
 }
 
 template <class T>
@@ -233,9 +251,15 @@ class Edge {
 	double weight;         // edge weight
 public:
 	Edge(Vertex<T> *d, double w);
+	Vertex<T> * getDest();
 	friend class Graph<T>;
 	friend class Vertex<T>;
 };
 
 template <class T>
 Edge<T>::Edge(Vertex<T> *d, double w): dest(d), weight(w) {}
+
+template <class T>
+Vertex<T> * Edge<T>::getDest() {
+	return this->dest;
+}

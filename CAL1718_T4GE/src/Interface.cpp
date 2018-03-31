@@ -1,32 +1,7 @@
-#include <iostream>
-#include <cstdio>
-#include "graphviewer.h"
-#include <fstream>
-#include <iostream>
-#include <sstream>
-#include "Graph.h"
-
-//////////////////////
-// Global Variables //
-//////////////////////
+#include "FunctionsPrototypes.h"
 
 GraphViewer *gv { };
 Graph<int> myGraph { };
-
-//////////////////////////
-// Functions Prototypes //
-//////////////////////////
-
-void mainMenu();
-void causeAnAccident();
-void fixAccident();
-void getShortestPath();
-void systemInformation();
-
-vector<int> checkUnreachableNodes();
-vector<int> pathGraphAnimation(vector<int> path);
-void resetGraphState(vector<int> unreachableNodes,vector<int> pathIndex);
-bool validNumberInput(string input, int upperLimit);
 
 void mainMenu() {
 
@@ -63,7 +38,7 @@ void mainMenu() {
 		switch (value)
 		{
 		case 1:
-			causeAnAccident();
+			causeAccident();
 			break;
 		case 2:
 			fixAccident();
@@ -78,33 +53,6 @@ void mainMenu() {
 		system("cls");
 
 	}while(value != 5);
-}
-
-void causeAnAccident() {
-
-	string option;
-	int value {};
-
-	cout << "Cause an accident" << endl << endl;
-
-	while(1) {
-
-		cout << "Select a node: ";
-		cin >> option;
-
-		if(validNumberInput(option,myGraph.getNumVertex())) {
-			value = stoi(option);
-			gv->setVertexColor(value,"red");
-			gv->rearrange();
-			myGraph.removeVertex(value);
-			break;
-		}
-		else
-			cout << "Invalid node (" << option << "). Try again !" << endl << endl;
-	}
-
-	cout << endl;
-	system("pause");
 }
 
 void fixAccident() {
@@ -253,19 +201,19 @@ int main() {
 	myGraph.addVertex(6);	gv->addNode(6,500,100);
 	myGraph.addVertex(7);	gv->addNode(7,500,300);
 
-	myGraph.addEdge(1, 2, 2);	gv->addEdge(1,1,2,EdgeType::DIRECTED);	gv->setEdgeLabel(1, "2");
-	myGraph.addEdge(1, 4, 7);	gv->addEdge(2,1,4,EdgeType::DIRECTED);	gv->setEdgeLabel(2, "7");
-	myGraph.addEdge(2, 4, 3);	gv->addEdge(3,2,4,EdgeType::DIRECTED);	gv->setEdgeLabel(3, "3");
-	myGraph.addEdge(2, 5, 5);	gv->addEdge(4,2,5,EdgeType::DIRECTED);	gv->setEdgeLabel(4, "5");
-	myGraph.addEdge(3, 1, 2);	gv->addEdge(5,3,1,EdgeType::DIRECTED);	gv->setEdgeLabel(5, "2");
-	myGraph.addEdge(3, 6, 5);	gv->addEdge(6,3,6,EdgeType::DIRECTED);	gv->setEdgeLabel(6, "5");
-	myGraph.addEdge(4, 3, 1);	gv->addEdge(7,4,3,EdgeType::DIRECTED);	gv->setEdgeLabel(7, "1");
-	myGraph.addEdge(4, 5, 1);	gv->addEdge(8,4,5,EdgeType::DIRECTED);	gv->setEdgeLabel(8, "1");
-	myGraph.addEdge(4, 6, 6);	gv->addEdge(9,4,6,EdgeType::DIRECTED);	gv->setEdgeLabel(9, "6");
-	myGraph.addEdge(4, 7, 4);	gv->addEdge(10,4,7,EdgeType::DIRECTED);	gv->setEdgeLabel(10, "4");
-	myGraph.addEdge(5, 7, 2);	gv->addEdge(11,5,7,EdgeType::DIRECTED);	gv->setEdgeLabel(11, "2");
-	myGraph.addEdge(6, 4, 3);	gv->addEdge(12,6,4,EdgeType::DIRECTED);	gv->setEdgeLabel(12, "3");
-	myGraph.addEdge(7, 6, 4);	gv->addEdge(13,7,6,EdgeType::DIRECTED);	gv->setEdgeLabel(13, "4");
+	myGraph.addEdge(1, 2, 2);	gv->addEdge(102,1,2,EdgeType::DIRECTED);	gv->setEdgeLabel(1, "2");
+	myGraph.addEdge(1, 4, 7);	gv->addEdge(104,1,4,EdgeType::DIRECTED);	gv->setEdgeLabel(2, "7");
+	myGraph.addEdge(2, 4, 3);	gv->addEdge(204,2,4,EdgeType::DIRECTED);	gv->setEdgeLabel(3, "3");
+	myGraph.addEdge(2, 5, 5);	gv->addEdge(205,2,5,EdgeType::DIRECTED);	gv->setEdgeLabel(4, "5");
+	myGraph.addEdge(3, 1, 2);	gv->addEdge(301,3,1,EdgeType::DIRECTED);	gv->setEdgeLabel(5, "2");
+	myGraph.addEdge(3, 6, 5);	gv->addEdge(306,3,6,EdgeType::DIRECTED);	gv->setEdgeLabel(6, "5");
+	myGraph.addEdge(4, 3, 1);	gv->addEdge(403,4,3,EdgeType::DIRECTED);	gv->setEdgeLabel(7, "1");
+	myGraph.addEdge(4, 5, 1);	gv->addEdge(405,4,5,EdgeType::DIRECTED);	gv->setEdgeLabel(8, "1");
+	myGraph.addEdge(4, 6, 6);	gv->addEdge(406,4,6,EdgeType::DIRECTED);	gv->setEdgeLabel(9, "6");
+	myGraph.addEdge(4, 7, 4);	gv->addEdge(407,4,7,EdgeType::DIRECTED);	gv->setEdgeLabel(10, "4");
+	myGraph.addEdge(5, 7, 2);	gv->addEdge(507,5,7,EdgeType::DIRECTED);	gv->setEdgeLabel(11, "2");
+	myGraph.addEdge(6, 4, 3);	gv->addEdge(604,6,4,EdgeType::DIRECTED);	gv->setEdgeLabel(12, "3");
+	myGraph.addEdge(7, 6, 4);	gv->addEdge(706,7,6,EdgeType::DIRECTED);	gv->setEdgeLabel(13, "4");
 
 	mainMenu();
 	return 0;
