@@ -1,1 +1,29 @@
-/Debug/
+# Project files
+*.cproject
+*.project
+*.settings
+
+# Visual Studio project files
+.vs/
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+*.sln
+
+# Executables
+Debug/
+Release/
+x64/
+x86/
+
+# Standard CAL project libraries
+boost/
+cute/
+
+# Cute generated files
+*.exe.xml
+*.xml
+
+# Exclude CAL Project
+CAL1718_T4GE/
+/.metadata/
