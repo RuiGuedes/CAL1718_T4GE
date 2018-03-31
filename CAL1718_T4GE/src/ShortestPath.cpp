@@ -22,14 +22,20 @@ void getShortestPath() {
 
 		if(validNumberInput(option,myGraph.getNumVertex())) {
 			startingNode = stoi(option);
-			gv->setVertexColor(startingNode,"green");
-			break;
+
+			if(myGraph.findVertex(startingNode) != NULL) {
+				gv->setVertexColor(startingNode,"green");
+				break;
+			}
+			else {
+				cout << "Accidented node (" << option << "). Try again !" << endl << endl;
+			}
 		}
 		else
 			cout << "Invalid node (" << option << "). Try again !" << endl << endl;
 	}
 
-	myGraph.dijkstraShortestPath(1);
+	myGraph.dijkstraShortestPath(startingNode);
 	vector<int> unreachableNodes = checkUnreachableNodes();
 
 	while(1) {
@@ -71,7 +77,6 @@ vector<int> checkUnreachableNodes() {
 			gv->setVertexColor(i,"yellow");
 			unreachableNodes.push_back(i);
 		}
-
 	}
 	gv->rearrange();
 	return unreachableNodes;
