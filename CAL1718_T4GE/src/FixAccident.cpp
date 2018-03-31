@@ -4,11 +4,10 @@
 // Functions Prototypes //
 //////////////////////////
 
-void causeIntersectionAccident();
-void causeRoadAccident();
-void updateSystem(int startingNode, int destinationNode);
+void fixIntersectionAccident();
+void fixRoadAccident();
 
-void causeAccident() {
+void fixAccident() {
 
 	system("cls");
 
@@ -16,7 +15,7 @@ void causeAccident() {
 	int value {};
 
 	do {
-		cout << "Cause accident" << endl << endl;
+		cout << "Fix accident" << endl << endl;
 
 		cout << "1 - Intersection accident" << endl;
 		cout << "2 - Road accident" << endl;
@@ -41,10 +40,10 @@ void causeAccident() {
 		switch (value)
 		{
 		case 1:
-			causeIntersectionAccident();
+			fixIntersectionAccident();
 			break;
 		case 2:
-			causeRoadAccident();
+			fixRoadAccident();
 			break;
 		}
 		if(value != 3) {
@@ -52,18 +51,18 @@ void causeAccident() {
 			cout << endl;
 			system("pause");
 		}
-
 		system("cls");
 
 	}while(value != 3);
 }
 
-void causeIntersectionAccident() {
+void fixIntersectionAccident() {
 
 	string option;
 	int node {};
+	Vertex<int> *origin { };
 
-	cout << "Cause an accident" << endl << endl;
+	cout << "Fix an accident" << endl << endl;
 
 	while(1) {
 
@@ -72,25 +71,24 @@ void causeIntersectionAccident() {
 
 		if(validNumberInput(option,myGraph.getNumVertex())) {
 			node = stoi(option);
-			gv->setVertexColor(node,"red");
+			gv->setVertexColor(node,"blue");
+			myGraph.removeAccidentedVertex(node);
+			origin = myGraph.findVertex(node);
+			origin->removeAccidentedEdges();
 			break;
 		}
 		else
 			cout << "Invalid node (" << option << "). Try again !" << endl << endl;
 	}
 
-	if(myGraph.findVertex(node) == NULL)
-		return;
-
-	for(unsigned int i = 0; i < myGraph.findVertex(node)->getAdj().size(); i++) {
-		updateSystem(node,myGraph.findVertex(node)->getAdj().at(i).getDest()->getInfo());
-		i--;
+	for(unsigned int i = 0; i < origin->getAdj().size(); i++) {
+		int destinationNode = origin->getAdj().at(i).getDest()->getInfo();
+		string edgeID = "" + to_string(node) + "0" + to_string(destinationNode);
+		gv->setEdgeColor(stoi(edgeID),"black");
 	}
-
-	myGraph.removeVertex(node);
 }
 
-void causeRoadAccident() {
+void fixRoadAccident() {
 
 	string option;
 	int startingNode { }, destinationNode { };
@@ -123,21 +121,13 @@ void causeRoadAccident() {
 			cout << "Invalid node (" << option << ") Try again !" << endl << endl;
 	}
 
-	updateSystem(startingNode,destinationNode);
-}
-
-void updateSystem(int startingNode, int destinationNode) {
-	string edgeID = "" + to_string(startingNode) + "0" + to_string(destinationNode);
-
 	Vertex<int> *origin = myGraph.findVertex(startingNode);
-	Vertex<int> *destination = myGraph.findVertex(destinationNode);
 
 	if(origin == NULL)
 		origin = myGraph.findAccidentedVertex(startingNode);
 
-	if(destination == NULL)
-		destination = myGraph.findAccidentedVertex(destinationNode);
+	origin->removeAccidentedEdge(destinationNode);
+	string edgeID = "" + to_string(startingNode) + "0" + to_string(destinationNode);
+	gv->setEdgeColor(stoi(edgeID),"black");
 
-	origin->removeEdge(destination);
-	gv->setEdgeColor(stoi(edgeID),"red");
 }

@@ -19,12 +19,9 @@ extern Graph<int> myGraph;
 
 void mainMenu();
 void causeAccident();
-
 void fixAccident();
+
 void getShortestPath();
 void systemInformation();
 
-vector<int> checkUnreachableNodes();
-vector<int> pathGraphAnimation(vector<int> path);
-void resetGraphState(vector<int> unreachableNodes,vector<int> pathIndex);
 bool validNumberInput(string input, int upperLimit);

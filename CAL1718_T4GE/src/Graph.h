@@ -27,6 +27,7 @@ class Graph {
 	vector<Vertex<T> *> accidentedVertexSet;	// accidented vertex set
 public:
 	Vertex<T> *findVertex(const T &in) const;
+	Vertex<T> *findAccidentedVertex(const T &in) const;
 	bool addVertex(const T &in);
 	void removeVertex(T info);
 	void removeAccidentedVertex(T info);
@@ -84,6 +85,14 @@ void Graph<T>::removeAccidentedVertex(T info) {
 template <class T>
 Vertex<T> * Graph<T>::findVertex(const T &in) const {
 	for (auto v : vertexSet)
+		if (v->info == in)
+			return v;
+	return NULL;
+}
+
+template <class T>
+Vertex<T> * Graph<T>::findAccidentedVertex(const T &in) const {
+	for (auto v : accidentedVertexSet)
 		if (v->info == in)
 			return v;
 	return NULL;
@@ -186,6 +195,8 @@ public:
 	Vertex(T in);
 	bool operator<(Vertex<T> & vertex) const; // // required by MutablePriorityQueue
 	void removeEdge(Vertex<T> *dest);
+	void removeAccidentedEdges();
+	void removeAccidentedEdge(int destinationNode);
 	T getInfo() const;
 	vector<Edge<T> > getAdj() const;
 	double getDist() const;
@@ -212,6 +223,25 @@ void Vertex<T>::removeEdge(Vertex<T> *d) {
 		if(this->adj.at(i).getDest()->getInfo() == d->getInfo()) {
 			accidentedAdj.push_back(this->adj.at(i));
 			this->adj.erase(this->adj.begin() + i);
+			return;
+		}
+	}
+}
+
+template <class T>
+void Vertex<T>::removeAccidentedEdges() {
+	for(unsigned int i = 0; i < accidentedAdj.size(); i++)
+		adj.push_back(accidentedAdj.at(i));
+
+	accidentedAdj.clear();
+}
+
+template <class T>
+void Vertex<T>::removeAccidentedEdge(int destinationNode) {
+	for(unsigned int i = 0; i < accidentedAdj.size(); i++) {
+		if(accidentedAdj.at(i).getDest()->getInfo() == destinationNode) {
+			adj.push_back(accidentedAdj.at(i));
+			accidentedAdj.erase(accidentedAdj.begin() + i);
 			return;
 		}
 	}
