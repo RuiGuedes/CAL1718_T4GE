@@ -1,11 +1,11 @@
-MIN_LATITUDE=41.14026
+Write Latitudes and Longitudes in degrees.
+The density parameter is optional and specifies the nodes'
+density in the map (lower density means nodes are more spread).
 
-MIN_LONGITUDE=-8.616236
-
-MAX_LATITUDE=41.16182
-
-MAX_LONGITUDE=-8.59306
-
-NODES=941
-
-EDGES=992
+MAX_LATITUDE=41.15900;
+MAX_LONGITUDE=-8.59400;
+MIN_LATITUDE=41.14000;
+MIN_LONGITUDE=-8.61500;
+NODES=941;
+EDGES=992;
+DENSITY=0.0001;

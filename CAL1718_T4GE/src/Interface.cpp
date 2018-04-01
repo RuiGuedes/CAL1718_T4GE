@@ -1,4 +1,5 @@
 #include "FunctionsPrototypes.h"
+#include "load_map.h"
 
 GraphViewer *gv { };
 Graph<int> myGraph { };
@@ -69,17 +70,18 @@ void systemInformation() {
 }
 
 int main() {
-
-	gv = new GraphViewer(600, 600, false);
+/*
+	gv = new GraphViewer(4800, 6400, false);
 	gv->createWindow(600, 600);
 	gv->defineVertexColor("blue");
 	gv->defineEdgeColor("black");
+
 
 	myGraph.addVertex(1);	gv->addNode(1,100,300);
 	myGraph.addVertex(2);	gv->addNode(2,100,500);
 	myGraph.addVertex(3);	gv->addNode(3,100,100);
 	myGraph.addVertex(4);	gv->addNode(4,300,300);
-	myGraph.addVertex(5);	gv->addNode(5,500,500);
+	myGraph.addVertex(5);	gv->addNode(5,700,700);
 	myGraph.addVertex(6);	gv->addNode(6,500,100);
 	myGraph.addVertex(7);	gv->addNode(7,500,300);
 
@@ -98,6 +100,14 @@ int main() {
 	myGraph.addEdge(7, 6, 4);	gv->addEdge(706,7,6,EdgeType::DIRECTED);	gv->setEdgeLabel(706, "4");
 
 	mainMenu();
+	return 0;
+*/
+
+	MapMetaData meta;
+	test_load_meta("./resource/gporto_meta.txt", meta);
+	test_load_nodes("./resource/gporto_nodes.txt", meta);
+
+	getchar();
 	return 0;
 }
 
