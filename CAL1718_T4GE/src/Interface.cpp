@@ -70,46 +70,12 @@ void systemInformation() {
 }
 
 int main(int argc, char* argv[]) {
-/*
-	gv = new GraphViewer(4800, 6400, false);
-	gv->createWindow(600, 600);
-	gv->defineVertexColor("blue");
-	gv->defineEdgeColor("black");
+	string which = argc > 1 ? argv[1] : "gporto";
 
-
-	myGraph.addVertex(1);	gv->addNode(1,100,300);
-	myGraph.addVertex(2);	gv->addNode(2,100,500);
-	myGraph.addVertex(3);	gv->addNode(3,100,100);
-	myGraph.addVertex(4);	gv->addNode(4,300,300);
-	myGraph.addVertex(5);	gv->addNode(5,700,700);
-	myGraph.addVertex(6);	gv->addNode(6,500,100);
-	myGraph.addVertex(7);	gv->addNode(7,500,300);
-
-	myGraph.addEdge(1, 2, 2);	gv->addEdge(102,1,2,EdgeType::DIRECTED);	gv->setEdgeLabel(102, "2");
-	myGraph.addEdge(1, 4, 7);	gv->addEdge(104,1,4,EdgeType::DIRECTED);	gv->setEdgeLabel(104, "7");
-	myGraph.addEdge(2, 4, 3);	gv->addEdge(204,2,4,EdgeType::DIRECTED);	gv->setEdgeLabel(204, "3");
-	myGraph.addEdge(2, 5, 5);	gv->addEdge(205,2,5,EdgeType::DIRECTED);	gv->setEdgeLabel(205, "5");
-	myGraph.addEdge(3, 1, 2);	gv->addEdge(301,3,1,EdgeType::DIRECTED);	gv->setEdgeLabel(301, "2");
-	myGraph.addEdge(3, 6, 5);	gv->addEdge(306,3,6,EdgeType::DIRECTED);	gv->setEdgeLabel(306, "5");
-	myGraph.addEdge(4, 3, 1);	gv->addEdge(403,4,3,EdgeType::DIRECTED);	gv->setEdgeLabel(403, "1");
-	myGraph.addEdge(4, 5, 1);	gv->addEdge(405,4,5,EdgeType::DIRECTED);	gv->setEdgeLabel(405, "1");
-	myGraph.addEdge(4, 6, 6);	gv->addEdge(406,4,6,EdgeType::DIRECTED);	gv->setEdgeLabel(406, "6");
-	myGraph.addEdge(4, 7, 4);	gv->addEdge(407,4,7,EdgeType::DIRECTED);	gv->setEdgeLabel(407, "4");
-	myGraph.addEdge(5, 7, 2);	gv->addEdge(507,5,7,EdgeType::DIRECTED);	gv->setEdgeLabel(507, "2");
-	myGraph.addEdge(6, 4, 3);	gv->addEdge(604,6,4,EdgeType::DIRECTED);	gv->setEdgeLabel(604, "3");
-	myGraph.addEdge(7, 6, 4);	gv->addEdge(706,7,6,EdgeType::DIRECTED);	gv->setEdgeLabel(706, "4");
+	int s = load_map("./resource/" + which, gv, myGraph, false);
+	if (s != 0) return -1;
 
 	mainMenu();
-	return 0;
-*/
-
-	string which = argc > 1 ? argv[1] : "newyork";
-	int status;
-
-	status = test_load_map("./resource/" + which);
-	if (status != 0) return -1;
-
-	std::getchar();
 	return 0;
 }
 
@@ -136,4 +102,27 @@ bool validNumberInput(string input, int upperLimit) {
 	catch(...){
 		return false;
 	}
+}
+
+
+int testNewMap(string path) {
+	int status;
+
+	status = test_load_meta("./resource/" + path);
+	if (status != 0) return -1;
+
+	status = test_load_nodes("./resource/" + path);
+	if (status != 0) return -1;
+
+	status = test_load_roads("./resource/" + path);
+	if (status != 0) return -1;
+
+	status = test_load_subroads("./resource/" + path);
+	if (status != 0) return -1;
+
+	status = test_load_map("./resource/" + path);
+	if (status != 0) return -1;
+
+	std::getchar();
+	return 0;
 }

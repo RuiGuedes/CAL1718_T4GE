@@ -46,7 +46,7 @@ static long double to_radians(long double degrees) {
 }
 
 /*
- * For user by MapMetaData
+ * For use by MapMetaData
  * Estimates the map width and height based on map density and the
  * nodes's geographic position.
  * @param meta The MapMetaData struct.
@@ -98,7 +98,7 @@ static void estimate_meta(MapMetaData &meta) {
 }
 
 /*
- * For user by load_map and test functions
+ * For use by load_map and test functions
  * Adds dummy boundary vertices around the map (around 20 per side)
  * @param ...
  */
@@ -144,35 +144,53 @@ static void show_boundaries(MapMetaData &meta, GraphViewer* gv, Graph<int> myGra
 
 
 
+
+/*
+ * @brief Initializes the Graph (only barely).
+ * Reads all information from the collection
+ * of files of format "filename + suffix",
+ * where suffix is meta, nodes, roads, subroads by default...
+ * @param filename The files' indicative name (e.g. gporto for the gporto_*.txt files)
+ * @param gv GraphViewer
+ * @param myGraph Graph
+ * @param boundaries Whether to add dummy boundary vertices around the generated map (defaults to false)
+ * @return Standard Success/Error
+ */
 int load_map(std::string filename, GraphViewer* &gv, Graph<int> &myGraph, bool boundaries) {
 	std::string meta_filename = filename + meta_suffix;
 	std::string nodes_filename = filename + nodes_suffix;
 	std::string roads_filename = filename + roads_suffix;
 	std::string subroads_filename = filename + subroads_suffix;
 
-	// Load the Map's metadata: latitudes, longitudes, number of nodes and edges.
+	// Load the Map's metadata: latitudes, longitudes, number of nodes and edges...
 	MapMetaData meta;
 	load_meta(meta_filename, meta);
 
 	// Initialize the map with appropriate sizes, but do nothing else.
+	// For some reason, creating the Window immediately is necessary...
 	gv = new GraphViewer(meta.width, meta.height, false);
 	gv->createWindow(600, 600);
-	gv->defineVertexColor("blue");
-	gv->defineEdgeColor("black");
 
-	// Load the map's nodes.
+	// Load the map's nodes...
 	// The nodes' filed id is mapped to a new id in nodeIdMap.
 	load_nodes(nodes_filename, meta, gv, myGraph);
 
-	// Load the map's roads.
+	// Load the map's road names...
 	// The roads' id is mapped to a new id in roadIdMap, the name is stored in
 	// roadNameMap and the direction is stored in roadDirectionMap.
 	load_roads(roads_filename, meta, gv, myGraph);
 
-	// Load the map's edges.
+	// Load the map's edges...
 	load_subroads(subroads_filename, meta, gv, myGraph);
 
+	// All good and loaded...
 	if (boundaries) show_boundaries(meta, gv, myGraph);
+
+	// Release auxiliary memory... while preparing for a new invocation later...
+	nodeIdMap.clear();
+	roadIdMap.clear();
+	roadNameMap.clear();
+	roadDirectionMap.clear();
 
 	return 0;
 }
@@ -181,21 +199,27 @@ int load_map(std::string filename, GraphViewer* &gv, Graph<int> &myGraph, bool b
 
 
 
+// ** Meta: attr=val;
+//    attr ?= ?(-?\d+\.?\d*)[.;,]       for long doubles
+//    attr ?= ?(\d+)[.;,]               for ints
+// -> ECMAScript (icase)
+//    [0] : Text Line
+//    [1] : Attribute value
 int load_meta(std::string filename, MapMetaData &meta) {
-	static const std::regex reg_min_lon("min_longitude ?= ?(-?\\d+.?\\d*)[.;,]", std::regex::icase);
-	static const std::regex reg_max_lon("max_longitude ?= ?(-?\\d+.?\\d*)[.;,]", std::regex::icase);
-	static const std::regex reg_min_lat("min_latitude ?= ?(-?\\d+.?\\d*)[.;,]", std::regex::icase);
-	static const std::regex reg_max_lat("max_latitude ?= ?(-?\\d+.?\\d*)[.;,]", std::regex::icase);
+	static const std::regex reg_min_lon("min_longitude ?= ?(-?\\d+\\.?\\d*)[.;,]", std::regex::icase);
+	static const std::regex reg_max_lon("max_longitude ?= ?(-?\\d+\\.?\\d*)[.;,]", std::regex::icase);
+	static const std::regex reg_min_lat("min_latitude ?= ?(-?\\d+\\.?\\d*)[.;,]", std::regex::icase);
+	static const std::regex reg_max_lat("max_latitude ?= ?(-?\\d+\\.?\\d*)[.;,]", std::regex::icase);
 	static const std::regex reg_nodes("nodes ?= ?(\\d+)[.;,]", std::regex::icase);
 	static const std::regex reg_edges("edges ?= ?(\\d+)[.;,]", std::regex::icase);
-	static const std::regex reg_density("density ?= ?(-?\\d+.?\\d*)[.;,]", std::regex::icase);
+	static const std::regex reg_density("density ?= ?(-?\\d+\\.?\\d*)[.;,]", std::regex::icase);
 
 	std::ifstream file(filename);
 	if (!file.is_open()) return -1;
 
 	// Load the entire textfile into text
 	std::string text((std::istreambuf_iterator<char>(file)),
-					std::istreambuf_iterator<char>());
+			std::istreambuf_iterator<char>());
 	file.close();
 
 	std::smatch match;
@@ -242,9 +266,9 @@ int load_meta(std::string filename, MapMetaData &meta) {
 
 
 
-// **
 // ** Node: node_id;lat_deg;long_deg;long_rad;lat_rad
 //    ^(\d+);(-?\d+.?\d*);(-?\d+.?\d*);(?:-?\d+.?\d*);(?:-?\d+.?\d*);?$
+//     ( 1 ) (    2     ) (    3     ) (?:    4     ) (?:    5     )
 // -> ECMAScript
 //    [0] : Text Line
 //    [1] : Node id (long long)
@@ -299,8 +323,9 @@ int load_nodes(std::string filename, MapMetaData &meta, GraphViewer* &gv, Graph<
 
 // ** Roads: road_id;road_name;two_way
 //    ^(\d+);((?:[-0-9a-zA-ZÀ-ÿ,\.]| )*);(False|True);?$
+//     ( 1 ) (            2            ) (    3     )
 // -> ECMAScript (icase)
-// Nota: A rua pode não ter nome...
+// Nota: A rua pode não ter nome!...
 //    [0] : Text Line
 //    [1] : Road id (long long)
 //    [2] : Road name (string)
@@ -351,6 +376,7 @@ int load_roads(std::string filename, MapMetaData &meta, GraphViewer* &gv, Graph<
 
 // ** Subroads: road_id;node1_id;node2_id;
 //    ^(\d+);(\d+);(\d+);?$
+//     ( 1 ) ( 2 ) ( 3 )
 // -> ECMAScript
 //    [0] : Text Line
 //    [1] : Road id
@@ -385,7 +411,6 @@ int load_subroads(std::string filename, MapMetaData &meta, GraphViewer* &gv, Gra
 			int node2id = nodeIdMap[id];
 
 			// Register Edges
-			std::cout << roadid << " ; " << node1id << " ; " << node2id << std::endl;
 			myGraph.addEdge(node1id, node2id, 0);
 			gv->addEdge(subroadid, node1id, node2id, EdgeType::UNDIRECTED);
 			if (roadDirectionMap[roadid]) {
@@ -410,34 +435,6 @@ int load_subroads(std::string filename, MapMetaData &meta, GraphViewer* &gv, Gra
 
 
 
-
-
-
-
-
-
-
-
-
-int test_load_map(std::string path) {
-	try {
-		// *** Setup
-		GraphViewer* gv;
-		Graph<int> myGraph;
-
-		// *** Call
-		load_map(path, gv, myGraph, true);
-
-		// *** Call
-		std::getchar();
-		gv->closeWindow();
-		delete gv;
-		return 0;
-	} catch (std::exception &e) {
-		std::cout << "Load Meta Failed\n" << e.what() << std::endl;
-		return -1;
-	}
-}
 
 
 
@@ -593,3 +590,25 @@ int test_load_subroads(std::string path) {
 }
 
 
+
+
+
+int test_load_map(std::string path) {
+	try {
+		// *** Setup
+		GraphViewer* gv;
+		Graph<int> myGraph;
+
+		// *** Call
+		load_map(path, gv, myGraph, true);
+
+		// *** Call
+		std::getchar();
+		gv->closeWindow();
+		delete gv;
+		return 0;
+	} catch (std::exception &e) {
+		std::cout << "Load Meta Failed\n" << e.what() << std::endl;
+		return -1;
+	}
+}
