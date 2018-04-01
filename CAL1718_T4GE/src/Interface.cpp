@@ -69,7 +69,7 @@ void systemInformation() {
 	system("pause");
 }
 
-int main() {
+int main(int argc, char* argv[]) {
 /*
 	gv = new GraphViewer(4800, 6400, false);
 	gv->createWindow(600, 600);
@@ -103,11 +103,13 @@ int main() {
 	return 0;
 */
 
-	MapMetaData meta;
-	test_load_meta("./resource/gporto_meta.txt", meta);
-	test_load_nodes("./resource/gporto_nodes.txt", meta);
+	string which = argc > 1 ? argv[1] : "newyork";
+	int status;
 
-	getchar();
+	status = test_load_map("./resource/" + which);
+	if (status != 0) return -1;
+
+	std::getchar();
 	return 0;
 }
 

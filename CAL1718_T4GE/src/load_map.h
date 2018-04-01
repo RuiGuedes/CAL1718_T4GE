@@ -15,7 +15,7 @@ struct MapMetaData {
 	long double density = default_density;
 };
 
-int load_map(std::string filename, MapMetaData &meta, GraphViewer* &gv, Graph<int> &myGraph);
+int load_map(std::string filename, GraphViewer* &gv, Graph<int> &myGraph, bool boundaries = false);
 
 int load_meta(std::string filename, MapMetaData &meta);
 
@@ -25,15 +25,15 @@ int load_roads(std::string filename, MapMetaData &meta, GraphViewer* &gv, Graph<
 
 int load_subroads(std::string filename, MapMetaData &meta, GraphViewer* &gv, Graph<int> &myGraph);
 
-void test_load_map(std::string path);
+int test_load_map(std::string path);
 
-void test_load_meta(std::string path, MapMetaData &meta);
+int test_load_meta(std::string path);
 
-void test_load_nodes(std::string path, MapMetaData &meta);
+int test_load_nodes(std::string path);
 
-void test_load_roads(std::string path, MapMetaData &meta);
+int test_load_roads(std::string path);
 
-void test_load_subroads(std::string path, MapMetaData &meta);
+int test_load_subroads(std::string path);
 
 
 #endif /* SRC_LOAD_MAP_H_ */
