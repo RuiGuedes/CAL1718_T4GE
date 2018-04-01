@@ -61,7 +61,7 @@ void GraphViewer::initialize(int width, int height, bool dynamic, int port_n) {
 		      &si,            // Pointer to STARTUPINFO structure
 		      &pi )           // Pointer to PROCESS_INFORMATION structure
       ) {
-    printf( "CreateProcess failed (%d).\n", GetLastError() );
+    printf( "CreateProcess failed (%ld).\n", GetLastError() );
     return;
   }
  

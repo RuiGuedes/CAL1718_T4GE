@@ -7,6 +7,7 @@
 vector<int> checkUnreachableNodes();
 vector<int> pathGraphAnimation(vector<int> path);
 void resetGraphState(vector<int> unreachableNodes,vector<int> pathIndex);
+void printTimeSpent(double time);
 
 void getShortestPath() {
 
@@ -61,7 +62,7 @@ void getShortestPath() {
 
 	vector<int> pathIndex = pathGraphAnimation(myGraph.getPath(startingNode,destinationNode));
 
-	cout << endl;
+	printTimeSpent((myGraph.findVertex(destinationNode)->getDist()));
 	system("pause");
 
 	resetGraphState(unreachableNodes,pathIndex);
@@ -102,5 +103,20 @@ void resetGraphState(vector<int> unreachableNodes,vector<int> pathIndex) {
 		gv->setVertexColor(pathIndex.at(i),"blue");
 
 	gv->rearrange();
+}
+
+void printTimeSpent(double time) {
+	double minutes = ((int)time)/60.0;
+	int hours = minutes/60.0;
+
+	cout << endl << "Time spent: ";
+
+	if(hours != 0)
+		cout << int(hours) << " hour(s) " << int(minutes%60) << " minute(s) and " << int(time%60) << " seconds" << endl << endl;
+	else if(minutes != 0)
+		cout << int(minutes%60) << " minute(s) and " << int(time%60) << " seconds" << endl << endl;
+	else
+		cout << int(time%60) << " seconds" << endl << endl;
+
 }
 

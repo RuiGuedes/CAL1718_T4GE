@@ -10,6 +10,7 @@
 #include <cmath>
 #include <algorithm>
 #include "MutablePriorityQueue.h"
+#include "Road.h"
 
 using namespace std;
 
@@ -31,7 +32,7 @@ public:
 	bool addVertex(const T &in);
 	void removeVertex(T info);
 	void removeAccidentedVertex(T info);
-	bool addEdge(const T &sourc, const T &dest, double w);
+	bool addEdge(const T &sourc, const T &dest, Road * road);
 	int getNumVertex() const;
 	vector<Vertex<T> *> getVertexSet() const;
 
@@ -112,16 +113,16 @@ bool Graph<T>::addVertex(const T &in) {
 
 /*
  * Adds an edge to a graph (this), given the contents of the source and
- * destination vertices and the edge weight (w).
+ * destination vertices and the edge road (road).
  * Returns true if successful, and false if the source or destination vertex does not exist.
  */
 template <class T>
-bool Graph<T>::addEdge(const T &sourc, const T &dest, double w) {
+bool Graph<T>::addEdge(const T &sourc, const T &dest, Road * road) {
 	auto v1 = findVertex(sourc);
 	auto v2 = findVertex(dest);
 	if (v1 == NULL || v2 == NULL)
 		return false;
-	v1->addEdge(v2,w);
+	v1->addEdge(v2,road);
 	return true;
 }
 
@@ -147,10 +148,10 @@ void Graph<T>::dijkstraShortestPath(const T &origin) {
 		Vertex<T> *v = q.extractMin();
 
 		for(auto w : v->adj) {
-			if(w.dest->dist > v->dist + w.weight) {
+			if(w.dest->dist > v->dist + w.road->getWeight()) {
 				double oldDist = w.dest->dist;
 
-				w.dest->dist = v->dist + w.weight;
+				w.dest->dist = v->dist + w.road->getWeight();
 				w.dest->path = v;
 
 				if(oldDist == INF)
@@ -190,7 +191,7 @@ class Vertex {
 	int queueIndex = 0; 		// required by MutablePriorityQueue
 
 	bool processing = false;
-	void addEdge(Vertex<T> *dest, double w);
+	void addEdge(Vertex<T> *dest, Road * road);
 public:
 	Vertex(T in);
 	bool operator<(Vertex<T> & vertex) const; // // required by MutablePriorityQueue
@@ -201,6 +202,7 @@ public:
 	vector<Edge<T> > getAdj() const;
 	double getDist() const;
 	Vertex *getPath() const;
+	Edge<T> & getEdge(Vertex<T> * destination);
 	friend class Graph<T>;
 	friend class MutablePriorityQueue<Vertex<T>>;
 };
@@ -210,11 +212,11 @@ Vertex<T>::Vertex(T in): info(in) {}
 
 /*
  * Auxiliary function to add an outgoing edge to a vertex (this),
- * with a given destination vertex (d) and edge weight (w).
+ * with a given destination vertex (d) and edge road (road).
  */
 template <class T>
-void Vertex<T>::addEdge(Vertex<T> *d, double w) {
-	adj.push_back(Edge<T>(d, w));
+void Vertex<T>::addEdge(Vertex<T> *d, Road * road) {
+	adj.push_back(Edge<T>(d, road));
 }
 
 template <class T>
@@ -258,6 +260,23 @@ T Vertex<T>::getInfo() const {
 }
 
 template <class T>
+Edge<T> & Vertex<T>::getEdge(Vertex<T> * destination) {
+	for(unsigned int i = 0; i < adj.size(); i++) {
+		if(adj.at(i).dest == destination)
+			return adj.at(i);
+	}
+
+	int index { -1 };
+	for(unsigned int i = 0; i < accidentedAdj.size(); i++) {
+		if(accidentedAdj.at(i).dest == destination){
+			index = i;
+			break;
+		}
+	}
+	return accidentedAdj.at(index);
+}
+
+template <class T>
 vector<Edge<T> > Vertex<T>::getAdj() const {
 	return this->adj;
 }
@@ -279,17 +298,27 @@ template <class T>
 class Edge {
 	Vertex<T> * dest;      // destination vertex
 	double weight;         // edge weight
+	Road * road;
 public:
-	Edge(Vertex<T> *d, double w);
-	Vertex<T> * getDest();
+	Edge(Vertex<T> *d, Road * w);
+
+	Vertex<T> * getDest() const;
+	Road * getRoad() const;
 	friend class Graph<T>;
 	friend class Vertex<T>;
 };
 
 template <class T>
-Edge<T>::Edge(Vertex<T> *d, double w): dest(d), weight(w) {}
+Edge<T>::Edge(Vertex<T> *d, Road * w) :
+dest(d), weight { std::numeric_limits<double>::max() }, road(w) {
+}
 
 template <class T>
-Vertex<T> * Edge<T>::getDest() {
+Vertex<T> * Edge<T>::getDest() const {
 	return this->dest;
+}
+
+template <class T>
+Road * Edge<T>::getRoad() const {
+	return this->road;
 }

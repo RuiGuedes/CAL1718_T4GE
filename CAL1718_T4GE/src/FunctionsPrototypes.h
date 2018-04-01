@@ -2,9 +2,11 @@
 #include <cstdio>
 #include "graphviewer.h"
 #include <fstream>
+#include <iterator>
 #include <iostream>
 #include <sstream>
 #include "Graph.h"
+
 
 //////////////////////
 // Global Variables //
@@ -20,7 +22,7 @@ extern Graph<int> myGraph;
 void mainMenu();
 void causeAccident();
 void fixAccident();
-
+void editRoadInfo();
 void getShortestPath();
 void systemInformation();
 
