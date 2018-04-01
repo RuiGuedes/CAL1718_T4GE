@@ -20,8 +20,8 @@ static std::map<int, bool> roadDirectionMap; // true means bidirectional
  */
 static int getX(long double longitude, MapMetaData &meta) {
 	// X grows from left to right
-	return std::floor(meta.width * (longitude - meta.min_longitude)
-			/ (meta.max_longitude - meta.min_longitude));
+	return std::floor(meta.width * ((longitude - meta.min_longitude)
+			/ (meta.max_longitude - meta.min_longitude)));
 }
 
 /*
@@ -31,8 +31,8 @@ static int getX(long double longitude, MapMetaData &meta) {
  */
 static int getY(long double latitude, MapMetaData &meta) {
 	// Y grows from top to bottom
-	return std::floor(meta.height * (meta.max_latitude - latitude)
-			/ (meta.max_latitude - meta.min_latitude));
+	return std::floor(meta.height * ((meta.max_latitude - latitude)
+			/ (meta.max_latitude - meta.min_latitude)));
 }
 
 /*
