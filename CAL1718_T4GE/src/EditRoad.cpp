@@ -8,6 +8,7 @@ void editRoadInformationInterface(Edge<int> edge);
 void addCars(Edge<int> edge);
 void removeCars(Edge<int> edge);
 void printEdgeInfo(Edge<int> edge);
+bool checkDestinationNode(Vertex<int> * origin,Vertex<int> * destination);
 
 //////////////////////
 // Global Variables //
@@ -21,6 +22,8 @@ void editRoadInfo() {
 	system("cls");
 
 	string option;
+	Vertex<int> *origin { };
+	Vertex<int> *destination { };
 
 	cout << "Edit road information " << endl << endl;
 
@@ -31,6 +34,9 @@ void editRoadInfo() {
 
 		if(validNumberInput(option,myGraph.getNumVertex())) {
 			startingNode = stoi(option);
+			origin = myGraph.findVertex(startingNode);
+			if(origin == NULL)
+				origin = myGraph.findAccidentedVertex(startingNode);
 			break;
 		}
 		else
@@ -44,20 +50,22 @@ void editRoadInfo() {
 
 		if(validNumberInput(option,myGraph.getNumVertex())) {
 			destinationNode = stoi(option);
-			break;
+			destination = myGraph.findVertex(destinationNode);
+			if(destination == NULL)
+				destination = myGraph.findAccidentedVertex(destinationNode);
+			if(checkDestinationNode(origin,destination))
+				break;
+			else
+				cout << "Invalid node (" << option << ") Try again !" << endl;
+
 		}
 		else
-			cout << "Invalid node (" << option << ") Try again !" << endl << endl;
+			cout << "Invalid node (" << option << ") Try again !" << endl;
 	}
 
-	Vertex<int> * origin = myGraph.findVertex(startingNode);
-	Vertex<int> * destination = myGraph.findVertex(destinationNode);
-
-	if(origin == NULL)
-		origin = myGraph.findAccidentedVertex(startingNode);
-
 	if(destination == NULL)
-		destination =myGraph.findAccidentedVertex(destinationNode);
+		destination = myGraph.findAccidentedVertex(destinationNode);
+
 
 	Edge<int> edge = origin->getEdge(destination);
 
@@ -100,7 +108,10 @@ void editRoadInformationInterface(Edge<int> edge) {
 			addCars(edge);
 			break;
 		case 2:
-			removeCars(edge);
+			if(edge.getRoad()->getActualCapacity() == 0)
+				cout << "There are no cars to be removed" << endl;
+			else
+				removeCars(edge);
 			break;
 		}
 		if(value != 3) {
@@ -188,4 +199,18 @@ void printEdgeInfo(Edge<int> edge) {
 	cout << "Distance -> " << edge.getRoad()->getDistance() << " meters"<< endl;
 	cout << "Amount of cars -> " << edge.getRoad()->getActualCapacity() << " cars" << endl;
 	cout << "Maximum capacity -> " << edge.getRoad()->getMaxCapacity() << " cars" << endl << endl;
+}
+
+bool checkDestinationNode(Vertex<int> * origin,Vertex<int> * destination) {
+	for(unsigned int i = 0; i < origin->getAdj().size(); i++) {
+		if(origin->getAdj().at(i).getDest() == destination)
+			return true;
+	}
+
+	for(unsigned int i = 0; i < origin->getAccidentedAdj().size(); i++) {
+		if(origin->getAccidentedAdj().at(i).getDest() == destination)
+			return true;
+	}
+
+	return false;
 }

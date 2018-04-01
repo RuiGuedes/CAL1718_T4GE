@@ -200,6 +200,7 @@ public:
 	void removeAccidentedEdge(int destinationNode);
 	T getInfo() const;
 	vector<Edge<T> > getAdj() const;
+	vector<Edge<T> > getAccidentedAdj() const;
 	double getDist() const;
 	Vertex *getPath() const;
 	Edge<T> & getEdge(Vertex<T> * destination);
@@ -279,6 +280,11 @@ Edge<T> & Vertex<T>::getEdge(Vertex<T> * destination) {
 template <class T>
 vector<Edge<T> > Vertex<T>::getAdj() const {
 	return this->adj;
+}
+
+template <class T>
+vector<Edge<T> > Vertex<T>::getAccidentedAdj() const {
+	return this->accidentedAdj;
 }
 
 template <class T>
