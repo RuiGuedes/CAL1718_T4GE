@@ -1,0 +1,39 @@
+# Project files
+*.cproject
+*.project
+*.settings
+
+# Visual Studio project files
+.vs/
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+*.sln
+
+# Executables
+Debug/
+Release/
+x64/
+x86/
+*.exe
+
+# Standard CAL project libraries
+boost/
+cute/
+
+# Cute generated files
+*.exe.xml
+*.xml
+
+# Exclude CAL Project
+/.metadata/
+
+# Open Street Maps
+*.osm
+
+# TeX Files
+*.aux
+*.log
+*.out
+*.synctex.gz
+*.toc
