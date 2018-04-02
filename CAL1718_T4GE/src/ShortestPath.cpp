@@ -37,31 +37,37 @@ void getShortestPath() {
 
 	myGraph.dijkstraShortestPath(startingNode);
 	vector<int> unreachableNodes = checkUnreachableNodes();
+	vector<int> pathIndex;
 
-	while(1) {
+	if((unreachableNodes.size() + myGraph.getAccidentedVertexSet().size()) >= (unsigned int)(myGraph.getNumVertex() - 1))
+		cout << "There are no reachable nodes at the moment. " << endl << endl;
+	else {
 
-		cout << "Select destination node: ";
-		cin >> option;
+		while(1) {
 
-		if(validNumberInput(option,myGraph.getNumVertex())) {
-			destinationNode = stoi(option);
+			cout << "Select destination node: ";
+			cin >> option;
 
-			if(myGraph.findVertex(destinationNode) == NULL)
-				cout << "Accidented node (" << option << ") Try again !" << endl << endl;
-			else if(myGraph.findVertex(destinationNode)->getDist() == INF)
-				cout << "Unreachable node (" << option << ") Try again !" << endl << endl;
-			else if(startingNode == destinationNode)
-				cout << "Same node as the one chosen to be the starting point. Try again !" << endl << endl;
+			if(validNumberInput(option,myGraph.getNumVertex())) {
+				destinationNode = stoi(option);
+
+				if(myGraph.findVertex(destinationNode) == NULL)
+					cout << "Accidented node (" << option << ") Try again !" << endl << endl;
+				else if(myGraph.findVertex(destinationNode)->getDist() == INF)
+					cout << "Unreachable node (" << option << ") Try again !" << endl << endl;
+				else if(startingNode == destinationNode)
+					cout << "Same node as the one chosen to be the starting point. Try again !" << endl << endl;
+				else
+					break;
+			}
 			else
-				break;
+				cout << "Invalid node (" << option << ") Try again !" << endl << endl;
 		}
-		else
-			cout << "Invalid node (" << option << ") Try again !" << endl << endl;
+
+		pathIndex = pathGraphAnimation(myGraph.getPath(startingNode,destinationNode));
+		cout << endl << "Time spent: " << myGraph.findVertex(destinationNode)->getDist() << " seconds" << endl << endl;
 	}
 
-	vector<int> pathIndex = pathGraphAnimation(myGraph.getPath(startingNode,destinationNode));
-
-	cout << endl << "Time spent: " << myGraph.findVertex(destinationNode)->getDist() << " seconds" << endl << endl;
 	system("pause");
 
 	resetGraphState(unreachableNodes,pathIndex);

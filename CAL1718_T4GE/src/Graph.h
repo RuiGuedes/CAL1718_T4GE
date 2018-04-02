@@ -35,6 +35,7 @@ public:
 	bool addEdge(const T &sourc, const T &dest, Road * road);
 	int getNumVertex() const;
 	vector<Vertex<T> *> getVertexSet() const;
+	vector<Vertex<T> *> getAccidentedVertexSet() const;
 
 	void dijkstraShortestPath(const T &s);
 	void dijkstraShortestPathOld(const T &s);
@@ -50,6 +51,11 @@ int Graph<T>::getNumVertex() const {
 template <class T>
 vector<Vertex<T> *> Graph<T>::getVertexSet() const {
 	return vertexSet;
+}
+
+template <class T>
+vector<Vertex<T> *> Graph<T>::getAccidentedVertexSet() const {
+	return accidentedVertexSet;
 }
 
 template <class T>
