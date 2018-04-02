@@ -9,6 +9,7 @@
 #include <limits>
 #include <cmath>
 #include <algorithm>
+#include "Graphviewer.h"
 #include "MutablePriorityQueue.h"
 #include "Road.h"
 
