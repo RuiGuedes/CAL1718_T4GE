@@ -1,6 +1,6 @@
 #include <iostream>
 #include <cstdio>
-#include "graphviewer.h"
+#include "Graphviewer.h"
 #include <fstream>
 #include <iterator>
 #include <iostream>

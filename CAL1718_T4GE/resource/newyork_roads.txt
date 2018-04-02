@@ -1,0 +1,329 @@
+5669002;West 61st Street;False
+5669004;West 61st Street;False
+5669664;West 58th Street;False
+5669841;East 70th Street;False
+5669879;East 63rd Street;False
+5670029;East 64th Street;False
+5670034;East 68th Street;False
+5670139;East 57th Street;False
+5670221;East Drive;False
+5670253;Central Park South;True
+5670348;Central Park West;False
+5670458;East 61st Street;False
+5670572;East 67th Street;False
+5670818;East 74th Street;False
+5670873;Grand Army Plaza;False
+5670874;Grand Army Plaza;False
+5670938;West 59th Street;False
+5671056;Amsterdam Avenue;False
+5671115;West 48th Street;False
+5671129;East 56th Street;False
+5671276;9th Avenue;False
+5671288;Center Drive;False
+5671475;East 66th Street;False
+5671574;East 59th Street;False
+5671691;West 60th Street;False
+5671709;West 53rd Street;False
+5672290;Doris C. Freedman Place;False
+5672399;West 62nd Street;False
+5672629;East 60th Street;False
+5672752;West 57th Street;True
+5672760;East 65th Street;False
+5672769;East 69th Street;False
+5672951;East 58th Street;False
+5672954;East 54th Street;False
+5673018;West 63rd Street;False
+5673114;65th Street Transverse;False
+5673117;65th Street Transverse;False
+5673461;East 62nd Street;False
+22898530;Broadway;False
+22946821;65th Street Transverse;False
+22946829;West Drive;False
+22946967;7th Avenue;False
+31311315;Center Drive;False
+31311316;East Drive;False
+32947289;Ed Koch Queensboro Bridge Lower Level;False
+32947292;;False
+32947293;;False
+32947295;Ed Koch Queensboro Bridge Lower Level;False
+32947297;;False
+32947509;Queensboro Bridge Outer Roadway;False
+32947517;;False
+32947558;;False
+36185329;65th Street Transverse;False
+36185330;65th Street Transverse;False
+36185331;65th Street Transverse;False
+36185332;65th Street Transverse;False
+36185336;East Drive;False
+36185337;East Drive;False
+44225601;West Drive;False
+46211828;East 62nd Street;False
+46211829;East 60th Street;False
+46240204;Park Avenue;False
+46334594;East 60th Street;False
+46372158;Ed Koch Queensboro Bridge Path;False
+46419221;;False
+46419222;;False
+46419223;Ed Koch Queensboro Bridge Path;False
+46420287;Ed Koch Queensboro Bridge Exit;False
+46443656;West 49th Street;False
+46482602;West 46th Street;False
+46521993;West 54th Street;False
+46521995;East 60th Street;False
+46522160;East 63rd Street;False
+46525011;West 61st Street;False
+46525065;West 58th Street;False
+46538335;West 51st Street;False
+46538371;West 53rd Street;False
+46538375;West 52nd Street;False
+46538429;West 59th Street;False
+46579577;Central Park West;False
+46579578;West 60th Street;False
+46579579;West 62nd Street;False
+46583189;Grand Army Plaza;False
+46613709;East Drive;False
+46613710;East Drive;False
+46613711;65th Street Transverse;False
+46613712;Center Drive;False
+46613713;Center Drive;False
+46694753;East 72nd Street;False
+46694760;East 73rd Street;False
+47795999;Central Park West;False
+68674962;Park Avenue;False
+91383966;Broadway;False
+108200127;;False
+108200128;;False
+125480074;8th Avenue;False
+128578946;Center Drive;False
+128578947;65th Street Transverse;False
+128578950;65th Street Transverse;False
+164184349;;False
+164632299;;False
+164632300;;False
+166030811;;False
+166030812;;False
+167922074;West 48th Street;False
+167922075;Central Park South;False
+169381965;1st Avenue;False
+171574337;Columbus Circle;False
+186202420;Central Park South;False
+194920158;West 50th Street;False
+194926851;8th Avenue;False
+195743152;Central Park South;True
+195743166;East 65th Street;False
+195743167;East 68th Street;False
+195743180;Madison Avenue;False
+195743183;Madison Avenue;False
+195743185;Madison Avenue;False
+195743211;West 54th Street;False
+195743297;10th Avenue;False
+195743301;10th Avenue;False
+195743335;5th Avenue;False
+195743336;5th Avenue;False
+195743339;5th Avenue;False
+195743342;5th Avenue;False
+196116975;Broadway;False
+196116976;Broadway;False
+196116980;Broadway;False
+196116988;Central Park South;False
+196116998;East 65th Street;False
+196117001;East 65th Street;False
+196117083;West 57th Street;True
+196117084;West 57th Street;True
+196117085;West 63rd Street;False
+196117089;3rd Avenue;False
+196117092;8th Avenue;False
+198595460;East 61st Street;False
+198595461;East 61st Street;False
+198595470;Ed Koch Queensboro Bridge Lower Level;False
+198595507;Queensboro Bridge lower level;False
+198595548;2nd Avenue;False
+198595549;2nd Avenue;False
+198924551;East 59th Street;False
+198924552;East 59th Street;False
+198924587;Madison Avenue;False
+198924630;;False
+198924727;2nd Avenue;False
+198924778;5th Avenue;False
+211731500;East Drive;False
+211731501;East Drive;False
+226015265;1st Avenue;False
+226041012;East 55th Street;False
+226041013;East 55th Street;False
+226041028;West 48th Street;False
+226041030;West 51st Street;False
+226041031;West 51st Street;False
+226041032;West 54th Street;False
+226041033;West 54th Street;False
+264546995;1st Avenue;False
+265356028;West 56th Street;False
+308322446;West 58th Street;False
+308322447;West 58th Street;False
+308322448;Broadway;False
+318474882;65th Street Transverse;False
+318476060;Central Park Drive;False
+318476063;West Drive;False
+319793821;Jaffe Drive (Lincoln Center Drop-Off);False
+319793822;Jaffe Drive (Lincoln Center Drop-Off);False
+320584278;East 71st Street;False
+321166656;;False
+324118553;West 54th Street;False
+324118554;West 54th Street;False
+324118555;West 54th Street;False
+324118556;West 54th Street;False
+324118557;West 54th Street;False
+324118558;West 54th Street;False
+330157985;;False
+330157986;;False
+330177562;;False
+330748464;West Drive;False
+330748465;West Drive;False
+346613530;West 65th Street;False
+358290454;2nd Avenue;False
+375163661;East 60th Street;False
+375164210;;False
+375165500;East 58th Street;False
+375165501;3rd Avenue;False
+375165664;3rd Avenue;False
+375165665;East 57th Street;False
+375165666;3rd Avenue;False
+382740985;7th Avenue;False
+385446610;West Drive;False
+385446617;West Drive;False
+386465168;Central Park Drive;False
+387128267;Lexington Avenue;False
+388696206;East 57th Street;False
+388696207;Madison Avenue;False
+419922376;;False
+420276995;Broadway;False
+420276996;West 62nd Street;False
+420281338;East 53rd Street;False
+420281339;Madison Avenue;False
+420357249;East 60th Street;False
+420496091;Lexington Avenue;False
+420806145;3rd Avenue;False
+420890022;8th Avenue;False
+420890023;8th Avenue;False
+420890024;8th Avenue;False
+420890025;8th Avenue;False
+420890026;8th Avenue;False
+420890027;8th Avenue;False
+420890028;8th Avenue;False
+420890029;8th Avenue;False
+420892262;9th Avenue;False
+420892263;9th Avenue;False
+420892264;9th Avenue;False
+420892265;9th Avenue;False
+420892266;9th Avenue;False
+420892267;9th Avenue;False
+420892268;9th Avenue;False
+420892269;9th Avenue;False
+420892270;9th Avenue;False
+420892271;9th Avenue;False
+420892272;9th Avenue;False
+420892273;9th Avenue;False
+420892274;9th Avenue;False
+420892275;9th Avenue;False
+420897874;Central Park West;False
+420899371;Central Park South;True
+420899372;Central Park South;True
+420899373;Central Park South;True
+420905128;West 53rd Street;False
+420905129;West 53rd Street;False
+420905130;West 53rd Street;False
+420906745;Madison Avenue;False
+420906750;Madison Avenue;False
+420906752;Madison Avenue;False
+420907903;8th Avenue;False
+420907906;8th Avenue;False
+420908137;West 50th Street;False
+420908138;West 50th Street;False
+421850829;Madison Avenue;False
+421850830;Madison Avenue;False
+421851202;East 59th Street;True
+422298615;5th Avenue;False
+425335557;West 60th Street;False
+439801901;Columbus Circle;False
+439801902;Columbus Circle;False
+439801903;Columbus Circle;False
+439933933;8th Avenue;False
+452322366;West 64th Street;False
+452322756;West 47th Street;False
+455678353;East 59th Street;False
+458180191;5th Avenue;False
+458180196;Madison Avenue;False
+458180197;5th Avenue;False
+458180198;East 60th Street;False
+458180199;Madison Avenue;False
+458180200;Lexington Avenue;False
+458452178;;True
+458642436;;True
+458672836;;True
+460065820;Columbus Circle;False
+460065821;Columbus Circle;False
+460065822;Columbus Circle;False
+460067515;Columbus Avenue;False
+460585328;10th Avenue;False
+461593095;2nd Avenue;False
+461593096;2nd Avenue;False
+464516471;6th Avenue;False
+465000799;3rd Avenue;False
+477823038;;False
+496986969;West 57th Street;True
+496986970;7th Avenue;False
+496989355;7th Avenue;False
+497165753;Park Avenue;False
+497165754;East 57th Street;False
+497165756;Park Avenue;False
+497165757;East 57th Street;False
+497251085;East 62nd Street;False
+497251086;3rd Avenue;False
+497258108;6th Avenue;False
+497258109;West 57th Street;True
+499172074;West 55th Street;False
+505582406;West 57th Street;True
+505778913;East 57th Street;True
+528748997;East 56th Street;False
+534878087;East 59th Street;False
+534878088;East 59th Street;False
+539018144;Ed Koch Queensboro Bridge Lower Level;False
+541331485;East 54th Street;False
+541331773;East 71st Street;False
+541350711;6th Avenue;False
+542258337;West 49th Street;False
+542371971;West 61st Street;False
+543905773;East 68th Street;False
+544616716;;False
+544616717;;False
+555303393;;False
+557138784;;False
+557139276;;False
+557142127;;False
+557391521;;False
+566857135;West Drive;False
+569345468;East 59th Street;False
+569345474;Lexington Avenue;False
+569345480;Lexington Avenue;False
+569345486;Lexington Avenue;False
+569345499;East 58th Street;False
+569345502;Lexington Avenue;False
+569345536;West 51st Street;False
+569345537;6th Avenue;False
+569345538;West 51st Street;False
+569345539;West 51st Street;False
+569345540;7th Avenue;False
+569345541;West 51st Street;False
+570152305;;False
+570152306;;False
+570153853;;False
+570153854;;False
+570153860;;False
+570154519;;False
+570154520;;False
+570154521;;False
+570155060;;False
+570155061;;False
+570158316;;False
+573228988;Park Avenue;False
+573228989;Park Avenue;False
+573229550;7th Avenue;False

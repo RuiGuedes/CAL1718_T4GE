@@ -12,6 +12,9 @@
 #include <netdb.h>
 #else
 #include <winsock2.h>
+#ifndef NO_ERROR
+#define NO_ERROR 0
+#endif
 #endif
 
 #include <string>

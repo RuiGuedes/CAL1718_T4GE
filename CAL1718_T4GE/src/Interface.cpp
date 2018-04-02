@@ -1,4 +1,5 @@
 #include "FunctionsPrototypes.h"
+#include "load_map.h"
 
 GraphViewer *gv { };
 Graph<int> myGraph { };
@@ -128,4 +129,27 @@ bool validNumberInput(string input, int upperLimit) {
 	catch(...){
 		return false;
 	}
+}
+
+
+int testNewMap(string path) {
+	int status;
+
+	status = test_load_meta("./resource/" + path);
+	if (status != 0) return -1;
+
+	status = test_load_nodes("./resource/" + path);
+	if (status != 0) return -1;
+
+	status = test_load_roads("./resource/" + path);
+	if (status != 0) return -1;
+
+	status = test_load_subroads("./resource/" + path);
+	if (status != 0) return -1;
+
+	status = test_load_map("./resource/" + path);
+	if (status != 0) return -1;
+
+	std::getchar();
+	return 0;
 }
