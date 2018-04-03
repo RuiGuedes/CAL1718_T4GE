@@ -1,20 +1,52 @@
 #include "Graph.h"
 
 #include <limits>
-#include <cmath>
+#include <math.h>
 #include <algorithm>
-#include <cerrno>
-#include <assert.h>
 
 #define INF numeric_limits<double>::max()
 
 /*
  * @brief Checks if a pair of integers is
  * within the bounds of the graph area
- * @nothrow
  */
 bool Graph::withinBounds(int x, int y) const {
 	return x >= 0 && y >= 0 && x <= width && y <= height;
+}
+
+/*
+ * @brief Moves vertex v from accidentedVertexSet
+ * to vertexSet. v in accidentedVertexSet check prior
+ */
+void Graph::moveToVertexSet(Vertex *v) {
+	accidentedVertexSet.erase(remove(
+			accidentedVertexSet.begin(),
+			accidentedVertexSet.end(), v),
+			accidentedVertexSet.end());
+	vertexSet.push_back(v);
+	sort(vertexSet.begin(), vertexSet.end());
+	update();
+}
+
+/*
+ * @brief Moves vertex v from vertexSet
+ * to accidentedVertexSet. v in vertexSet check prior
+ */
+void Graph::moveToAccidentedVertexSet(Vertex *v) {
+	vertexSet.erase(remove(
+			vertexSet.begin(),
+			vertexSet.end(), v),
+			vertexSet.end());
+	accidentedVertexSet.push_back(v);
+	sort(accidentedVertexSet.begin(), accidentedVertexSet.end());
+	update();
+}
+
+/*
+ * @brief Updates the graph window with new info
+ */
+void Graph::update() const {
+	gv->rearrange();
 }
 
 /*
@@ -90,7 +122,6 @@ bool Graph::addVertex(Vertex* v) {
 /*
  * @brief Returns a vertex with a given id
  * @return The vertex if found, nullptr otherwise
- * @nothrow
  */
 Vertex* Graph::findVertex(int id) const {
 	return getVertex(id);
@@ -99,7 +130,6 @@ Vertex* Graph::findVertex(int id) const {
 /*
  * @brief Returns a vertex with a given id
  * @return The vertex if found, nullptr otherwise
- * @nothrow
  */
 Vertex* Graph::getVertex(int id) const {
 	static const auto getId = [](Vertex *v) -> int { return v->id; };
@@ -118,7 +148,6 @@ Vertex* Graph::getVertex(int id) const {
 
 /*
  * @brief Returns the number of clear vertices
- * @nothrow
  */
 int Graph::getNumVertices() const {
 	return vertexSet.size();
@@ -126,7 +155,6 @@ int Graph::getNumVertices() const {
 
 /*
  * @brief Returns the number of accidented vertices
- * @nothrow
  */
 int Graph::getNumAccidentedVertices() const {
 	return accidentedVertexSet.size();
@@ -135,7 +163,6 @@ int Graph::getNumAccidentedVertices() const {
 /*
  * @brief Returns the total number of vertices,
  * both clear and accidented
- * @nothrow
  */
 int Graph::getTotalVertices() const {
 	return vertexSet.size() + accidentedVertexSet.size();
@@ -144,7 +171,6 @@ int Graph::getTotalVertices() const {
 /*
  * @brief Returns a vector copy of the graph's clear
  * vertex set
- * @nothrow
  */
 vector<Vertex*> Graph::getVertexSet() const {
 	return vertexSet;
@@ -153,7 +179,6 @@ vector<Vertex*> Graph::getVertexSet() const {
 /*
  * @brief Returns a vector copy of the graph's accidented
  * vertex set
- * @nothrow
  */
 vector<Vertex*> Graph::getAccidentedVertexSet() const {
 	return accidentedVertexSet;
@@ -161,7 +186,6 @@ vector<Vertex*> Graph::getAccidentedVertexSet() const {
 
 /*
  * @brief Returns a vector with all of the graph's vertices
- * @nothrow
  */
 vector<Vertex*> Graph::getAllVertexSet() const {
 	vector<Vertex*> set = vertexSet;
@@ -186,7 +210,7 @@ double Graph::distance(Vertex* v1, Vertex* v2) const {
 /*
  * @brief Computes the length of an edge e,
  * according to the distance between both endpoints
- * @throws invalid_argument if Edge not found
+ * @throws invalid_argument if Edge is nullptr
  */
 double Graph::length(Edge* e) const {
 	if (e == nullptr) {
@@ -292,7 +316,7 @@ void Graph::removeVertex(Vertex* v) {
  * with id sourceId and ending in vertex with id destId
  * @return True if edge was successfully added
  *         False if a similar edge already existed
- * @throws invalid_argument if Vertex not found
+ * @throws invalid_argument if either Vertex not found
  * @throws logic_error if Repeated edge id
  */
 bool Graph::addEdge(int eid, int sourceId, int destId,
@@ -306,7 +330,7 @@ bool Graph::addEdge(int eid, int sourceId, int destId,
  * vsource and ending in vertex vdest
  * @return True if edge was successfully added
  *         False if a similar edge already existed
- * @throws invalid_argument if Vertex not found
+ * @throws invalid_argument if either Vertex is nullptr
  * @throws logic_error if Repeated edge id
  */
 bool Graph::addEdge(int eid, Vertex* vsource, Vertex* vdest,
@@ -376,7 +400,7 @@ Edge* Graph::getEdge(int eid) const {
  * @brief Returns a pointer to an edge starting at a
  * vertex with id sourceId and ending at vertex destId
  * @return The edge pointer, or nullptr if not found
- * @throws invalid_argument if either Vertex not found
+ * 			nullptr also if either vertex not found
  */
 Edge* Graph::findEdge(int sourceId, int destId) const {
 	return getEdge(sourceId, destId);
@@ -386,14 +410,13 @@ Edge* Graph::findEdge(int sourceId, int destId) const {
  * @brief Returns a pointer to an edge starting at a
  * vertex with id sourceId and ending at vertex destId
  * @return The edge pointer, or nullptr if not found
- * @throws invalid_argument if either Vertex not found
+ * 			nullptr also if either vertex not found
  */
 Edge* Graph::getEdge(int sourceId, int destId) const {
 	Vertex* vsource = findVertex(sourceId);
 	Vertex* vdest = findVertex(destId);
-	if (vsource == nullptr || vdest == nullptr) {
-		throw std::invalid_argument("Vertex not found");
-	}
+	if (vsource == nullptr || vdest == nullptr)
+		return nullptr;
 	return vsource->getEdge(vdest);
 }
 
@@ -401,7 +424,7 @@ Edge* Graph::getEdge(int sourceId, int destId) const {
  * @brief Fixes a previously accidented edge e
  * @return True if edge was previously accidented
  *         False otherwise
- * @throws invalid_argument if Edge not found
+ * @throws invalid_argument if Edge is nullptr
  */
 bool Graph::fixEdge(Edge* e) {
 	if (e == nullptr) {
@@ -414,7 +437,7 @@ bool Graph::fixEdge(Edge* e) {
  * @brief Causes an accident on an edge e
  * @return True if edge was previously clear
  *         False otherwise
- * @throws invalid_argument if Edge not found
+ * @throws invalid_argument if Edge is nullptr
  */
 bool Graph::accidentEdge(Edge* e) {
 	if (e == nullptr) {
@@ -476,9 +499,6 @@ bool Graph::johnsonDist() {
 
 
 
-vector<Vertex*> Graph::getPath(int sourceId, int destId) const {
-}
-
 vector<Vertex*> Graph::getPath(Vertex* source, Vertex* dest) const {
 }
 
@@ -500,6 +520,34 @@ ostream& Graph::operator<<(ostream& out) const {
 
 
 
+
+/*
+ * @brief Moves edge e from accidentedAdj
+ * to adj. v in accidentedAdj check prior
+ */
+void Vertex::moveToAdj(Edge *e) {
+	accidentedAdj.erase(remove(
+			accidentedAdj.begin(),
+			accidentedAdj.end(), e),
+			accidentedAdj.end());
+	adj.push_back(e);
+	sort(adj.begin(), adj.end());
+	graph->update();
+}
+
+/*
+ * @brief Moves edge e from adj
+ * to accidentedAdj. v in adj check prior
+ */
+void Vertex::moveToAccidentedAdj(Edge *e) {
+	adj.erase(remove(
+			adj.begin(),
+			adj.end(), e),
+			adj.end());
+	accidentedAdj.push_back(e);
+	sort(accidentedAdj.begin(), accidentedAdj.end());
+	graph->update();
+}
 
 /*
  * @brief Vertex constructor, taking the vertex id,
@@ -702,6 +750,7 @@ Edge* Vertex::getEdge(Vertex* vdest) const {
 bool Vertex::fix() {
 	if (accidented) {
 		accidented = false;
+		graph->moveToVertexSet(this);
 		return true;
 	} else {
 		return false;
@@ -715,6 +764,7 @@ bool Vertex::fix() {
 bool Vertex::accident() {
 	if (!accidented) {
 		accidented = true;
+		graph->moveToAccidentedVertexSet(this);
 		return true;
 	} else {
 		return false;
@@ -789,6 +839,8 @@ void Vertex::removeEdge(Edge* edge) {
 	}
 }
 
+
+
 bool Vertex::operator<(Vertex* v) const {
 	return id < v->id;
 }
@@ -822,53 +874,91 @@ ostream& Vertex::operator<<(ostream& out) const {
 
 
 
+/*
+ * @brief Constructs an edge with given id
+ * starting at vertex vsource with destination
+ * vdest, with a given weight and an initial
+ * conditional accidented, defaulting to false
+ */
 Edge::Edge(int id, Vertex* vsource, Vertex* vdest,
 		double weight, bool accidented):
 	id(id), source(vsource), dest(vdest),
 	weight(weight), accidented(accidented),
 	graph(nullptr) {}
 
+/*
+ * @brief Return's the edge's source vertex
+ */
 Vertex* Edge::getSource() const {
 	return source;
 }
 
+/*
+ * @brief Return's the edge's destination vertex
+ */
 Vertex* Edge::getDest() const {
 	return dest;
 }
 
+/*
+ * @brief Return's the edge's id
+ */
 int Edge::getId() const {
 	return id;
 }
 
+/*
+ * @brief Return's the edge's weight
+ */
 double Edge::getWeight() const {
 	return weight;
 }
 
+/*
+ * @brief Check whether the edge is accidented
+ */
 bool Edge::isAccidented() const {
 	return accidented;
 }
 
+/*
+ * @brief Fixes this edge from a previous accident
+ * @return True if the edge was previously accidented
+ *         False otherwise
+ */
 bool Edge::fix() {
 	if (accidented) {
 		accidented = false;
+		source->moveToAdj(this);
 		return true;
 	} else {
 		return false;
 	}
 }
 
+/*
+ * @brief Causes an accident on this vertex
+ * @return True if the vertex was previously clear
+ *         False otherwise
+ */
 bool Edge::accident() {
 	if (!accidented) {
 		accidented = true;
+		source->moveToAccidentedAdj(this);
 		return true;
 	} else {
 		return false;
 	}
 }
 
+/*
+ * @brief Sets this vertex's weight. May be negative
+ */
 void Edge::setWeight(double weight) {
 	this->weight = weight;
 }
+
+
 
 bool Edge::operator<(Edge* e) const {
 	return id < e->id;

@@ -29,16 +29,21 @@ class Graph {
 	vector<Vertex*> vertexSet;
 	vector<Vertex*> accidentedVertexSet;
 
-	// ***** Auxiliary, for cohesion and error checking
+	// ***** Auxiliary
 	bool withinBounds(int x, int y) const;
+	void moveToVertexSet(Vertex *v);
+	void moveToAccidentedVertexSet(Vertex *v);
+
 public:
+	void update() const;
+
 	// ***** Constructors and destructor
 	Graph(int width, int height);
 	~Graph();
 
 	// ***** Vertex CRUD
 	// C
-	bool addVertex(int id, int x, int y, bool accident = false);
+	bool addVertex(int id, int x, int y, bool accidented = false);
 	bool addVertex(Vertex *v);
 	// R
 	Vertex *findVertex(int id) const;
@@ -94,7 +99,6 @@ public:
 	// Johnson by distance.
 	bool johnsonDist();
 
-	vector<Vertex*> getPath(int sourceId, int destId) const;
 	vector<Vertex*> getPath(Vertex *source, Vertex *dest) const;
 
 	// ***** Operations
@@ -125,6 +129,9 @@ class Vertex {
 	//Vertex *path = nullptr;
 	//int queueIndex = 0; // MutablePriorityQueue
 	//bool processing = false;
+
+	void moveToAdj(Edge *e);
+	void moveToAccidentedAdj(Edge *e);
 
 public:
 	// Constructors and destructor
