@@ -1,5 +1,8 @@
-﻿
-
+﻿/*
+ * GraphViewer.h
+ *
+ * Disponibilizada no moodle para a aula pratica 6
+ */
 #ifndef _GRAPH_VIEWER_H_
 #define _GRAPH_VIEWER_H_
 
