@@ -1,11 +1,9 @@
-#include "FunctionsPrototypes.h"
 #include "LoadMap.h"
 
-GraphViewer *gv { };
-Graph<int> myGraph { };
+Graph* graph;
 
 int testNewMap(string path);
-
+/*
 void mainMenu() {
 
 	system("cls");
@@ -74,7 +72,7 @@ void systemInformation() {
 
 	system("pause");
 }
-
+*/
 int main() {
 
 //	gv = new GraphViewer(600, 600, false);
@@ -128,10 +126,8 @@ int main() {
 //	}
 //
 //	cout << endl << "Loading map information ..." << endl << endl;
-	//loadMap("../resource/" + filename, gv, myGraph, false);
-	loadMap("../resource/gporto", gv, myGraph, false);
-	mainMenu();
 
+	testNewMap("./resource/newyork_large");
 	return 0;
 }
 
@@ -141,6 +137,7 @@ int main() {
  * @param number string extraida da stream de input
  * @return Retorna true se number e um numero e false se number contem alguma coisa para alem de digitos.
  */
+/*
 bool validNumberInput(string input, int upperLimit) {
 	for (unsigned int i = 0; i < input.size(); i++){
 		if (!(isdigit(input.at(i))))
@@ -160,38 +157,40 @@ bool validNumberInput(string input, int upperLimit) {
 	}
 }
 
+*/
+
 
 int testNewMap(string path) {
 	int status;
 
-	status = testLoadMeta("../resource/" + path);
+	status = testLoadMeta(path);
 	if (status != 0)
 		return -1;
 
 	cout << "Next test " << endl << endl;
 
-	status = testLoadNodes("../resource/" + path);
+	status = testLoadNodes(path);
 	if (status != 0)
 		return -1;
 
 	cout << "Next test " << endl << endl;
 
-	status = testLoadRoads("../resource/" + path);
+	status = testLoadRoads(path);
 	if (status != 0)
 		return -1;
 
 	cout << "Next test " << endl << endl;
 
-	status = testLoadSubroads("../resource/" + path);
+	status = testLoadSubroads(path);
 	if (status != 0)
 		return -1;
 
 	cout << "Next test " << endl << endl;
 
-	status = testLoadMap("../resource/" + path);
+	status = testLoadMap(path);
 	if (status != 0)
 		return -1;
 
 	getchar();
-	return 0;
+	exit(0);
 }

@@ -153,8 +153,10 @@ bool Graph::setBackground(string path) const {
  * @brief Graph constructor, taking
  * display width and display height in grid entries
  */
-Graph::Graph(int width, int height) {
-	this->width = width; this->height = height;
+Graph::Graph(int width, int height, bool showEdgeLabel,
+		bool showEdgeWeight, bool showEdgeFlux):
+	width(width), height(height), showEdgeLabel(showEdgeLabel),
+	showEdgeWeight(showEdgeWeight), showEdgeFlux(showEdgeFlux) {
 	gv = new GraphViewer(width, height, false);
 	gv->createWindow(GRAPH_VIEWER_WIDTH, GRAPH_VIEWER_HEIGHT);
 	defineVertexColor(VERTEX_CLEAR_COLOR);
@@ -187,12 +189,12 @@ Graph::~Graph() {
  */
 bool Graph::addVertex(int id, int x, int y, bool accidented) {
 	if (findVertex(id)) {
-		throw std::logic_error("Repeated vertex id");
+		throw std::logic_error("Repeated vertex id " + to_string(id));
 	} else if (!withinBounds(x, y)) {
 		throw std::out_of_range("Vertex out of graph bounds");
 	} else {
 		Vertex *v = new Vertex(id, x, y, accidented);
-		v->graph = this;
+		v->_sgraph(this);
 		if (accidented) {
 			accidentedVertexSet.push_back(v);
 		} else {
@@ -220,12 +222,12 @@ bool Graph::addVertex(int id, int x, int y, bool accidented) {
  */
 bool Graph::addVertex(Vertex* v) {
 	if (findVertex(v->getId())) {
-		throw std::logic_error("Repeated vertex id");
+		throw std::logic_error("Repeated vertex id " + to_string(v->getId()));
 	} else if (!withinBounds(v->getX(), v->getY())) {
 		throw std::out_of_range("Vertex out of graph bounds");
 	} else {
 		int id = v->getId();
-		v->graph = this;
+		v->_sgraph(this);
 		if (v->isAccidented()) {
 			accidentedVertexSet.push_back(v);
 		} else {
@@ -255,14 +257,14 @@ Vertex* Graph::findVertex(int id) const {
  * @return The vertex if found, nullptr otherwise
  */
 Vertex* Graph::getVertex(int id) const {
-	static const auto getId = [](Vertex *v) -> int { return v->id; };
+	const auto getId = [&id](Vertex *v) -> int { return v->getId() == id; };
 
 	// Look for vertex in vertexSet
-	auto it = find(vertexSet.cbegin(), vertexSet.cend(), getId);
+	auto it = find_if(vertexSet.cbegin(), vertexSet.cend(), getId);
 	if (it != vertexSet.cend()) return *it;
 
 	// Look for vertex in accidentedVertexSet
-	it = find(accidentedVertexSet.cbegin(), accidentedVertexSet.cend(), getId);
+	it = find_if(accidentedVertexSet.cbegin(), accidentedVertexSet.cend(), getId);
 	if (it != accidentedVertexSet.cend()) return *it;
 
 	// Vertex not found
@@ -337,7 +339,7 @@ double Graph::distance(Vertex* v1, Vertex* v2) const {
  */
 double Graph::length(Edge* e) const {
 	if (e == nullptr) {
-		return std::invalid_argument("Edge not found");
+		throw std::invalid_argument("Edge not found");
 	}
 	return distance(e->getSource(), e->getDest());
 }
@@ -468,7 +470,6 @@ bool Graph::addEdge(int eid, Vertex* vsource, Vertex* vdest,
 		throw std::logic_error("Repeated edge id");
 	}
 	Edge* e = new Edge(eid, vsource, vdest, weight, accidented);
-	e->graph = this;
 	// Delegate to vertex
 	if (vsource->addEdge(e)) {
 		return true;
@@ -494,7 +495,6 @@ bool Graph::addEdge(Edge *e) {
 	if (findEdge(e->getId()) != nullptr) {
 		throw std::logic_error("Repeated edge id");
 	}
-	e->graph = this;
 	// Delegate to vertex
 	return vsource->addEdge(e);
 }
@@ -583,8 +583,8 @@ bool Graph::accidentEdge(Edge* e) {
  * @return True if edge was successfully removed
  * @throws invalid_argument if Edge not found
  */
-bool Graph::removeEdge(int eid) {
-	return removeEdge(findEdge(eid));
+void Graph::removeEdge(int eid) {
+	removeEdge(findEdge(eid));
 }
 
 /*
@@ -592,12 +592,12 @@ bool Graph::removeEdge(int eid) {
  * @return True if edge was successfully removed
  * @throws invalid_argument if Edge not found
  */
-bool Graph::removeEdge(Edge* e) {
+void Graph::removeEdge(Edge* e) {
 	if (e == nullptr) {
 		throw std::invalid_argument("Edge not found");
 	}
 	// Delegate to vertex
-	return e->getSource()->removeEdge(e);
+	e->getSource()->removeEdge(e);
 }
 
 
@@ -684,6 +684,13 @@ void Vertex::moveToAccidentedAdj(Edge *e) {
 	graph->update();
 }
 
+void Vertex::_sgraph(Graph* graph) {
+	if (this->graph != nullptr) {
+		throw std::logic_error("Graph already set");
+	}
+	this->graph = graph;
+}
+
 /*
  * @brief Vertex constructor, taking the vertex id,
  * cartesian coordinates x and y and an initial
@@ -747,7 +754,7 @@ bool Vertex::isAdjacentTo(Vertex* dest) const {
 	if (dest == nullptr) {
 		throw std::invalid_argument("Vertex not found");
 	}
-	const auto getDest = [&dest](Edge *e) -> bool { return e->dest == dest; };
+	const auto getDest = [&dest](Edge *e) -> bool { return e->getDest() == dest; };
 	return any_of(adj.cbegin(), adj.cend(), getDest)
 			|| any_of(accidentedAdj.cbegin(), accidentedAdj.cend(), getDest);
 }
@@ -761,7 +768,7 @@ bool Vertex::connectsTo(Vertex* dest) const {
 	if (dest == nullptr) {
 		throw std::invalid_argument("Vertex not found");
 	}
-	const auto getDest = [&dest](Edge *e) -> bool { return e->dest == dest; };
+	const auto getDest = [&dest](Edge *e) -> bool { return e->getDest() == dest; };
 	return any_of(adj.cbegin(), adj.cend(), getDest)
 			|| any_of(accidentedAdj.cbegin(), accidentedAdj.cend(), getDest);
 }
@@ -829,15 +836,18 @@ bool Vertex::addEdge(Edge* e) {
 		adj.push_back(e);
 	}
 	int id = e->getId();
+	e->_sgraph(graph);
 	graph->gv->addEdge(id, e->getSource()->getId(),
 				e->getDest()->getId(), EdgeType::DIRECTED);
 	// * Set Edge Label
-	graph->setEdgeLabel(id, to_string(id));
+	if (graph->showEdgeLabel)
+		graph->setEdgeLabel(id, to_string(id));
 	// * Set Edge Color
 	if (e->isAccidented())
 		graph->setEdgeColor(id, EDGE_ACCIDENTED_COLOR);
 	// * Set Edge Weight
-	graph->setEdgeWeight(id, e->getWeight());
+	if (graph->showEdgeWeight)
+		graph->setEdgeWeight(id, e->getWeight());
 	// No graph->update()
 	return true;
 }
@@ -855,12 +865,12 @@ Edge* Vertex::findEdge(int eid) const {
  * @return The edge or nullptr if not found
  */
 Edge* Vertex::getEdge(int eid) const {
-	const auto getEid = [&eid](Edge *e) -> bool { return e->id == eid; };
-	auto it = find(adj.cbegin(), adj.cend(), getEid);
+	const auto getEid = [&eid](Edge *e) -> bool { return e->getId() == eid; };
+	auto it = find_if(adj.cbegin(), adj.cend(), getEid);
 	if (it != adj.cend()) return *it;
 
-	it = find(accidentedAdj.cbegin(), accidentedAdj.cend(), getEid);
-	if (it != adj.cend()) return *it;
+	it = find_if(accidentedAdj.cbegin(), accidentedAdj.cend(), getEid);
+	if (it != accidentedAdj.cend()) return *it;
 
 	return nullptr;
 }
@@ -885,12 +895,12 @@ Edge* Vertex::getEdge(Vertex* vdest) const {
 	if (vdest == nullptr) {
 		throw std::invalid_argument("Vertex not found");
 	}
-	const auto getDest = [&vdest](Edge *e) -> bool { return e->dest == vdest; };
-	auto it = find(adj.cbegin(), adj.cend(), getDest);
+	const auto getDest = [&vdest](Edge *e) -> bool { return e->getDest() == vdest; };
+	auto it = find_if(adj.cbegin(), adj.cend(), getDest);
 	if (it != adj.cend()) return *it;
 
-	it = find(accidentedAdj.cbegin(), accidentedAdj.cend(), getDest);
-	if (it != adj.cend()) return *it;
+	it = find_if(accidentedAdj.cbegin(), accidentedAdj.cend(), getDest);
+	if (it != accidentedAdj.cend()) return *it;
 
 	return nullptr;
 }
@@ -1024,11 +1034,11 @@ bool Vertex::operator!=(Vertex* v) const {
 	return id != v->id;
 }
 
-ostream& Vertex::operator<<(ostream& out) const {
-	out << "ID = " << id << "; ";
-	out << "(" << x << "," << y << "); ";
-	out << "#Good = " << adj.size() << "; ";
-	out << "#Bad = " << accidentedAdj.size();
+ostream& operator<<(ostream& out, Vertex* v) {
+	out << "ID = " << v->getId() << "; ";
+	out << "(" << v->getX() << "," << v->getY() << "); ";
+	out << "#Good = " << v->getAdj().size() << "; ";
+	out << "#Bad = " << v->getAccidentedAdj().size();
 	return out;
 }
 
@@ -1040,6 +1050,13 @@ ostream& Vertex::operator<<(ostream& out) const {
 
 
 
+
+void Edge::_sgraph(Graph* graph) {
+	if (this->graph != nullptr) {
+		throw std::logic_error("Graph already set");
+	}
+	this->graph = graph;
+}
 
 /*
  * @brief Constructs an edge with given id
@@ -1129,6 +1146,8 @@ bool Edge::accident() {
  */
 void Edge::setWeight(double weight) {
 	this->weight = weight;
+	if (graph->showEdgeWeight)
+		graph->setEdgeWeight(id, weight);
 }
 
 
@@ -1149,10 +1168,10 @@ bool Edge::operator!=(Edge* e) const {
 	return id != e->id;
 }
 
-ostream& Edge::operator<<(ostream& out) const {
-	out << "EID = " << id << "; ";
-	out << "Weight = " << weight << "; ";
-	out << "(" << source->getId() << " -> " << dest->getId() << "); ";
+ostream& operator<<(ostream& out, Edge* e) {
+	out << "EID = " << e->getId() << "; ";
+	out << "Weight = " << e->getWeight() << "; ";
+	out << "(" << e->getSource()->getId() << " -> " << e->getDest()->getId() << "); ";
 	return out;
 }
 

@@ -29,9 +29,10 @@ class Vertex;
 
 class Graph {
 	const int width, height;
-	GraphViewer *gv;
 	vector<Vertex*> vertexSet;
 	vector<Vertex*> accidentedVertexSet;
+	const bool showEdgeLabel, showEdgeWeight, showEdgeFlux;
+	GraphViewer *gv;
 
 	// ***** Auxiliary
 	bool withinBounds(int x, int y) const;
@@ -39,7 +40,7 @@ class Graph {
 	void moveToAccidentedVertexSet(Vertex *v);
 
 public:
-	// ***** Visual API
+	///// ***** Visual API
 	void update() const;
 	void rearrange() const;
 
@@ -55,12 +56,14 @@ public:
 
 	bool setEdgeThickness(int id, int thickness) const;
 	bool setBackground(string path) const;
+	/////
 
-	// ***** Constructors and destructor
-	Graph(int width, int height);
+	///// ***** Constructors and destructor
+	Graph(int width, int height, bool showEdgeLabel = false,
+			bool showEdgeWeight = false, bool showEdgeFlux = false);
 	~Graph();
 
-	// ***** Vertex CRUD
+	///// ***** Vertex CRUD
 	// C
 	bool addVertex(int id, int x, int y, bool accidented = false);
 	bool addVertex(Vertex *v);
@@ -84,8 +87,9 @@ public:
 	// D
 	void removeVertex(int id);
 	void removeVertex(Vertex *v);
+	/////
 
-	// ***** Edge CRUD
+	///// ***** Edge CRUD
 	// C
 	bool addEdge(int eid, int sourceId, int destId, double weight/*, Road* road*/, bool accidented = false);
 	bool addEdge(int eid, Vertex *vsource, Vertex *vdest, double weight/*, Road* road*/, bool accidented = false);
@@ -99,10 +103,11 @@ public:
 	bool fixEdge(Edge *e);
 	bool accidentEdge(Edge *e);
 	// D
-	bool removeEdge(int eid);
-	bool removeEdge(Edge *e);
+	void removeEdge(int eid);
+	void removeEdge(Edge *e);
+	/////
 
-	// ***** Algorithms
+	///// ***** Algorithms
 	// Breadth First Search, single source. Find minimal paths to all other vertices
 	bool bfs(Vertex *vsource);
 	// Breadth First Search, with destination. Find minimal path to destination vertex only
@@ -117,10 +122,11 @@ public:
 	bool floydWarshallDist();
 	// Johnson by distance.
 	bool johnsonDist();
+	/////
 
 	vector<Vertex*> getPath(Vertex *source, Vertex *dest) const;
 
-	// ***** Operations
+	///// ***** Operations
 	ostream& operator<<(ostream &out) const;
 	friend class Vertex;
 	friend class Edge;
@@ -135,12 +141,12 @@ public:
 //////////////////////////
 
 class Vertex {
-	Graph* graph;
 	const int id;
 	const int x, y;
 	bool accidented;
 	vector<Edge*> adj;
 	vector<Edge*> accidentedAdj;
+	Graph* graph = nullptr;
 
 	// Algorithm auxiliary
 	//bool visited = false;
@@ -153,7 +159,8 @@ class Vertex {
 	void moveToAccidentedAdj(Edge *e);
 
 public:
-	// Constructors and destructor
+	///// ***** Constructor
+	void _sgraph(Graph* graph);
 	explicit Vertex(int id, int x, int y, bool accidented = false);
 	~Vertex();
 
@@ -194,12 +201,12 @@ public:
 	void removeEdge(Edge *edge);
 	/////
 
-	// ***** Operations
+	///// ***** Operations
 	bool operator<(Vertex *v) const; // MutablePriorityQueue
 	bool operator>(Vertex *v) const;
 	bool operator==(Vertex *v) const;
 	bool operator!=(Vertex *v) const;
-	ostream& operator<<(ostream &out) const;
+	friend ostream& operator<<(ostream &out, Vertex* v);
 	friend class Edge;
 	friend class MutablePriorityQueue<Vertex>;
 };
@@ -213,27 +220,30 @@ public:
 //////////////////////////
 
 class Edge {
-	Graph* graph;
 	const int id;
 	Vertex *source;
 	Vertex *dest;
 	double weight;
 	bool accidented;
+	Graph* graph = nullptr;
 	// ...
 	/*Road *road;*/
 
 public:
+	///// ***** Constructor
+	void _sgraph(Graph* graph);
 	explicit Edge(int id, Vertex* vsource, Vertex *vdest, double weight/*, Road *w*/, bool accidented = false);
 
-	// ***** Vertex CRUD
+	///// ***** Vertex CRUD
 	// C
 	// R
 	Vertex *getSource() const;
 	Vertex *getDest() const;
 	// U
 	// D
+	/////
 
-	// ***** Edge CRUD
+	///// ***** Edge CRUD
 	// C
 	// R
 	int getId() const;
@@ -244,13 +254,14 @@ public:
 	bool accident();
 	void setWeight(double weight);
 	// D
+	/////
 
 	// ***** Operations
 	bool operator<(Edge *e) const; // MutablePriorityQueue
 	bool operator>(Edge *e) const;
 	bool operator==(Edge *e) const;
 	bool operator!=(Edge *e) const;
-	ostream& operator<<(ostream &out) const;
+	friend ostream& operator<<(ostream &out, Edge* e);
 	friend class MutablePriorityQueue<Vertex>;
 };
 

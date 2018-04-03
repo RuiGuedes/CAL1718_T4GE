@@ -267,7 +267,7 @@ int loadNodes(string filename, MapMetaData &meta, Graph* &graph) {
 	string line;
 	getline(file, line);
 
-	int newNodes = 0, mappedID = 0;
+	int newNodes = 0, mappedID = 1;
 
 	while (!file.eof() && !file.fail()) {
 		smatch match;
@@ -311,7 +311,7 @@ int loadNodes(string filename, MapMetaData &meta, Graph* &graph) {
 //    [1] : Road id (long long)
 //    [2] : Road name (string)
 //    [3] : Two way (bool)
-int loadRoads(string filename, MapMetaData &meta, GraphViewer* &gv, Graph<int> &myGraph) {
+int loadRoads(string filename, MapMetaData &meta, Graph* &graph) {
 	static const regex reg("^(\\d+);((?:[-0-9a-zA-ZÀ-ÿ,\\.]| )*);(False|True);?$");
 	static const string FalseStr = "False", TrueStr = "True";
 
@@ -322,7 +322,7 @@ int loadRoads(string filename, MapMetaData &meta, GraphViewer* &gv, Graph<int> &
 	string line;
 	getline(file, line);
 
-	int newRoads = 0, mappedID = 0;
+	int newRoads = 0, mappedID = 1;
 
 	while (!file.eof() && !file.fail()) {
 		smatch match;
@@ -372,7 +372,7 @@ int loadSubroads(string filename, MapMetaData &meta, Graph* &graph) {
 	string line;
 	getline(file, line);
 
-	int newSubroads = 0, subRoadID = 0;
+	int newSubroads = 0, subRoadID = 1;
 
 	while (!file.eof() && !file.fail()) {
 		smatch match;
@@ -437,6 +437,7 @@ int testLoadMeta(string path) {
 		return 0;
 	} catch (exception &e) {
 		cout << "Load Meta Failed\n" << e.what() << endl;
+		getchar();
 		return -1;
 	}
 }
@@ -454,9 +455,9 @@ int testLoadNodes(string path) {
 
 		// *** Test
 		auto vertexSet = graph->getAllVertexSet();
-		for (auto node : nodeIdMap) {
-			cout << node << endl;
-			if (graph->findVertex(node.second) == nullptr)
+		for (auto v : vertexSet) {
+			cout << v << endl;
+			if (graph->findVertex(v->getId()) == nullptr)
 				throw logic_error("Node not found in Graph");
 		}
 
@@ -465,6 +466,7 @@ int testLoadNodes(string path) {
 		return 0;
 	} catch (std::exception &e) {
 		cout << "Load Nodes Failed\n" << e.what() << std::endl;
+		getchar();
 		return -1;
 	}
 }
@@ -495,6 +497,7 @@ int testLoadRoads(string path) {
 		return 0;
 	} catch (exception &e) {
 		cout << "Load Roads Failed\n" << e.what() << endl;
+		getchar();
 		return -1;
 	}
 }
@@ -526,6 +529,7 @@ int testLoadSubroads(string path) {
 		return 0;
 	} catch (exception &e) {
 		cout << "Load Roads Failed\n" << e.what() << endl;
+		getchar();
 		return -1;
 	}
 }
@@ -541,6 +545,7 @@ int testLoadMap(string path) {
 		return 0;
 	} catch (exception &e) {
 		cout << "Load Meta Failed\n" << e.what() << endl;
+		getchar();
 		return -1;
 	}
 }
