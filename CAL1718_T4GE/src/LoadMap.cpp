@@ -1,9 +1,9 @@
-#include "FunctionsPrototypes.h"
 #include <regex>
 #include <fstream>
 #include <limits>
 #include <exception>
 #include <stdexcept>
+#include <math.h>
 
 #include "LoadMap.h"
 
@@ -98,42 +98,29 @@ static void estimateMeta(MapMetaData &meta) {
  * Adds dummy boundary vertices around the map (around 20 per side)
  * @param ...
  */
-static void showBoundaries(MapMetaData &meta, GraphViewer* gv, Graph<int> myGraph) {
-	int ID = myGraph.getNumVertex() + 1;
+static void showBoundaries(MapMetaData &meta, Graph* &graph) {
+	int ID = graph->getTotalVertices() + 1;
 
 	// Corners
-	myGraph.addVertex(ID);
-	gv->addNode(ID++, 0, 0);
-
-	myGraph.addVertex(ID);
-	gv->addNode(ID++, meta.width, 0);
-
-	myGraph.addVertex(ID);
-	gv->addNode(ID++, 0, meta.height);
-
-	myGraph.addVertex(ID);
-	gv->addNode(ID++, meta.width, meta.height);
+	graph->addVertex(ID++, 0, 0);
+	graph->addVertex(ID++, meta.width, 0);
+	graph->addVertex(ID++, 0, meta.height);
+	graph->addVertex(ID++, meta.width, meta.height);
 
 	int increment;
 
 	// Top and bottom
 	increment = (meta.width + 30) / 20;
 	for (int i = increment; i < meta.width; i += increment) {
-		myGraph.addVertex(ID);
-		gv->addNode(ID++, i, 0);
-
-		myGraph.addVertex(ID);
-		gv->addNode(ID++, i, meta.height);
+		graph->addVertex(ID++, i, 0);
+		graph->addVertex(ID++, i, meta.height);
 	}
 
 	// Left and right
 	increment = (meta.height + 30) / 20;
 	for (int j = increment; j < meta.height; j += increment) {
-		myGraph.addVertex(ID);
-		gv->addNode(ID++, 0, j);
-
-		myGraph.addVertex(ID);
-		gv->addNode(ID++, meta.width, j);
+		graph->addVertex(ID++, 0, j);
+		graph->addVertex(ID++, meta.width, j);
 	}
 }
 
@@ -152,7 +139,7 @@ static void showBoundaries(MapMetaData &meta, GraphViewer* gv, Graph<int> myGrap
  * @param boundaries Whether to add dummy boundary vertices around the generated map (defaults to false)
  * @return Standard Success/Error
  */
-int loadMap(string filename, GraphViewer* &gv, Graph<int> &myGraph, bool boundaries) {
+int loadMap(string filename, Graph* &graph, bool boundaries) {
 	string meta_filename = filename + meta_suffix;
 	string nodes_filename = filename + nodes_suffix;
 	string roads_filename = filename + roads_suffix;
@@ -164,24 +151,22 @@ int loadMap(string filename, GraphViewer* &gv, Graph<int> &myGraph, bool boundar
 
 	// Initialize the map with appropriate sizes, but do nothing else.
 	// For some reason, creating the Window immediately is necessary...
-	gv = new GraphViewer(meta.width, meta.height, false);
-	gv->createWindow(600, 600);
+	graph = new Graph(meta.width, meta.height);
 
 	// Load the map's nodes...
 	// The nodes' filed id is mapped to a new id in nodeIdMap.
-	loadNodes(nodes_filename, meta, gv, myGraph);
+	loadNodes(nodes_filename, meta, graph);
 
 	// Load the map's road names...
 	// The roads' id is mapped to a new id in roadIdMap, the name is stored in
 	// roadNameMap and the direction is stored in roadDirectionMap.
-	loadRoads(roads_filename, meta, gv, myGraph);
+	loadRoads(roads_filename, meta, graph);
 
 	// Load the map's edges...
-	loadSubroads(subroads_filename, meta, gv, myGraph);
+	loadSubroads(subroads_filename, meta, graph);
 
 	// All good and loaded...
-	if (boundaries)
-		showBoundaries(meta, gv, myGraph);
+	if (boundaries) showBoundaries(meta, graph);
 
 	// Release auxiliary memory... while preparing for a new invocation later...
 	nodeIdMap.clear();
@@ -189,6 +174,7 @@ int loadMap(string filename, GraphViewer* &gv, Graph<int> &myGraph, bool boundar
 	roadNameMap.clear();
 	roadDirectionMap.clear();
 
+	graph->update();
 	return 0;
 }
 
@@ -271,7 +257,7 @@ int loadMeta(string filename, MapMetaData &meta) {
 //    [3] : Longitude in degrees (long double)
 //    [4]*: Longitude in radians (long double)
 //    [5]*: Latitude in radians (long double)
-int loadNodes(string filename, MapMetaData &meta, GraphViewer* &gv, Graph<int> &myGraph) {
+int loadNodes(string filename, MapMetaData &meta, Graph* &graph) {
 	static const regex reg("^(\\d+);(-?\\d+.?\\d*);(-?\\d+.?\\d*);(?:-?\\d+.?\\d*);(?:-?\\d+.?\\d*);?$");
 
 	ifstream file(filename);
@@ -300,8 +286,7 @@ int loadNodes(string filename, MapMetaData &meta, GraphViewer* &gv, Graph<int> &
 			int x = getX(longitude, meta);
 
 			// Add Node
-			myGraph.addVertex(mappedID);
-			gv->addNode(mappedID, x, y);
+			graph->addVertex(mappedID, x, y);
 			++newNodes;
 			++mappedID;
 		}
@@ -377,7 +362,7 @@ int loadRoads(string filename, MapMetaData &meta, GraphViewer* &gv, Graph<int> &
 //    [1] : Road id
 //    [2] : Node 1 id
 //    [3] : Node 2 id
-int loadSubroads(string filename, MapMetaData &meta, GraphViewer* &gv, Graph<int> &myGraph) {
+int loadSubroads(string filename, MapMetaData &meta, Graph* &graph) {
 	static const regex reg("^(\\d+);(\\d+);(\\d+);?$");
 
 	ifstream file(filename);
@@ -407,19 +392,19 @@ int loadSubroads(string filename, MapMetaData &meta, GraphViewer* &gv, Graph<int
 			int node2id = nodeIdMap[id];
 
 			// Register Edges
+			Vertex* v1 = graph->getVertex(node1id);
+			Vertex* v2 = graph->getVertex(node2id);
+			double weight = graph->distance(v1, v2);
 
-
-
-			myGraph.addEdge(node1id, node2id, 0);
-			gv->addEdge(subRoadID, node1id, node2id, EdgeType::DIRECTED);
-			if (roadDirectionMap[roadid]) {
-				// Add reverse edges
-				++subRoadID;
-				myGraph.addEdge(node2id, node1id, 0);
-				gv->addEdge(subRoadID, node2id, node1id, EdgeType::DIRECTED);
-			}
+			graph->addEdge(subRoadID, node1id, node2id, weight);
 			++newSubroads;
 			++subRoadID;
+			if (roadDirectionMap[roadid]) {
+				// Add reverse edge
+				graph->addEdge(subRoadID, node2id, node1id, weight);
+				++newSubroads;
+				++subRoadID;
+			}
 		}
 
 		getline(file, line);
@@ -461,29 +446,22 @@ int testLoadNodes(string path) {
 		MapMetaData meta;
 		loadMeta(path + meta_suffix, meta);
 
-		GraphViewer* gv = new GraphViewer(meta.width, meta.height, false);
-		Graph<int> myGraph;
+		Graph* graph = new Graph(meta.width, meta.height);
 
-		gv->createWindow(600, 600);
-		gv->defineVertexColor("blue");
-		gv->defineEdgeColor("black");
-
-		loadNodes(path + nodes_suffix, meta, gv, myGraph);
-		showBoundaries(meta, gv, myGraph);
-		gv->rearrange();
+		loadNodes(path + nodes_suffix, meta, graph);
+		showBoundaries(meta, graph);
+		graph->update();
 
 		// *** Test
-		auto vertexSet = myGraph.getVertexSet();
+		auto vertexSet = graph->getAllVertexSet();
 		for (auto node : nodeIdMap) {
-			cout << "FILE=" << node.first << " ; ";
-			cout << "MAPPED=" << node.second << endl;
-			if (myGraph.findVertex(node.second) == nullptr)
-				throw logic_error("Node not found in myGraph");
+			cout << node << endl;
+			if (graph->findVertex(node.second) == nullptr)
+				throw logic_error("Node not found in Graph");
 		}
 
 		getchar();
-		gv->closeWindow();
-		delete gv;
+		delete graph;
 		return 0;
 	} catch (std::exception &e) {
 		cout << "Load Nodes Failed\n" << e.what() << std::endl;
@@ -496,17 +474,13 @@ int testLoadRoads(string path) {
 		MapMetaData meta;
 		loadMeta(path + meta_suffix, meta);
 
-		GraphViewer* gv = new GraphViewer(meta.width, meta.height, false);
-		Graph<int> myGraph;
+		Graph* graph = new Graph(meta.width, meta.height);
 
-		gv->createWindow(600, 600);
-		gv->defineVertexColor("blue");
-		gv->defineEdgeColor("black");
+		loadNodes(path + nodes_suffix, meta, graph);
+		showBoundaries(meta, graph);
+		graph->update();
 
-		loadNodes(path + nodes_suffix, meta, gv, myGraph);
-		showBoundaries(meta, gv, myGraph);
-
-		loadRoads(path + roads_suffix, meta, gv, myGraph);
+		loadRoads(path + roads_suffix, meta, graph);
 
 		for (auto road : roadIdMap) {
 			int id = road.second;
@@ -517,8 +491,7 @@ int testLoadRoads(string path) {
 		}
 
 		getchar();
-		gv->closeWindow();
-		delete gv;
+		delete graph;
 		return 0;
 	} catch (exception &e) {
 		cout << "Load Roads Failed\n" << e.what() << endl;
@@ -531,31 +504,25 @@ int testLoadSubroads(string path) {
 		MapMetaData meta;
 		loadMeta(path + meta_suffix, meta);
 
-		GraphViewer* gv = new GraphViewer(meta.width, meta.height, false);
-		Graph<int> myGraph;
+		Graph* graph = new Graph(meta.width, meta.height);
 
-		gv->createWindow(600, 600);
-		gv->defineVertexColor("blue");
-		gv->defineEdgeColor("black");
+		loadNodes(path + nodes_suffix, meta, graph);
+		showBoundaries(meta, graph);
+		graph->update();
 
-		loadNodes(path + nodes_suffix, meta, gv, myGraph);
-		showBoundaries(meta, gv, myGraph);
+		loadRoads(path + roads_suffix, meta, graph);
 
-		loadRoads(path + roads_suffix, meta, gv, myGraph);
+		loadSubroads(path + subroads_suffix, meta, graph);
 
-		loadSubroads(path + subroads_suffix, meta, gv, myGraph);
-
-		auto vertexSet = myGraph.getVertexSet();
+		auto vertexSet = graph->getAllVertexSet();
 		for (auto v : vertexSet) {
 			for (auto edge : v->getAdj()) {
-				cout << v->getInfo() << ";";
-				cout << edge.getDest()->getInfo() << ";" << std::endl;
+				cout << edge << endl;
 			}
 		}
 
 		getchar();
-		gv->closeWindow();
-		delete gv;
+		delete graph;
 		return 0;
 	} catch (exception &e) {
 		cout << "Load Roads Failed\n" << e.what() << endl;
@@ -565,14 +532,12 @@ int testLoadSubroads(string path) {
 
 int testLoadMap(string path) {
 	try {
-		GraphViewer* gv;
-		Graph<int> myGraph;
+		Graph* graph;
 
-		loadMap(path, gv, myGraph, true);
+		loadMap(path, graph, true);
 
 		getchar();
-		gv->closeWindow();
-		delete gv;
+		delete graph;
 		return 0;
 	} catch (exception &e) {
 		cout << "Load Meta Failed\n" << e.what() << endl;

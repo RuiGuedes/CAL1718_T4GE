@@ -179,6 +179,9 @@ Graph::~Graph() {
 /*
  * @brief Adds a vertex with the given data to the
  * appropriate vertex set of the graph
+ *
+ * This automatically incorporates the vertex into
+ * GraphViewer as expected
  * @throws logic_error if Repeated vertex id
  * @throws out_of_range if Vertex out of graph bounds
  */
@@ -209,6 +212,9 @@ bool Graph::addVertex(int id, int x, int y, bool accidented) {
 /*
  * @brief Adds an already created vertex to the
  * appropriate vertex set of the graph
+ *
+ * This automatically incorporates the vertex into
+ * GraphViewer as expected
  * @throws logic_error if Repeated vertex id
  * @throws out_of_range if Vertex out of graph bounds
  */
@@ -802,9 +808,12 @@ vector<Vertex*> Vertex::getPath() const {
 /*
  * @brief Adds a previously created edge e to the
  * vertex
+ *
+ * This automatically incorporates the edge into
+ * GraphViewer as expected
  * @return True if edge was successfully added
  *         False if there was already an edge in the same
- *         spot (pointing to the same vertex)
+ *         spot (pointing to the same destination)
  * @throws invalid_argument if Edge is nullptr
  */
 bool Vertex::addEdge(Edge* e) {
