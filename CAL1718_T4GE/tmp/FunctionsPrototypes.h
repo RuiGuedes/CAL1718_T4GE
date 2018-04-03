@@ -11,8 +11,7 @@
 // Global Variables //
 //////////////////////
 
-extern GraphViewer *gv;
-extern Graph<int> myGraph;
+extern Graph* graph;
 
 //////////////////////////
 // Functions Prototypes //
