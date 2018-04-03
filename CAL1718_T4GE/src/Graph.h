@@ -35,7 +35,21 @@ class Graph {
 	void moveToAccidentedVertexSet(Vertex *v);
 
 public:
+	// ***** Visual API
 	void update() const;
+
+	bool setVertexLabel(int id, string label) const;
+	bool setVertexColor(int id, string color) const;
+	bool defineVertexColor(string color) const;
+
+	bool setEdgeLabel(int eid, string label) const;
+	bool setEdgeWeight(int id, int weight) const;
+	bool setEdgeFlow(int id, int flow) const;
+	bool setEdgeColor(int eid, string color) const;
+	bool defineEdgeColor(string color) const;
+
+	bool setEdgeThickness(int id, int thickness) const;
+	bool setBackground(string path) const;
 
 	// ***** Constructors and destructor
 	Graph(int width, int height);

@@ -42,12 +42,103 @@ void Graph::moveToAccidentedVertexSet(Vertex *v) {
 	update();
 }
 
+
+
 /*
  * @brief Updates the graph window with new info
  */
 void Graph::update() const {
 	gv->rearrange();
 }
+
+/*
+ * GRAPHVIEWER
+ * @brief Define o texto de um vértice em particular
+ */
+bool Graph::setVertexLabel(int id, string label) const {
+	return gv->setVertexLabel(id, label);
+}
+
+/*
+ * GRAPHVIEWER
+ * @brief Define a cor de um vértice em particular
+ */
+bool Graph::setVertexColor(int id, string color) const {
+	return gv->setVertexColor(id, color);
+}
+
+/*
+ * GRAPHVIEWER
+ * @brief Define a cor default de todos os vértices
+ */
+bool Graph::defineVertexColor(string color) const {
+	return gv->defineVertexColor(color);
+}
+
+/*
+ * GRAPHVIEWER
+ * @brief Define o label de uma aresta em particular
+ * w: PESO, f: FLUXO, LABEL
+ */
+bool Graph::setEdgeLabel(int eid, string label) const {
+	return gv->setEdgeLabel(eid, label);
+}
+
+/*
+ * GRAPHVIEWER
+ * @brief Define o peso de uma aresta em particular
+ * w: PESO, f: FLUXO, LABEL
+ */
+bool Graph::setEdgeWeight(int id, int weight) const {
+	return gv->setEdgeWeight(id, weight);
+}
+
+/*
+ * GRAPHVIEWER
+ * @brief Define o fluxo de uma aresta em particular
+ * w: PESO, f: FLUXO, LABEL
+ */
+bool Graph::setEdgeFlow(int id, int flow) const {
+	return gv->setEdgeFlow(id, flow);
+}
+
+/*
+ * GRAPHVIEWER
+ * @brief Define a cor de uma aresta em particular
+ */
+bool Graph::setEdgeColor(int eid, string color) const {
+	return gv->setEdgeColor(eid, color);
+}
+
+/*
+ * GRAPHVIEWER
+ * @brief Define a cor default de todas as arestas
+ */
+bool Graph::defineEdgeColor(string color) const {
+	return gv->defineEdgeColor(color);
+}
+
+/*
+ * GRAPHVIEWER
+ * @brief Define a espessura de uma aresta em particular
+ * @param thickness O default é thickness 1.
+ */
+bool Graph::setEdgeThickness(int id, int thickness) const {
+	return gv->setEdgeThickness(id, thickness);
+}
+
+/*
+ * GRAPHVIEWER
+ * @brief Define a imagem de fundo do grafo.
+ * @param path Caminho para o ficheiro da imagem.
+ */
+bool Graph::setBackground(string path) const {
+	return gv->setBackground(path);
+}
+
+
+
+
 
 /*
  * @brief Graph constructor, taking
@@ -93,6 +184,8 @@ bool Graph::addVertex(int id, int x, int y, bool accidented) {
 		} else {
 			vertexSet.push_back(v);
 		}
+		gv->addNode(id, x, y);
+		// No graph->update()
 		return true;
 	}
 }
@@ -115,6 +208,8 @@ bool Graph::addVertex(Vertex* v) {
 		} else {
 			vertexSet.push_back(v);
 		}
+		gv->addNode(v->getId(), v->getX(), v->getY());
+		// No graph->update()
 		return true;
 	}
 }
@@ -304,10 +399,13 @@ void Graph::removeVertex(Vertex* v) {
 		delete v;
 		accidentedVertexSet.erase(it);
 	} else {
+		int id = v->getId();
 		auto it = find(vertexSet.begin(),
 				vertexSet.end(), v);
 		delete v;
 		vertexSet.erase(it);
+		gv->removeNode(id);
+		// No graph->update()
 	}
 }
 
@@ -343,6 +441,7 @@ bool Graph::addEdge(int eid, Vertex* vsource, Vertex* vdest,
 	}
 	Edge* e = new Edge(eid, vsource, vdest, weight, accidented);
 	e->graph = this;
+	// Delegate to vertex
 	if (vsource->addEdge(e)) {
 		return true;
 	} else {
@@ -368,6 +467,7 @@ bool Graph::addEdge(Edge *e) {
 		throw std::logic_error("Repeated edge id");
 	}
 	e->graph = this;
+	// Delegate to vertex
 	return vsource->addEdge(e);
 }
 
@@ -385,6 +485,7 @@ Edge* Graph::findEdge(int eid) const {
  */
 Edge* Graph::getEdge(int eid) const {
 	// Look for the edge in vertexSet first
+	// Delegate to vertices
 	for (auto vertex : vertexSet) {
 		Edge* e = vertex->getEdge(eid);
 		if (e != nullptr) return e;
@@ -417,6 +518,7 @@ Edge* Graph::getEdge(int sourceId, int destId) const {
 	Vertex* vdest = findVertex(destId);
 	if (vsource == nullptr || vdest == nullptr)
 		return nullptr;
+	// Delegate to vertex
 	return vsource->getEdge(vdest);
 }
 
@@ -430,6 +532,7 @@ bool Graph::fixEdge(Edge* e) {
 	if (e == nullptr) {
 		throw std::invalid_argument("Edge not found");
 	}
+	// Delegate to edge directly
 	return e->fix();
 }
 
@@ -443,6 +546,7 @@ bool Graph::accidentEdge(Edge* e) {
 	if (e == nullptr) {
 		throw std::invalid_argument("Edge not found");
 	}
+	// Delegate to edge directly
 	return e->fix();
 }
 
@@ -464,6 +568,7 @@ bool Graph::removeEdge(Edge* e) {
 	if (e == nullptr) {
 		throw std::invalid_argument("Edge not found");
 	}
+	// Delegate to vertex
 	return e->getSource()->removeEdge(e);
 }
 
@@ -500,6 +605,8 @@ bool Graph::johnsonDist() {
 
 
 vector<Vertex*> Graph::getPath(Vertex* source, Vertex* dest) const {
+	// TODO
+	return vector<Vertex*>();
 }
 
 
@@ -682,11 +789,17 @@ bool Vertex::addEdge(Edge* e) {
 	if (e == nullptr) {
 		throw std::invalid_argument("Edge not found");
 	}
+	if (findEdge(e->getDest())) {
+		return false; // An edge already on the spot, delete it first
+	}
 	if (e->isAccidented()) {
 		accidentedAdj.push_back(e);
 	} else {
 		adj.push_back(e);
 	}
+	graph->gv->addEdge(e->getId(), e->getSource()->getId(),
+				e->getDest()->getId(), EdgeType::DIRECTED);
+	// No graph->update()
 	return true;
 }
 
@@ -804,6 +917,7 @@ bool Vertex::accidentEdge(Vertex *vdest) {
 /*
  * @brief Removes an edge with given id
  * @throws invalid_argument if Edge not found
+ * @throws invalid_argument if Edge is not from this vertex
  */
 void Vertex::removeEdge(int eid) {
 	return removeEdge(findEdge(eid));
@@ -813,6 +927,7 @@ void Vertex::removeEdge(int eid) {
  * @brief Removes an edge with destination dest
  * @throws invalid_argument if Vertex is nullptr
  * @throws invalid_argument if Edge not found
+ * @throws invalid_argument if Edge is not from this vertex
  */
 void Vertex::removeEdge(Vertex* dest) {
 	return removeEdge(findEdge(dest));
@@ -821,10 +936,14 @@ void Vertex::removeEdge(Vertex* dest) {
 /*
  * @brief Removes an edge
  * @throws invalid_argument if Edge not found
+ * @throws invalid_argument if Edge is not from this vertex
  */
 void Vertex::removeEdge(Edge* edge) {
 	if (edge == nullptr) {
 		throw std::invalid_argument("Edge not found");
+	}
+	if (!findEdge(edge->getId())) {
+		throw std::invalid_argument("Edge not from this vertex");
 	}
 	if (edge->isAccidented()) {
 		auto it = find(accidentedAdj.begin(),
@@ -832,10 +951,13 @@ void Vertex::removeEdge(Edge* edge) {
 		delete edge;
 		accidentedAdj.erase(it);
 	} else {
+		int id = edge->getId();
 		auto it = find(adj.begin(),
 				adj.end(), edge);
 		delete edge;
 		adj.erase(it);
+		graph->gv->removeEdge(id);
+		// No graph->update()
 	}
 }
 
