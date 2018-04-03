@@ -110,7 +110,7 @@ int main() {
  * @param number string extraida da stream de input
  * @return Retorna true se number e um numero e false se number contem alguma coisa para alem de digitos.
  */
-/*
+
 bool validNumberInput(string input, int upperLimit) {
 	for (unsigned int i = 0; i < input.size(); i++){
 		if (!(isdigit(input.at(i))))
@@ -125,12 +125,10 @@ bool validNumberInput(string input, int upperLimit) {
 
 		return true;
 	}
-	catch(...){
+	catch(...){// out_of_range ou invalid_argument
 		return false;
 	}
 }
-
-*/
 
 
 
