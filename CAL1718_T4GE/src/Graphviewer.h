@@ -17,7 +17,6 @@
 #include <signal.h>
 #include <string>
 
-#include "Edgetype.h"
 #include "Connection.h"
 
 #define BLUE "BLUE"
@@ -33,6 +32,17 @@
 #define DARK_GRAY "DARK_GRAY"
 #define LIGHT_GRAY "LIGHT_GRAY"
 #define MAGENTA "MAGENTA"
+
+/**
+ * Classe que enumera os tipos de arestas.
+ * Usar EdgeType::UNDIRECTED para uma aresta sem direcção, ou
+ *      EdgeType::DIRECTED para uma aresta dirigida.
+ */
+class EdgeType {
+ public:
+  const static int UNDIRECTED = 0;
+  const static int DIRECTED = 1;
+};
 
 /**
  * Classe que guarda o grafo e o representa. Todas as suas funções retornam um booleano a indicar

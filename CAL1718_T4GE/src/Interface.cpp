@@ -26,7 +26,7 @@ void mainMenu() {
 			cout << endl << "Enter an option (1-6): ";
 			cin >> option;
 
-			if(validNumberInput(option,6)) {
+			if (validNumberInput(option,6)) {
 				value = stoi(option);
 				break;
 			}
@@ -57,7 +57,7 @@ void mainMenu() {
 		}
 		system("cls");
 
-	}while(value != 6);
+	} while(value != 6);
 }
 
 void systemInformation() {
@@ -127,7 +127,7 @@ int main() {
 //
 //	cout << endl << "Loading map information ..." << endl << endl;
 
-	testNewMap("./resource/newyork_large");
+	testNewMap("./resource/small");
 	return 0;
 }
 

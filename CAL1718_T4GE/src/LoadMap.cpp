@@ -110,14 +110,14 @@ static void showBoundaries(MapMetaData &meta, Graph* &graph) {
 	int increment;
 
 	// Top and bottom
-	increment = (meta.width + 30) / 20;
+	increment = meta.width / ((meta.width + 1000) / 200);
 	for (int i = increment; i < meta.width; i += increment) {
 		graph->addVertex(ID++, i, 0);
 		graph->addVertex(ID++, i, meta.height);
 	}
 
 	// Left and right
-	increment = (meta.height + 30) / 20;
+	increment = meta.height / ((meta.height + 1000) / 200);
 	for (int j = increment; j < meta.height; j += increment) {
 		graph->addVertex(ID++, 0, j);
 		graph->addVertex(ID++, meta.width, j);
@@ -192,6 +192,9 @@ int loadMeta(string filename, MapMetaData &meta) {
 	static const regex reg_nodes("nodes ?= ?(\\d+)[.;,]", regex::icase);
 	static const regex reg_edges("edges ?= ?(\\d+)[.;,]", regex::icase);
 	static const regex reg_density("density ?= ?(-?\\d+\\.?\\d*)[.;,]", regex::icase);
+	static const regex reg_width("width ?= ?(\\d+)[.;,]", regex::icase);
+	static const regex reg_height("height ?= ?(\\d+)[.;,]", regex::icase);
+	static const regex reg_test("test ?= ?(\\d)[.;,]", regex::icase);
 
 	ifstream file(filename);
 	if (!file.is_open())
@@ -242,6 +245,18 @@ int loadMeta(string filename, MapMetaData &meta) {
 	// Optional
 	if (regex_search(text, match, reg_density))
 		meta.density = stold(match[1]);
+
+	// Optional
+	if (regex_search(text, match, reg_width))
+		meta.width = stoi(match[1]);
+
+	// Optional
+	if (regex_search(text, match, reg_height))
+		meta.height = stoi(match[1]);
+
+	// Optional
+	if (regex_search(text, match, reg_test))
+		meta.test = static_cast<bool>(stoi(match[1]));
 
 	estimateMeta(meta);
 	return 0;

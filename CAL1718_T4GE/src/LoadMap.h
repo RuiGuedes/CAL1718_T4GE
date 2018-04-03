@@ -15,6 +15,7 @@ struct MapMetaData {
 	long double min_latitude, max_latitude;
 	int nodes, edges;
 	int width = 0, height = 0;
+	bool test = false;
 	long double density = default_density;
 };
 

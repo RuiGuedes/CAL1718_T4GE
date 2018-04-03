@@ -1,0 +1,4 @@
+1;Avenida da Boavista;FALSE
+2;Circunvalação;TRUE
+3;Rotunda ABC;FALSE
+4;Roberto Frias;FALSE
