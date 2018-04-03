@@ -53,7 +53,7 @@ class GraphViewer {
    * determinado pelo programa (true) ou se deve ser determinado pelo utilizador (false).
    */
   GraphViewer(int width, int height, bool port_n);
-  // CHECK
+  // CHECK ENCAPS
   
   /**
    * Construtor que cria um novo grafo, utilizando uma porta especificada pelo utilizador para a ligação.
@@ -65,7 +65,7 @@ class GraphViewer {
    * já usada por outro programa ou pelo sistema.
    */
   GraphViewer(int width, int height, bool dynamic, int port_n);
-  // CHECK
+  // CHECK ENCAPS
   
   /**
    * Função que cria a janela para visualização.
@@ -73,13 +73,13 @@ class GraphViewer {
    * @param height Altura da janela a criar.
    */
   bool createWindow(int width, int height);
-  // CHECK
+  // CHECK ENCAPS
 
   /**
    * Fecha a janela a ser utilizada para visualização.
    */
   bool closeWindow();
-  // CHECK
+  // CHECK ENCAPS
 
   /**
    * Acrescenta um nó à representação do grafo, numa posição específica,
@@ -89,7 +89,7 @@ class GraphViewer {
    * @param y Posição vertical do nó.
    */
   bool addNode(int id, int x, int y);
-  // CHECK
+  // CHECK ENCAPS
 
   /**
    * Acrescenta um nó à representação do grafo, numa posição ao critério do programa.
@@ -107,21 +107,21 @@ class GraphViewer {
    * ou EdgeType.UNDIRECTED caso a aresta seja bidirecional.
    */
   bool addEdge(int id, int v1, int v2, int edgeType);
-  // CHECK
+  // CHECK ENCAPS
 
   /**
    * Remove um nó da representação do grafo e todas as arestas ligadas a este.
    * @param id Identificador único do nó a a remover.
    */
   bool removeNode(int id);
-  // CHECK
+  // CHECK ENCAPS
 
   /**
    * Remove uma aresta da representação do grafo.
    * @param id Identificador único da aresta a remover.
    */
   bool removeEdge(int id);
-  // CHECK
+  // CHECK ENCAPS
 
   /**
    * Função que define o texto de um nó.
@@ -129,7 +129,7 @@ class GraphViewer {
    * @param label Novo texto do nó.
    */
   bool setVertexLabel(int id, string label);
-  // CHECK
+  // CHECK ENCAPS
 
   /**
    * Função que define o texto de uma aresta.
@@ -137,7 +137,7 @@ class GraphViewer {
    * @param label Novo texto da aresta.
    */
   bool setEdgeLabel(int id, string label);
-  // CHECK
+  // CHECK ENCAPS
 
   /**
    * Função que define a cor de uma aresta.
@@ -145,7 +145,7 @@ class GraphViewer {
    * @param color Nova cor da aresta, utilizar as constantes definidas no graphviewer.h para conveniência.
    */
   bool setEdgeColor(int id, string color);
-  // CHECK
+  // CHECK ENCAPS
 
   /**
    * Função que define a cor de um nó.
@@ -153,21 +153,21 @@ class GraphViewer {
    * @param color Nova cor do nó, utilizar as constantes definidas no graphviewer.h para conveniência.
    */
   bool setVertexColor(int id, string color);
-  // CHECK
+  // CHECK ENCAPS
 
   /**
    * Função que define a cor global das arestas.
    * @param color Nova cor das arestas, utilizar as constantes definidas no graphviewer.h para conveniência.
    */
   bool defineEdgeColor(string color);
-  // CHECK
+  // CHECK ENCAPS
 
   /**
    * Função que define a cor global dos nós.
    * @param color Nova cor dos nós, utilizar as constantes definidas no graphviewer.h para conveniência.
    */
   bool defineVertexColor(string color);
-  // CHECK
+  // CHECK ENCAPS
 
   /**
    * Função que define a espessura de uma aresta.
@@ -176,14 +176,14 @@ class GraphViewer {
    * arestas são criadas com a espessura de 1.
    */
   bool setEdgeThickness(int id, int thickness);
-  // CHECK
+  // CHECK ENCAPS
   
   /**
    * Função que altera a imagem de fundo do grafo.
    * @param path Caminho para o ficheiro com a imagem.
    */
   bool setBackground(string path);
-  // CHECK
+  // CHECK ENCAPS
 
   /**
    * Função que define o peso de uma aresta na representação do grafo, a ser visualizado
@@ -207,7 +207,7 @@ class GraphViewer {
    * Função que actualiza a visualização do grafo.
    */
   bool rearrange();
-  // CHECK
+  // CHECK ENCAPS
 
 #ifdef linux
   static pid_t procId;

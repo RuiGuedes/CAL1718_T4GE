@@ -45,9 +45,18 @@ void Graph::moveToAccidentedVertexSet(Vertex *v) {
 
 
 /*
+ * GRAPHVIEWER
  * @brief Updates the graph window with new info
  */
 void Graph::update() const {
+	gv->rearrange();
+}
+
+/*
+ * GRAPHVIEWER
+ * @brief Updates the graph window with new info
+ */
+void Graph::rearrange() const {
 	gv->rearrange();
 }
 
@@ -148,6 +157,8 @@ Graph::Graph(int width, int height) {
 	this->width = width; this->height = height;
 	gv = new GraphViewer(width, height, false);
 	gv->createWindow(GRAPH_VIEWER_WIDTH, GRAPH_VIEWER_HEIGHT);
+	defineVertexColor(VERTEX_CLEAR_COLOR);
+	defineEdgeColor(EDGE_CLEAR_COLOR);
 }
 
 /*
@@ -185,6 +196,11 @@ bool Graph::addVertex(int id, int x, int y, bool accidented) {
 			vertexSet.push_back(v);
 		}
 		gv->addNode(id, x, y);
+		// * Set Vertex Label
+		setVertexLabel(id, to_string(id));
+		// * Set Vertex Color
+		if (v->isAccidented())
+			setVertexColor(id, VERTEX_ACCIDENTED_COLOR);
 		// No graph->update()
 		return true;
 	}
@@ -202,13 +218,19 @@ bool Graph::addVertex(Vertex* v) {
 	} else if (!withinBounds(v->getX(), v->getY())) {
 		throw std::out_of_range("Vertex out of graph bounds");
 	} else {
+		int id = v->getId();
 		v->graph = this;
 		if (v->isAccidented()) {
 			accidentedVertexSet.push_back(v);
 		} else {
 			vertexSet.push_back(v);
 		}
-		gv->addNode(v->getId(), v->getX(), v->getY());
+		gv->addNode(id, v->getX(), v->getY());
+		// * Set Vertex Label
+		setVertexLabel(id, to_string(id));
+		// * Set Vertex Color
+		if (v->isAccidented())
+			setVertexColor(id, VERTEX_ACCIDENTED_COLOR);
 		// No graph->update()
 		return true;
 	}
@@ -797,8 +819,16 @@ bool Vertex::addEdge(Edge* e) {
 	} else {
 		adj.push_back(e);
 	}
-	graph->gv->addEdge(e->getId(), e->getSource()->getId(),
+	int id = e->getId();
+	graph->gv->addEdge(id, e->getSource()->getId(),
 				e->getDest()->getId(), EdgeType::DIRECTED);
+	// * Set Edge Label
+	graph->setEdgeLabel(id, to_string(id));
+	// * Set Edge Color
+	if (e->isAccidented())
+		graph->setEdgeColor(id, EDGE_ACCIDENTED_COLOR);
+	// * Set Edge Weight
+	graph->setEdgeWeight(id, e->getWeight());
 	// No graph->update()
 	return true;
 }
@@ -863,7 +893,10 @@ Edge* Vertex::getEdge(Vertex* vdest) const {
 bool Vertex::fix() {
 	if (accidented) {
 		accidented = false;
+		// Move back to vertexSet
 		graph->moveToVertexSet(this);
+		// * Set Vertex Color
+		graph->setVertexColor(id, VERTEX_CLEAR_COLOR);
 		return true;
 	} else {
 		return false;
@@ -877,7 +910,10 @@ bool Vertex::fix() {
 bool Vertex::accident() {
 	if (!accidented) {
 		accidented = true;
+		// Move to accidentedVertexSet
 		graph->moveToAccidentedVertexSet(this);
+		// * Set Vertex Color
+		graph->setVertexColor(id, VERTEX_ACCIDENTED_COLOR);
 		return true;
 	} else {
 		return false;
@@ -1051,7 +1087,10 @@ bool Edge::isAccidented() const {
 bool Edge::fix() {
 	if (accidented) {
 		accidented = false;
+		// Move back to adj
 		source->moveToAdj(this);
+		// * Set Edge Color
+		graph->setEdgeColor(id, EDGE_CLEAR_COLOR);
 		return true;
 	} else {
 		return false;
@@ -1066,7 +1105,10 @@ bool Edge::fix() {
 bool Edge::accident() {
 	if (!accidented) {
 		accidented = true;
+		// Move to accidentedAdj
 		source->moveToAccidentedAdj(this);
+		// * Set Edge Color
+		graph->setEdgeColor(id, EDGE_ACCIDENTED_COLOR);
 		return true;
 	} else {
 		return false;

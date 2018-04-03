@@ -12,8 +12,12 @@
 
 using namespace std;
 
-#define GRAPH_VIEWER_WIDTH  ((int)600)
-#define GRAPH_VIEWER_HEIGHT ((int)600)
+#define GRAPH_VIEWER_WIDTH        ((int)600)
+#define GRAPH_VIEWER_HEIGHT       ((int)600)
+#define VERTEX_CLEAR_COLOR        BLUE
+#define VERTEX_ACCIDENTED_COLOR   RED
+#define EDGE_CLEAR_COLOR          BLACK
+#define EDGE_ACCIDENTED_COLOR     RED
 
 class Edge;
 class Graph;
@@ -37,6 +41,7 @@ class Graph {
 public:
 	// ***** Visual API
 	void update() const;
+	void rearrange() const;
 
 	bool setVertexLabel(int id, string label) const;
 	bool setVertexColor(int id, string color) const;
@@ -195,7 +200,6 @@ public:
 	bool operator==(Vertex *v) const;
 	bool operator!=(Vertex *v) const;
 	ostream& operator<<(ostream &out) const;
-	friend class Graph;
 	friend class Edge;
 	friend class MutablePriorityQueue<Vertex>;
 };
@@ -247,8 +251,6 @@ public:
 	bool operator==(Edge *e) const;
 	bool operator!=(Edge *e) const;
 	ostream& operator<<(ostream &out) const;
-	friend class Graph;
-	friend class Vertex;
 	friend class MutablePriorityQueue<Vertex>;
 };
 
