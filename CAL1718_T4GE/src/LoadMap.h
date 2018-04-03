@@ -39,3 +39,4 @@ int testLoadRoads(string path);
 
 int testLoadSubroads(string path);
 
+int testNewMap(string path);

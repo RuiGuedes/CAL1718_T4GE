@@ -149,6 +149,10 @@ int loadMap(string filename, Graph* &graph, bool boundaries) {
 	MapMetaData meta;
 	loadMeta(meta_filename, meta);
 
+	// If test flag is given, switch main line to testNewMap()
+	if (meta.test)
+		return testNewMap("../resource/" + filename);
+
 	// Initialize the map with appropriate sizes, but do nothing else.
 	// For some reason, creating the Window immediately is necessary...
 	graph = new Graph(meta.width, meta.height);
@@ -563,4 +567,39 @@ int testLoadMap(string path) {
 		getchar();
 		return -1;
 	}
+}
+
+int testNewMap(string path) {
+	int status;
+
+	status = testLoadMeta(path);
+	if (status != 0)
+		return -1;
+
+	cout << "Next test " << endl << endl;
+
+	status = testLoadNodes(path);
+	if (status != 0)
+		return -1;
+
+	cout << "Next test " << endl << endl;
+
+	status = testLoadRoads(path);
+	if (status != 0)
+		return -1;
+
+	cout << "Next test " << endl << endl;
+
+	status = testLoadSubroads(path);
+	if (status != 0)
+		return -1;
+
+	cout << "Next test " << endl << endl;
+
+	status = testLoadMap(path);
+	if (status != 0)
+		return -1;
+
+	getchar();
+	exit(0);
 }
