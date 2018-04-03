@@ -36,6 +36,7 @@ void getShortestPath() {
 	}
 
 	myGraph.dijkstraShortestPath(startingNode);
+
 	vector<int> unreachableNodes = checkUnreachableNodes();
 	vector<int> pathIndex;
 

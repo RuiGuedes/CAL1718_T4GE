@@ -106,10 +106,32 @@ int main() {
 //
 //	mainMenu();
 
-	//int s = loadMap("./resource/newyork", gv, myGraph, false);
-	testLoadMap("newyork_large");
+//	ifstream file;
+//	string filename;
+//
+//	cout << "Select map file" << endl << endl;
+//
+//	while(1) {
+//
+//		cout << "Filename: ";
+//		cin >> filename;
+//
+//		file.open("../resource/" + filename + "_meta.txt");
+//
+//		if (file.is_open()) {
+//			file.close();
+//			break;
+//		}
+//		else
+//			cout << "Invalid filename. Try again !" << endl << endl;
+//
+//	}
+//
+//	cout << endl << "Loading map information ..." << endl << endl;
+	//loadMap("../resource/" + filename, gv, myGraph, false);
+	loadMap("../resource/gporto", gv, myGraph, false);
+	mainMenu();
 
-	getchar();
 	return 0;
 }
 
@@ -142,31 +164,31 @@ bool validNumberInput(string input, int upperLimit) {
 int testNewMap(string path) {
 	int status;
 
-	status = testLoadMeta("./resource/" + path);
+	status = testLoadMeta("../resource/" + path);
 	if (status != 0)
 		return -1;
 
 	cout << "Next test " << endl << endl;
 
-	status = testLoadNodes("./resource/" + path);
+	status = testLoadNodes("../resource/" + path);
 	if (status != 0)
 		return -1;
 
 	cout << "Next test " << endl << endl;
 
-	status = testLoadRoads("./resource/" + path);
+	status = testLoadRoads("../resource/" + path);
 	if (status != 0)
 		return -1;
 
 	cout << "Next test " << endl << endl;
 
-	status = testLoadSubroads("./resource/" + path);
+	status = testLoadSubroads("../resource/" + path);
 	if (status != 0)
 		return -1;
 
 	cout << "Next test " << endl << endl;
 
-	status = testLoadMap("./resource/" + path);
+	status = testLoadMap("../resource/" + path);
 	if (status != 0)
 		return -1;
 

@@ -150,12 +150,14 @@ void Graph<T>::dijkstraShortestPath(const T &origin) {
 			v->path = NULL;
 		}
 	}
-
+	cout << "1\n\n";
 	while(!q.empty()) {
 		Vertex<T> *v = q.extractMin();
 
 		for(auto w : v->adj) {
+			cout << w.road->getWeight() << "\n\n";
 			if(w.dest->dist > v->dist + w.road->getWeight()) {
+				cout << w.road->getWeight() << "\n\n";
 				double oldDist = w.dest->dist;
 
 				w.dest->dist = v->dist + w.road->getWeight();

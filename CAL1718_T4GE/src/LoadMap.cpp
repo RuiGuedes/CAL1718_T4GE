@@ -407,13 +407,16 @@ int loadSubroads(string filename, MapMetaData &meta, GraphViewer* &gv, Graph<int
 			int node2id = nodeIdMap[id];
 
 			// Register Edges
+
+
+
 			myGraph.addEdge(node1id, node2id, 0);
-			gv->addEdge(subRoadID, node1id, node2id, EdgeType::UNDIRECTED);
+			gv->addEdge(subRoadID, node1id, node2id, EdgeType::DIRECTED);
 			if (roadDirectionMap[roadid]) {
 				// Add reverse edges
 				++subRoadID;
 				myGraph.addEdge(node2id, node1id, 0);
-				gv->addEdge(subRoadID, node2id, node1id, EdgeType::UNDIRECTED);
+				gv->addEdge(subRoadID, node2id, node1id, EdgeType::DIRECTED);
 			}
 			++newSubroads;
 			++subRoadID;
