@@ -63,13 +63,12 @@ public:
 	Graph(int width, int height);
 	~Graph();
 
-	///// ***** Vertex CRUD
-	// C
+	///// ***** Vertex
 	bool addVertex(int id, int x, int y, bool accidented = false);
-	bool addVertex(Vertex *v); //
-	// R
+	bool addVertex(Vertex *v);
+
 	Vertex *findVertex(int id) const;
-	Vertex *getVertex(int id) const; //
+	Vertex *getVertex(int id) const;
 	int getNumVertices() const;
 	int getNumAccidentedVertices() const;
 	int getTotalVertices() const;
@@ -81,28 +80,27 @@ public:
 	bool connectedTo(Vertex *v1, Vertex *v2, bool bothways = false) const;
 	bool edgeIsAccidented(Edge *e) const;
 	bool vertexIsAccidented(Vertex* v) const;
-	// U
+
 	bool fixVertex(Vertex *v);
 	bool accidentVertex(Vertex *v);
-	// D
+
 	void removeVertex(int id);
 	void removeVertex(Vertex *v);
 	/////
 
 	///// ***** Edge CRUD
-	// C
-	bool addEdge(int eid, int sourceId, int destId, double weight/*, Road* road*/, bool accidented = false);
-	bool addEdge(int eid, Vertex *vsource, Vertex *vdest, double weight/*, Road* road*/, bool accidented = false);
+	bool addEdge(int eid, int sourceId, int destId, double weight, Subroad* road, bool accidented = false);
+	bool addEdge(int eid, Vertex *vsource, Vertex *vdest, double weight, Subroad* road, bool accidented = false);
 	bool addEdge(Edge *e);
-	// R
+
 	Edge *findEdge(int eid) const;
 	Edge *getEdge(int eid) const;
 	Edge *findEdge(int sourceId, int destId) const;
 	Edge *getEdge(int sourceId, int destId) const;
-	// U
+
 	bool fixEdge(Edge *e);
 	bool accidentEdge(Edge *e);
-	// D
+
 	void removeEdge(int eid);
 	void removeEdge(Edge *e);
 	/////
@@ -146,8 +144,6 @@ public:
 	~Vertex();
 
 	///// ***** Vertex CRUD
-	// C
-	// R
 	int getID() const;
 	int getX() const; // could also make x a const public
 	int getY() const; // could also make y a const public
@@ -159,24 +155,21 @@ public:
 	vector<Edge*> getAccidentedAdj() const;
 	Vertex *getPredecessor() const;
 	vector<Vertex*> getPath() const;
-	// U
-	// D
 	/////
 
 	///// ***** Edge CRUD
-	// C
 	bool addEdge(Edge *e);
-	// R
+
 	Edge *findEdge(int eid) const;
 	Edge *getEdge(int eid) const;
 	Edge *findEdge(Vertex *vdest) const;
 	Edge *getEdge(Vertex *vdest) const;
-	// U
+
 	bool fix();
 	bool accident();
 	bool fixEdge(Vertex *vdest);
 	bool accidentEdge(Vertex *vdest);
-	// D
+
 	void removeEdge(int eid);
 	void removeEdge(Vertex *dest);
 	void removeEdge(Edge *edge);
@@ -209,26 +202,17 @@ class Edge {
 	Graph* graph = nullptr;
 	Subroad* subroad;
 
-	// ...
-	/*Road *road;*/
-
 public:
 	///// ***** Constructor
 	void _sgraph(Graph* graph);
-	explicit Edge(int id, Vertex* vsource, Vertex *vdest, double weight/*, Road *w*/, bool accidented = false);
+	explicit Edge(int id, Vertex* vsource, Vertex *vdest, double weight, Subroad *subroad, bool accidented = false);
 
 	///// ***** Vertex CRUD
-	// C
-	// R
 	Vertex *getSource() const;
 	Vertex *getDest() const;
-	// U
-	// D
 	/////
 
 	///// ***** Edge CRUD
-	// C
-	// R
 	int getID() const;
 	double getWeight() const;
 	Road *getRoad() const;
@@ -237,12 +221,11 @@ public:
 	int getActualCapacity() const;
 	int getMaxCapacity() const;
 	int calculateAverageSpeed() const;
-	// U
+
 	bool fix();
 	bool accident();
 	void setWeight(double weight);
 	bool setActualCapacity(int capacity);
-	// D
 	/////
 
 	// ***** Operations
@@ -266,9 +249,9 @@ public:
 class Road {
 	const int id;
 	const string name;
+	const bool bothways;
 	double totalDistance = 0;
-	bool bothways;
-	int averageSpeed;
+	int averageSpeed = 0;
 
 public:
 	Road(int rid, string name, bool bothways = false);
@@ -278,6 +261,7 @@ public:
 	// R
 	int getID() const;
 	string getName() const;
+	bool isBidirectional() const;
 	double getTotalDistance() const;
 	int getAverageSpeed() const;
 	// U
@@ -301,22 +285,19 @@ class Subroad {
 	Road *const road;
 
 	int actualCapacity = 0;
-	int maxCapacity;
+	int maxCapacity = 0;
 
 public:
 	Subroad(double distance, Road* road);
 
 	///// ***** Subroad CRUD
-	// C
-	// R
 	Road *getRoad() const;
 	double getDistance() const;
 	int getActualCapacity() const;
 	int getMaxCapacity() const;
 	int calculateAverageSpeed() const;
-	// U
+
 	bool setActualCapacity(int actualCapacity);
-	// D
 	/////
 
 	friend class Road;

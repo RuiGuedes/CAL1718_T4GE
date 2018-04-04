@@ -1,9 +1,13 @@
+#include <stdlib.h>
+#include <time.h>
+
+#include "FunctionsPrototypes.h"
 #include "LoadMap.h"
 #include "Graph.h"
 
 Graph* graph;
 
-/*
+
 void mainMenu() {
 
 	system("cls");
@@ -26,7 +30,7 @@ void mainMenu() {
 			cout << endl << "Enter an option (1-6): ";
 			cin >> option;
 
-			if (validNumberInput(option,6)) {
+			if (validIDInput(option,6)) {
 				value = stoi(option);
 				break;
 			}
@@ -49,7 +53,7 @@ void mainMenu() {
 			editRoadInfo();
 			break;
 		case 4:
-			getShortestPath();
+			//getShortestPath();
 			break;
 		case 5:
 			systemInformation();
@@ -59,7 +63,7 @@ void mainMenu() {
 
 	} while(value != 6);
 }
-*/
+
 void systemInformation() {
 
 	cout << "System information" << endl << endl;
@@ -74,6 +78,7 @@ void systemInformation() {
 }
 
 int main() {
+	srand(time(0));
 //	ifstream file;
 //	string filename;
 //
@@ -98,7 +103,9 @@ int main() {
 //	cout << endl << "Loading map information ..." << endl << endl;
 
 	//loadMap("../resource/small", graph);
-	loadMap("./resource/newyork_large", graph);
+
+	//loadMap("./resource/newyork_large", graph);
+	testNewMap("./resource/newyork_large");
 
 	//mainMenu();
 	getchar();

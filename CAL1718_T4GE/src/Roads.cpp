@@ -1,4 +1,5 @@
 #include <math.h>
+#include <stdlib.h>
 
 #include "Graph.h"
 
@@ -7,18 +8,7 @@
 ////////////////
 
 Road::Road(int rid, string name, bool bothways):
-	id(rid), name(name), bothways(bothways) {
-	// DUMMY
-	if (totalDistance > 1.0)
-		averageSpeed = 120;
-	if (totalDistance > 0.5)
-		averageSpeed = 90;
-	if (totalDistance > 0.25)
-		averageSpeed = 70;
-	if (totalDistance > 0.1)
-		averageSpeed = 50;
-	averageSpeed = 30;
-}
+	id(rid), name(name), bothways(bothways) {}
 
 int Road::getID() const {
 	return id;
@@ -26,6 +16,10 @@ int Road::getID() const {
 
 string Road::getName() const {
 	return name;
+}
+
+bool Road::isBidirectional() const {
+	return bothways;
 }
 
 double Road::getTotalDistance() const {
@@ -39,6 +33,16 @@ int Road::getAverageSpeed() const {
 bool Road::setTotalDistance(double distance) {
 	if (totalDistance != 0 || distance <= 0) return false;
 	totalDistance = distance;
+
+	if (distance > 1.0)
+		averageSpeed = 120;
+	else if (distance > 0.5)
+		averageSpeed = 90;
+	else if (distance > 0.25)
+		averageSpeed = 70;
+	else
+		averageSpeed = 50;
+
 	return true;
 }
 
@@ -52,8 +56,8 @@ bool Road::setTotalDistance(double distance) {
 
 Subroad::Subroad(double distance, Road* road):
 		distance(distance), road(road) {
-	maxCapacity = ceil(distance * 300);
-	actualCapacity = rand() % maxCapacity;
+	maxCapacity = ceil(distance * 300 + 10);
+	actualCapacity = (rand() % maxCapacity);
 }
 
 Road* Subroad::getRoad() const {

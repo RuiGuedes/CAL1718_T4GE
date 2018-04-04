@@ -448,9 +448,9 @@ void Graph::removeVertex(Vertex* v) {
  * @throws logic_error if Repeated edge id
  */
 bool Graph::addEdge(int eid, int sourceId, int destId,
-		double weight/*, Road *w*/, bool accidented) {
+		double weight, Subroad *subroad, bool accidented) {
 	return addEdge(eid, findVertex(sourceId),
-			findVertex(destId),weight/*, w*/);
+			findVertex(destId), weight, subroad, accidented);
 }
 
 /*
@@ -462,14 +462,14 @@ bool Graph::addEdge(int eid, int sourceId, int destId,
  * @throws logic_error if Repeated edge id
  */
 bool Graph::addEdge(int eid, Vertex* vsource, Vertex* vdest,
-		double weight/*, Road *w*/, bool accidented) {
+		double weight, Subroad *subroad, bool accidented) {
 	if (vsource == nullptr || vdest == nullptr) {
 		throw std::invalid_argument("Vertex not found");
 	}
 	if (findEdge(eid) != nullptr) {
 		throw std::logic_error("Repeated edge id");
 	}
-	Edge* e = new Edge(eid, vsource, vdest, weight, accidented);
+	Edge* e = new Edge(eid, vsource, vdest, weight, subroad, accidented);
 	// Delegate to vertex
 	if (vsource->addEdge(e)) {
 		return true;
@@ -1028,10 +1028,9 @@ void Edge::_sgraph(Graph* graph) {
  * conditional accidented, defaulting to false
  */
 Edge::Edge(int id, Vertex* vsource, Vertex* vdest,
-		double weight, bool accidented):
-	id(id), source(vsource), dest(vdest),
-	weight(weight), accidented(accidented),
-	graph(nullptr) {}
+		double weight, Subroad* subroad, bool accidented):
+	id(id), source(vsource), dest(vdest), weight(weight),
+	accidented(accidented), subroad(subroad) {}
 
 /*
  * @brief Return's the edge's source vertex

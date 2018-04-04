@@ -10,8 +10,7 @@
 
 static map<long long, int> nodeIdMap;
 static map<long long, int> roadIdMap;
-static map<int, string> roadNameMap;
-static map<int, bool> roadDirectionMap; 	// True means bidirectional
+static map<int, Road*> roadMap;
 
 
 extern bool graphLoaded;
@@ -227,8 +226,7 @@ int loadMap(string filename, Graph* &graph, bool boundaries) {
 	// Release auxiliary memory
 	nodeIdMap.clear();
 	roadIdMap.clear();
-	roadNameMap.clear();
-	roadDirectionMap.clear();
+	roadMap.clear();
 
 	graph->update();
 	graphLoaded = true;
@@ -429,17 +427,19 @@ int loadRoads(string filename, MapMetaData &meta, Graph* &graph) {
 				long long id = stoll(match[1]);
 				roadIdMap[id] = lineID;
 
-				// Get Road name
+				// Get Road Name
 				string name = match[2];
-				roadNameMap[lineID] = name;
 
 				// Get Road Direction
-				if(match[3] == TrueStr)
-					roadDirectionMap[lineID] = true;
+				bool bothways;
+				if (match[3] == TrueStr)
+					bothways = true;
 				else
-					roadDirectionMap[lineID] = false;
+					bothways = false;
 
 				// Register Road
+				Road* road = new Road(lineID, name, bothways);
+				roadMap[lineID] = road;
 				++newRoads;
 			} catch (runtime_error &e) {
 				cerr << e.what() << endl;
@@ -454,7 +454,7 @@ int loadRoads(string filename, MapMetaData &meta, Graph* &graph) {
 	}
 
 	file.close();
-	return newRoads;
+	return 0;
 }
 
 // ** Subroads: road_id;node1_id;node2_id;
@@ -476,6 +476,8 @@ int loadSubroads(string filename, MapMetaData &meta, Graph* &graph) {
 	getline(file, line);
 
 	int newSubroads = 0, subRoadID = 1, lineID = 1;
+	Road* currentRoad = nullptr;
+	vector<Subroad*> subroads;
 
 	while (!file.eof() && !file.fail()) {
 		smatch match;
@@ -487,6 +489,22 @@ int loadSubroads(string filename, MapMetaData &meta, Graph* &graph) {
 				id = stoll(match[1]);
 				int roadid = roadIdMap[id];
 
+				// Finish setting up the previous Road's data
+				// if this subroad belongs to a different Road
+				if (!currentRoad) {
+					currentRoad = roadMap[roadid];
+				}
+				else if (roadMap[roadid] != currentRoad) {
+					double totalDistance = 0;
+					for (auto subroad : subroads)
+						totalDistance += subroad->getDistance();
+
+					currentRoad->setTotalDistance(totalDistance);
+					subroads.clear();
+
+					currentRoad = roadMap[roadid];
+				}
+
 				// Get Node 1
 				id = stoll(match[2]);
 				int node1id = nodeIdMap[id];
@@ -495,17 +513,20 @@ int loadSubroads(string filename, MapMetaData &meta, Graph* &graph) {
 				id = stoll(match[3]);
 				int node2id = nodeIdMap[id];
 
-				// Register Edges
+				// Get vertices and distance
 				Vertex* v1 = graph->getVertex(node1id);
 				Vertex* v2 = graph->getVertex(node2id);
-				double weight = graph->distance(v1, v2);
+				double distance = graph->distance(v1, v2);
 
-				graph->addEdge(subRoadID, v1, v2, weight);
+				// Load subroad
+				Subroad* subroad = new Subroad(distance, currentRoad);
+				subroads.push_back(subroad);
+				graph->addEdge(subRoadID, v1, v2, distance, subroad);
 				++newSubroads;
 				++subRoadID;
-				if (roadDirectionMap[roadid]) {
+				if (currentRoad->isBidirectional()) {
 					// Add reverse edge
-					graph->addEdge(subRoadID, v2, v1, weight);
+					graph->addEdge(subRoadID, v2, v1, distance, subroad);
 					++newSubroads;
 					++subRoadID;
 				}
@@ -522,7 +543,7 @@ int loadSubroads(string filename, MapMetaData &meta, Graph* &graph) {
 	}
 
 	file.close();
-	return newSubroads;
+	return 0;
 }
 
 
@@ -533,10 +554,17 @@ int loadSubroads(string filename, MapMetaData &meta, Graph* &graph) {
 
 int testLoadMeta(string path) {
 	try {
+		// Exit if any of the 4 files is not found
+		if (!checkFilename(path)) {
+			return -1;
+		}
+
+		// Load meta data
 		MapMetaData meta;
 		if (loadMeta(path + meta_suffix, meta) != 0) {
 			return -1;
 		}
+
 		cout << "Min Longitude: " << meta.min_longitude << endl;
 		cout << "Max Longitude: " << meta.max_longitude << endl;
 		cout << "Min Latitude: " << meta.min_latitude << endl;
@@ -563,15 +591,29 @@ int testLoadMeta(string path) {
 
 int testLoadNodes(string path) {
 	try {
+		Graph* graph;
+
+		// Exit if any of the 4 files is not found
+		if (!checkFilename(path)) {
+			return -1;
+		}
+
+		// Load meta data
 		MapMetaData meta;
-		loadMeta(path + meta_suffix, meta);
+		if (loadMeta(path + meta_suffix, meta) != 0) {
+			return -1;
+		}
 
-		Graph* graph = new Graph(meta.width, meta.height);
+		// Initialize the graph
+		graph = new Graph(meta.width, meta.height);
 
+		// Load Nodes, Roads and Subroads
 		if (loadNodes(path + nodes_suffix, meta, graph) != 0) {
 			return -1;
 		}
-		showBoundaries(meta, graph);
+
+		if (meta.boundaries) showBoundaries(meta, graph);
+
 		graph->update();
 
 		// *** Test
@@ -594,24 +636,41 @@ int testLoadNodes(string path) {
 
 int testLoadRoads(string path) {
 	try {
+		Graph* graph;
+
+		// Exit if any of the 4 files is not found
+		if (!checkFilename(path)) {
+			return -1;
+		}
+
+		// Load meta data
 		MapMetaData meta;
-		loadMeta(path + meta_suffix, meta);
+		if (loadMeta(path + meta_suffix, meta) != 0) {
+			return -1;
+		}
 
-		Graph* graph = new Graph(meta.width, meta.height);
+		// Initialize the graph
+		graph = new Graph(meta.width, meta.height);
 
-		loadNodes(path + nodes_suffix, meta, graph);
-		showBoundaries(meta, graph);
-		graph->update();
-
+		// Load Nodes, Roads and Subroads
+		if (loadNodes(path + nodes_suffix, meta, graph) != 0) {
+			return -1;
+		}
 		if (loadRoads(path + roads_suffix, meta, graph) != 0) {
 			return -1;
 		}
 
-		for (auto road : roadIdMap) {
-			int id = road.second;
-			cout << "ID=" << id << " ; ";
-			cout << "NAME=" << roadNameMap[id] << " ; ";
-			cout << "TWOWAY=" << (roadDirectionMap[id] ? "true" : "false");
+		if (meta.boundaries) showBoundaries(meta, graph);
+
+		graph->update();
+
+		// *** Test
+		cout << "MADE IT " << endl;
+		for (auto r : roadMap) {
+			Road* road = r.second;
+			cout << "ID=" << road->getID() << " ; ";
+			cout << "NAME=" << road->getName() << " ; ";
+			cout << "TWOWAY=" << (road->isBidirectional() ? "true" : "false");
 			cout << " ; " << endl;
 		}
 
@@ -627,21 +686,38 @@ int testLoadRoads(string path) {
 
 int testLoadSubroads(string path) {
 	try {
+		Graph* graph;
+
+		// Exit if any of the 4 files is not found
+		if (!checkFilename(path)) {
+			return -1;
+		}
+
+		// Load meta data
 		MapMetaData meta;
-		loadMeta(path + meta_suffix, meta);
+		if (loadMeta(path + meta_suffix, meta) != 0) {
+			return -1;
+		}
 
-		Graph* graph = new Graph(meta.width, meta.height);
+		// Initialize the graph
+		graph = new Graph(meta.width, meta.height);
 
-		loadNodes(path + nodes_suffix, meta, graph);
-		showBoundaries(meta, graph);
-		graph->update();
-
-		loadRoads(path + roads_suffix, meta, graph);
-
+		// Load Nodes, Roads and Subroads
+		if (loadNodes(path + nodes_suffix, meta, graph) != 0) {
+			return -1;
+		}
+		if (loadRoads(path + roads_suffix, meta, graph) != 0) {
+			return -1;
+		}
 		if (loadSubroads(path + subroads_suffix, meta, graph) != 0) {
 			return -1;
 		}
 
+		if (meta.boundaries) showBoundaries(meta, graph);
+
+		graph->update();
+
+		// *** Test
 		auto vertexSet = graph->getAllVertexSet();
 		for (auto v : vertexSet) {
 			for (auto edge : v->getAdj()) {
