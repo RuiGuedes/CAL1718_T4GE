@@ -22,10 +22,7 @@ bool Graph::withinBounds(int x, int y) const {
  * to vertexSet. v in accidentedVertexSet check prior
  */
 void Graph::moveToVertexSet(Vertex *v) {
-	accidentedVertexSet.erase(remove(
-			accidentedVertexSet.begin(),
-			accidentedVertexSet.end(), v),
-			accidentedVertexSet.end());
+	accidentedVertexSet.erase(remove(accidentedVertexSet.begin(),accidentedVertexSet.end(), v), accidentedVertexSet.end());
 	vertexSet.push_back(v);
 	sort(vertexSet.begin(), vertexSet.end());
 	update();
@@ -36,15 +33,11 @@ void Graph::moveToVertexSet(Vertex *v) {
  * to accidentedVertexSet. v in vertexSet check prior
  */
 void Graph::moveToAccidentedVertexSet(Vertex *v) {
-	vertexSet.erase(remove(
-			vertexSet.begin(),
-			vertexSet.end(), v),
-			vertexSet.end());
+	vertexSet.erase(remove(vertexSet.begin(),vertexSet.end(), v),vertexSet.end());
 	accidentedVertexSet.push_back(v);
 	sort(accidentedVertexSet.begin(), accidentedVertexSet.end());
 	update();
 }
-
 
 
 /*
@@ -261,11 +254,13 @@ Vertex* Graph::getVertex(int id) const {
 
 	// Look for vertex in vertexSet
 	auto it = find_if(vertexSet.cbegin(), vertexSet.cend(), getId);
-	if (it != vertexSet.cend()) return *it;
+	if (it != vertexSet.cend())
+		return *it;
 
 	// Look for vertex in accidentedVertexSet
 	it = find_if(accidentedVertexSet.cbegin(), accidentedVertexSet.cend(), getId);
-	if (it != accidentedVertexSet.cend()) return *it;
+	if (it != accidentedVertexSet.cend())
+		return *it;
 
 	// Vertex not found
 	return nullptr;
@@ -424,14 +419,12 @@ void Graph::removeVertex(Vertex* v) {
 		throw std::invalid_argument("Vertex not found");
 	}
 	if (v->isAccidented()) {
-		auto it = find(accidentedVertexSet.begin(),
-				accidentedVertexSet.end(), v);
+		auto it = find(accidentedVertexSet.begin(), accidentedVertexSet.end(), v);
 		delete v;
 		accidentedVertexSet.erase(it);
 	} else {
 		int id = v->getID();
-		auto it = find(vertexSet.begin(),
-				vertexSet.end(), v);
+		auto it = find(vertexSet.begin(), vertexSet.end(), v);
 		delete v;
 		vertexSet.erase(it);
 		gv->removeNode(id);
@@ -516,11 +509,13 @@ Edge* Graph::getEdge(int eid) const {
 	// Delegate to vertices
 	for (auto vertex : vertexSet) {
 		Edge* e = vertex->getEdge(eid);
-		if (e != nullptr) return e;
+		if (e != nullptr)
+			return e;
 	}
 	for (auto vertex : accidentedVertexSet) {
 		Edge* e = vertex->getEdge(eid);
-		if (e != nullptr) return e;
+		if (e != nullptr)
+			return e;
 	}
 	return nullptr;
 }
@@ -575,7 +570,7 @@ bool Graph::accidentEdge(Edge* e) {
 		throw std::invalid_argument("Edge not found");
 	}
 	// Delegate to edge directly
-	return e->fix();
+	return e->accident();
 }
 
 /*
@@ -624,10 +619,7 @@ ostream& Graph::operator<<(ostream& out) const {
  * to adj. v in accidentedAdj check prior
  */
 void Vertex::moveToAdj(Edge *e) {
-	accidentedAdj.erase(remove(
-			accidentedAdj.begin(),
-			accidentedAdj.end(), e),
-			accidentedAdj.end());
+	accidentedAdj.erase(remove(accidentedAdj.begin(),accidentedAdj.end(), e),accidentedAdj.end());
 	adj.push_back(e);
 	sort(adj.begin(), adj.end());
 	graph->update();
@@ -638,10 +630,7 @@ void Vertex::moveToAdj(Edge *e) {
  * to accidentedAdj. v in adj check prior
  */
 void Vertex::moveToAccidentedAdj(Edge *e) {
-	adj.erase(remove(
-			adj.begin(),
-			adj.end(), e),
-			adj.end());
+	adj.erase(remove(adj.begin(),adj.end(), e),adj.end());
 	accidentedAdj.push_back(e);
 	sort(accidentedAdj.begin(), accidentedAdj.end());
 	graph->update();
@@ -764,6 +753,7 @@ vector<Edge*> Vertex::getAccidentedAdj() const {
  */
 Vertex* Vertex::getPredecessor() const {
 	return nullptr; // TODO
+	//Add data member to Vertex Class in order to save the vertex predecessor and basically return it in this function
 }
 
 /*
@@ -800,8 +790,7 @@ bool Vertex::addEdge(Edge* e) {
 	}
 	int id = e->getID();
 	e->_sgraph(graph);
-	graph->gv->addEdge(id, e->getSource()->getID(),
-				e->getDest()->getID(), EdgeType::DIRECTED);
+	graph->gv->addEdge(id, e->getSource()->getID(), e->getDest()->getID(), EdgeType::DIRECTED);
 	// * Set Edge Label
 	if (showEdgeLabels)
 		graph->setEdgeLabel(id, to_string(id));
@@ -970,8 +959,7 @@ void Vertex::removeEdge(Edge* edge) {
 		accidentedAdj.erase(it);
 	} else {
 		int id = edge->getID();
-		auto it = find(adj.begin(),
-				adj.end(), edge);
+		auto it = find(adj.begin(), adj.end(), edge);
 		delete edge;
 		adj.erase(it);
 		graph->gv->removeEdge(id);
