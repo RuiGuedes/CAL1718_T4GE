@@ -1061,11 +1061,35 @@ double Edge::getWeight() const {
 	return weight;
 }
 
+Road* Edge::getRoad() const {
+	return subroad->getRoad();
+}
+
 /*
  * @brief Check whether the edge is accidented
  */
 bool Edge::isAccidented() const {
 	return accidented;
+}
+
+
+double Edge::getDistance() const {
+	return subroad->getDistance();
+}
+
+
+int Edge::getActualCapacity() const {
+	return subroad->getActualCapacity();
+}
+
+
+int Edge::getMaxCapacity() const {
+	return subroad->getMaxCapacity();
+}
+
+
+int Edge::calculateAverageSpeed() const {
+	return subroad->calculateAverageSpeed();
 }
 
 /*
@@ -1111,6 +1135,11 @@ void Edge::setWeight(double weight) {
 	this->weight = weight;
 	if (showEdgeWeights)
 		graph->setEdgeWeight(id, weight);
+}
+
+
+bool Edge::setActualCapacity(int capacity) {
+	return subroad->setActualCapacity(capacity);
 }
 
 

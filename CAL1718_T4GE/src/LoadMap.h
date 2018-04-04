@@ -31,8 +31,6 @@ int loadRoads(string filename, MapMetaData &meta, Graph* &graph);
 
 int loadSubroads(string filename, MapMetaData &meta, Graph* &graph);
 
-int testLoadMap(string path);
-
 int testLoadMeta(string path);
 
 int testLoadNodes(string path);
@@ -40,5 +38,7 @@ int testLoadNodes(string path);
 int testLoadRoads(string path);
 
 int testLoadSubroads(string path);
+
+int testLoadMap(string path);
 
 int testNewMap(string path);

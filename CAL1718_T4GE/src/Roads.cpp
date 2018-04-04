@@ -1,6 +1,6 @@
 #include <math.h>
 
-#include "Roads.h"
+#include "Graph.h"
 
 ////////////////
 // Class Road //
@@ -56,6 +56,10 @@ Subroad::Subroad(double distance, Road* road):
 	actualCapacity = rand() % maxCapacity;
 }
 
+Road* Subroad::getRoad() const {
+	return road;
+}
+
 double Subroad::getDistance() const {
 	return distance;
 }
@@ -83,7 +87,7 @@ int Subroad::calculateAverageSpeed() const {
 	return averageSpeed*0.1;
 }
 
-bool Subroad::setAtualCapacity(int capacity) {
+bool Subroad::setActualCapacity(int capacity) {
 	if (actualCapacity <= 0 || actualCapacity > maxCapacity) return false;
 	actualCapacity = capacity;
 	return true;

@@ -6,8 +6,10 @@
 
 void causeIntersectionAccident();
 void causeRoadAccident();
-void updateSystem(int startingNode, int destinationNode);
 
+/*
+ * Cause Accident UI Menu
+ */
 void causeAccident() {
 
 	system("cls");
@@ -27,7 +29,7 @@ void causeAccident() {
 			cout << endl << "Enter an option (1-3): ";
 			cin >> option;
 
-			if(validNumberInput(option,3)) {
+			if(validIDInput(option,3)) {
 				value = stoi(option);
 				break;
 			}
@@ -48,7 +50,7 @@ void causeAccident() {
 			break;
 		}
 		if(value != 3) {
-			gv->rearrange();
+			graph->rearrange();
 			cout << endl;
 			system("pause");
 		}
@@ -58,86 +60,92 @@ void causeAccident() {
 	}while(value != 3);
 }
 
+/*
+ * Cause Node accident UI
+ */
 void causeIntersectionAccident() {
 
 	string option;
-	int node {};
+	Vertex *v = nullptr;
 
 	cout << "Cause an accident" << endl << endl;
 
+	// Get node
 	while(1) {
 
 		cout << "Select a node: ";
 		cin >> option;
 
-		if(validNumberInput(option,myGraph.getNumVertex())) {
-			node = stoi(option);
-			gv->setVertexColor(node,"red");
-			break;
+		if(validIDInput(option)) {
+			int node = stoi(option);
+			Vertex* v = graph->getVertex(node);
+			if (v != nullptr) {
+				break;
+			} else {
+				cout << "Invalid node (" << option << "). Try again !" << endl << endl;
+			}
 		}
 		else
 			cout << "Invalid node (" << option << "). Try again !" << endl << endl;
 	}
 
-	if(myGraph.findVertex(node) == NULL)
-		return;
-
-	for(unsigned int i = 0; i < myGraph.findVertex(node)->getAdj().size(); i++) {
-		updateSystem(node,myGraph.findVertex(node)->getAdj().at(i).getDest()->getInfo());
-		i--;
-	}
-
-	myGraph.removeVertex(node);
+	// Cause accident
+	v->accident();
 }
 
+/*
+ * Cause Edge accident UI
+ */
 void causeRoadAccident() {
 
 	string option;
-	int startingNode { }, destinationNode { };
+	Vertex *origin = nullptr;
+	Vertex *destination = nullptr;
 
 	cout << "Cause an accident" << endl << endl;
 
+	// Get origin
 	while(1) {
 
 		cout << "Select starting node: ";
 		cin >> option;
 
-		if(validNumberInput(option,myGraph.getNumVertex())) {
-			startingNode = stoi(option);
-			break;
+		if(validIDInput(option)) {
+			int node = stoi(option);
+			origin = graph->findVertex(node);
+			if (origin == nullptr)
+				cout << "Invalid node (" << option << "). Try again !" << endl << endl;
+			else
+				break;
 		}
 		else
 			cout << "Invalid node (" << option << "). Try again !" << endl << endl;
 	}
 
+	// Get destination
 	while(1) {
 
 		cout << endl << "Select destination node: ";
 		cin >> option;
 
-		if(validNumberInput(option,myGraph.getNumVertex())) {
-			destinationNode = stoi(option);
-			break;
+		if(validIDInput(option)) {
+			int node = stoi(option);
+			destination = graph->findVertex(node);
+			if (destination == nullptr) {
+				cout << "Invalid node (" << option << "). Try again !" << endl << endl;
+			}
+			else if (!origin->isAdjacentTo(destination)) {
+				cout << "Node " << option << " is not adjacent to " << origin->getID() << endl << endl;
+			}
+			else {
+				break;
+			}
 		}
 		else
 			cout << "Invalid node (" << option << ") Try again !" << endl << endl;
 	}
 
-	updateSystem(startingNode,destinationNode);
-}
-
-void updateSystem(int startingNode, int destinationNode) {
-	string edgeID = "" + to_string(startingNode) + "0" + to_string(destinationNode);
-
-	Vertex<int> *origin = myGraph.findVertex(startingNode);
-	Vertex<int> *destination = myGraph.findVertex(destinationNode);
-
-	if(origin == NULL)
-		origin = myGraph.findAccidentedVertex(startingNode);
-
-	if(destination == NULL)
-		destination = myGraph.findAccidentedVertex(destinationNode);
-
-	origin->removeEdge(destination);
-	gv->setEdgeColor(stoi(edgeID),"red");
+	// Cause accident
+	origin->accidentEdge(destination);
+	//updateSystem(startingNode,destinationNode);
 }

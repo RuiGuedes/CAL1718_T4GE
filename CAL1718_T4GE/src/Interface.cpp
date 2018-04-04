@@ -104,32 +104,3 @@ int main() {
 	getchar();
 	return 0;
 }
-
-/**
- * Verifica se a string number contem apenas digitos ou se contem simbolos ou caracteres nao
- * aceites para a situacao.
- * @param number string extraida da stream de input
- * @return Retorna true se number e um numero e false se number contem alguma coisa para alem de digitos.
- */
-
-bool validNumberInput(string input, int upperLimit) {
-	for (unsigned int i = 0; i < input.size(); i++){
-		if (!(isdigit(input.at(i))))
-			return false;
-	}
-
-	try {
-		int value = stoi(input);
-
-		if( (value < 1) || (value > upperLimit))
-			throw exception();
-
-		return true;
-	}
-	catch(...){// out_of_range ou invalid_argument
-		return false;
-	}
-}
-
-
-
