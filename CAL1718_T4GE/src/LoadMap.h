@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 #include "Graph.h"
 
 using namespace std;
@@ -15,7 +17,7 @@ struct MapMetaData {
 	long double min_latitude, max_latitude;
 	int nodes, edges;
 	int width = 0, height = 0;
-	bool test = false;
+	bool boundaries = false;
 	long double density = default_density;
 };
 

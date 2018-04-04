@@ -1,14 +1,12 @@
-/*
- * Graph.h
- */
 #pragma once
 
+#include <iostream>
+#include <string>
 #include <vector>
 #include <queue>
 #include <list>
 
 #include "Graphviewer.h"
-#include "MutablePriorityQueue.h"
 
 using namespace std;
 
@@ -31,7 +29,6 @@ class Graph {
 	const int width, height;
 	vector<Vertex*> vertexSet;
 	vector<Vertex*> accidentedVertexSet;
-	const bool showEdgeLabel, showEdgeWeight, showEdgeFlux;
 	GraphViewer *gv;
 
 	// ***** Auxiliary
@@ -59,17 +56,16 @@ public:
 	/////
 
 	///// ***** Constructors and destructor
-	Graph(int width, int height, bool showEdgeLabel = false,
-			bool showEdgeWeight = false, bool showEdgeFlux = false);
+	Graph(int width, int height);
 	~Graph();
 
 	///// ***** Vertex CRUD
 	// C
 	bool addVertex(int id, int x, int y, bool accidented = false);
-	bool addVertex(Vertex *v);
+	bool addVertex(Vertex *v); //
 	// R
 	Vertex *findVertex(int id) const;
-	Vertex *getVertex(int id) const;
+	Vertex *getVertex(int id) const; //
 	int getNumVertices() const;
 	int getNumAccidentedVertices() const;
 	int getTotalVertices() const;
@@ -108,23 +104,11 @@ public:
 	/////
 
 	///// ***** Algorithms
-	// Breadth First Search, single source. Find minimal paths to all other vertices
-	bool bfs(Vertex *vsource);
-	// Breadth First Search, with destination. Find minimal path to destination vertex only
-	bool bfs(Vertex *vsource, Vertex *vdest);
 	// Dijkstra by distance, single source. Find shortest paths to all other vertices
-	bool dijkstraDist(Vertex *vsource); // or int version
-	// Dijkstra by distance, with destination. Find shortest path to destination vertex only
 	bool dijkstraDist(Vertex *vsource, Vertex *vdest); // or int version
 	// A* by distance. Find shortest path to destination vertex only
 	bool AstarDist(Vertex *vsource, Vertex *vdest);
-	// Floyd-Warshall by distance.
-	bool floydWarshallDist();
-	// Johnson by distance.
-	bool johnsonDist();
 	/////
-
-	vector<Vertex*> getPath(Vertex *source, Vertex *dest) const;
 
 	///// ***** Operations
 	ostream& operator<<(ostream &out) const;
@@ -148,13 +132,6 @@ class Vertex {
 	vector<Edge*> accidentedAdj;
 	Graph* graph = nullptr;
 
-	// Algorithm auxiliary
-	//bool visited = false;
-	//double dist = 0;
-	//Vertex *path = nullptr;
-	//int queueIndex = 0; // MutablePriorityQueue
-	//bool processing = false;
-
 	void moveToAdj(Edge *e);
 	void moveToAccidentedAdj(Edge *e);
 
@@ -167,7 +144,7 @@ public:
 	///// ***** Vertex CRUD
 	// C
 	// R
-	int getId() const;
+	int getID() const;
 	int getX() const; // could also make x a const public
 	int getY() const; // could also make y a const public
 	double distanceTo(Vertex *dest) const;
@@ -207,8 +184,8 @@ public:
 	bool operator==(Vertex *v) const;
 	bool operator!=(Vertex *v) const;
 	friend ostream& operator<<(ostream &out, Vertex* v);
+	friend class Graph;
 	friend class Edge;
-	friend class MutablePriorityQueue<Vertex>;
 };
 
 
@@ -246,7 +223,7 @@ public:
 	///// ***** Edge CRUD
 	// C
 	// R
-	int getId() const;
+	int getID() const;
 	double getWeight() const;
 	bool isAccidented() const;
 	// U
@@ -262,6 +239,7 @@ public:
 	bool operator==(Edge *e) const;
 	bool operator!=(Edge *e) const;
 	friend ostream& operator<<(ostream &out, Edge* e);
-	friend class MutablePriorityQueue<Vertex>;
+	friend class Graph;
+	friend class Vertex;
 };
 

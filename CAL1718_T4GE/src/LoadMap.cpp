@@ -1,9 +1,10 @@
-#include <regex>
 #include <fstream>
 #include <limits>
 #include <exception>
 #include <stdexcept>
+#include <regex>
 #include <math.h>
+#include <stdlib.h>
 
 #include "LoadMap.h"
 
@@ -12,6 +13,17 @@ static map<long long, int> roadIdMap;
 static map<int, string> roadNameMap;
 static map<int, bool> roadDirectionMap; 	// True means bidirectional
 
+
+extern bool graphLoaded;
+extern bool showEdgeLabels;
+extern bool showEdgeWeights;
+extern bool showEdgeFlows;
+
+
+
+/////////////////////////
+// Auxiliary Functions //
+/////////////////////////
 
 /*
  * For use by load_nodes
@@ -98,35 +110,80 @@ static void estimateMeta(MapMetaData &meta) {
  * Adds dummy boundary vertices around the map (around 20 per side)
  * @param ...
  */
-static void showBoundaries(MapMetaData &meta, Graph* &graph) {
-	int ID = graph->getTotalVertices() + 1;
+void showBoundaries(MapMetaData &meta, Graph* &graph) {
+	int ID = -1000;
 
 	// Corners
-	graph->addVertex(ID++, 0, 0);
-	graph->addVertex(ID++, meta.width, 0);
-	graph->addVertex(ID++, 0, meta.height);
-	graph->addVertex(ID++, meta.width, meta.height);
+	graph->addVertex(ID--, 0, 0);
+	graph->addVertex(ID--, meta.width, 0);
+	graph->addVertex(ID--, 0, meta.height);
+	graph->addVertex(ID--, meta.width, meta.height);
 
 	int increment;
 
 	// Top and bottom
 	increment = meta.width / ((meta.width + 1000) / 200);
 	for (int i = increment; i < meta.width; i += increment) {
-		graph->addVertex(ID++, i, 0);
-		graph->addVertex(ID++, i, meta.height);
+		graph->addVertex(ID--, i, 0);
+		graph->addVertex(ID--, i, meta.height);
 	}
 
 	// Left and right
 	increment = meta.height / ((meta.height + 1000) / 200);
 	for (int j = increment; j < meta.height; j += increment) {
-		graph->addVertex(ID++, 0, j);
-		graph->addVertex(ID++, meta.width, j);
+		graph->addVertex(ID--, 0, j);
+		graph->addVertex(ID--, meta.width, j);
 	}
+}
+
+/*
+ * For use by loadMap
+ * Checks if all files are present and openable
+ * Extremely rigid -- exits if some file is not found
+ */
+static bool checkFilename(string filename) {
+	ifstream file;
+
+	file.open(filename + meta_suffix);
+	if (!file.is_open() || !file.good()) {
+		cout << "Meta file not found (" << filename + meta_suffix << ")" << endl;
+		//getchar();
+		return false;
+	}
+	file.close();
+
+	file.open(filename + nodes_suffix);
+	if (!file.is_open() || !file.good()) {
+		cout << "Nodes file not found (" << filename + nodes_suffix << ")" << endl;
+		//getchar();
+		return false;
+	}
+	file.close();
+
+	file.open(filename + roads_suffix);
+	if (!file.is_open() || !file.good()) {
+		cout << "Roads file not found (" << filename + roads_suffix << ")" << endl;
+		//getchar();
+		return false;
+	}
+	file.close();
+
+	file.open(filename + subroads_suffix);
+	if (!file.is_open() || !file.good()) {
+		cout << "Subroads file not found (" << filename + subroads_suffix << ")" << endl;
+		//getchar();
+		return false;
+	}
+	file.close();
+
+	return true;
 }
 
 
 
-
+////////////////////
+// Load Functions //
+////////////////////
 
 /*
  * @brief Initializes the Graph (only barely).
@@ -140,45 +197,41 @@ static void showBoundaries(MapMetaData &meta, Graph* &graph) {
  * @return Standard Success/Error
  */
 int loadMap(string filename, Graph* &graph, bool boundaries) {
-	string meta_filename = filename + meta_suffix;
-	string nodes_filename = filename + nodes_suffix;
-	string roads_filename = filename + roads_suffix;
-	string subroads_filename = filename + subroads_suffix;
+	// Exit if any of the 4 files is not found
+	if (!checkFilename(filename)) {
+		return -1;
+	}
 
-	// Load the Map's metadata: latitudes, longitudes, number of nodes and edges...
+	// Load meta data
 	MapMetaData meta;
-	loadMeta(meta_filename, meta);
+	if (loadMeta(filename + meta_suffix, meta) != 0) {
+		return -1;
+	}
 
-	// If test flag is given, switch main line to testNewMap()
-	if (meta.test)
-		return testNewMap("../resource/" + filename);
-
-	// Initialize the map with appropriate sizes, but do nothing else.
-	// For some reason, creating the Window immediately is necessary...
+	// Initialize the graph
 	graph = new Graph(meta.width, meta.height);
 
-	// Load the map's nodes...
-	// The nodes' filed id is mapped to a new id in nodeIdMap.
-	loadNodes(nodes_filename, meta, graph);
+	// Load Nodes, Roads and Subroads
+	if (loadNodes(filename + nodes_suffix, meta, graph) != 0) {
+		return -1;
+	}
+	if (loadRoads(filename + roads_suffix, meta, graph) != 0) {
+		return -1;
+	}
+	if (loadSubroads(filename + subroads_suffix, meta, graph) != 0) {
+		return -1;
+	}
 
-	// Load the map's road names...
-	// The roads' id is mapped to a new id in roadIdMap, the name is stored in
-	// roadNameMap and the direction is stored in roadDirectionMap.
-	loadRoads(roads_filename, meta, graph);
+	if (meta.boundaries) showBoundaries(meta, graph);
 
-	// Load the map's edges...
-	loadSubroads(subroads_filename, meta, graph);
-
-	// All good and loaded...
-	if (boundaries) showBoundaries(meta, graph);
-
-	// Release auxiliary memory... while preparing for a new invocation later...
+	// Release auxiliary memory
 	nodeIdMap.clear();
 	roadIdMap.clear();
 	roadNameMap.clear();
 	roadDirectionMap.clear();
 
 	graph->update();
+	graphLoaded = true;
 	return 0;
 }
 
@@ -198,7 +251,10 @@ int loadMeta(string filename, MapMetaData &meta) {
 	static const regex reg_density("density ?= ?(-?\\d+\\.?\\d*)[.;,]", regex::icase);
 	static const regex reg_width("width ?= ?(\\d+)[.;,]", regex::icase);
 	static const regex reg_height("height ?= ?(\\d+)[.;,]", regex::icase);
-	static const regex reg_test("test ?= ?(\\d)[.;,]", regex::icase);
+	static const regex reg_boundaries("boundaries ?= ?([01])[.;,]", regex::icase);
+	static const regex reg_show_edge_labels("show_edge_labels? ?= ?([01])[.;,]", regex::icase);
+	static const regex reg_show_edge_weights("show_edge_weights? ?= ?([01])[.;,]", regex::icase);
+	static const regex reg_show_edge_flows("show_edge_flows? ?= ?([01])[.;,]", regex::icase);
 
 	ifstream file(filename);
 	if (!file.is_open())
@@ -210,57 +266,75 @@ int loadMeta(string filename, MapMetaData &meta) {
 
 	smatch match;
 
-	// Mandatory
-	if (regex_search(text, match, reg_min_lon))
-		meta.min_longitude = stold(match[1]);
-	else
-		return -1;
+	try {
+		// Mandatory: MIN_LONGITUDE
+		if (regex_search(text, match, reg_min_lon))
+			meta.min_longitude = stold(match[1]);
+		else
+			return -1;
 
-	// Mandatory
-	if (regex_search(text, match, reg_max_lon))
-		meta.max_longitude = stold(match[1]);
-	else
-		return -1;
+		// Mandatory: MAX_LONGITUDE
+		if (regex_search(text, match, reg_max_lon))
+			meta.max_longitude = stold(match[1]);
+		else
+			return -1;
 
-	// Mandatory
-	if (regex_search(text, match, reg_min_lat))
-		meta.min_latitude = stold(match[1]);
-	else
-		return -1;
+		// Mandatory: MIN_LATITUDE
+		if (regex_search(text, match, reg_min_lat))
+			meta.min_latitude = stold(match[1]);
+		else
+			return -1;
 
-	// Mandatory
-	if (regex_search(text, match, reg_max_lat))
-		meta.max_latitude = stold(match[1]);
-	else
-		return -1;
+		// Mandatory: MAX_LATITUDE
+		if (regex_search(text, match, reg_max_lat))
+			meta.max_latitude = stold(match[1]);
+		else
+			return -1;
 
-	// Mandatory
-	if (regex_search(text, match, reg_nodes))
-		meta.nodes = stoi(match[1]);
-	else
-		return -1;
+		// Mandatory: NODES
+		if (regex_search(text, match, reg_nodes))
+			meta.nodes = stoi(match[1]);
+		else
+			return -1;
 
-	// Mandatory
-	if (regex_search(text, match, reg_edges))
-		meta.edges = stoi(match[1]);
-	else
-		return -1;
+		// Mandatory: EDGES
+		if (regex_search(text, match, reg_edges))
+			meta.edges = stoi(match[1]);
+		else
+			return -1;
 
-	// Optional
-	if (regex_search(text, match, reg_density))
-		meta.density = stold(match[1]);
+		// Optional: DENSITY
+		if (regex_search(text, match, reg_density))
+			meta.density = stold(match[1]);
 
-	// Optional
-	if (regex_search(text, match, reg_width))
-		meta.width = stoi(match[1]);
+		// Optional: WIDTH
+		if (regex_search(text, match, reg_width))
+			meta.width = stoi(match[1]);
 
-	// Optional
-	if (regex_search(text, match, reg_height))
-		meta.height = stoi(match[1]);
+		// Optional: HEIGHT
+		if (regex_search(text, match, reg_height))
+			meta.height = stoi(match[1]);
 
-	// Optional
-	if (regex_search(text, match, reg_test))
-		meta.test = static_cast<bool>(stoi(match[1]));
+		// Optional: BOUNDARIES
+		if (regex_search(text, match, reg_boundaries))
+			meta.boundaries = static_cast<bool>(stoi(match[1]));
+
+		// Optional: SHOW_EDGE_LABELS
+		if (regex_search(text, match, reg_show_edge_labels))
+			showEdgeLabels = static_cast<bool>(stoi(match[1]));
+
+		// Optional: SHOW_EDGE_WEIGHTS
+		if (regex_search(text, match, reg_show_edge_weights))
+			showEdgeWeights = static_cast<bool>(stoi(match[1]));
+
+		// Optional: SHOW_EDGE_FLOWS
+		if (regex_search(text, match, reg_show_edge_flows))
+			showEdgeFlows = static_cast<bool>(stoi(match[1]));
+	} catch (runtime_error &e) {
+		cerr << e.what() << endl;
+		cerr << "Found numeric field not representable in " << filename << endl;
+		return -2;
+	}
 
 	estimateMeta(meta);
 	return 0;
@@ -286,39 +360,42 @@ int loadNodes(string filename, MapMetaData &meta, Graph* &graph) {
 	string line;
 	getline(file, line);
 
-	int newNodes = 0, mappedID = 1;
+	int newNodes = 0, lineID = 1;
 
 	while (!file.eof() && !file.fail()) {
 		smatch match;
 
 		if (regex_match(line, match, reg)) {
-			// Get Node ID
-			long long id = stoll(match[1]);
-			nodeIdMap[id] = mappedID;
+			try {
+				// Get Node ID
+				long long id = stoll(match[1]);
+				nodeIdMap[id] = lineID;
 
-			// Get Node Latitude
-			double long latitude = stold(match[2]);
-			int y = getY(latitude, meta);
+				// Get Node Latitude
+				double long latitude = stold(match[2]);
+				int y = getY(latitude, meta);
 
-			// Get Node Longitude
-			double long longitude = stold(match[3]);
-			int x = getX(longitude, meta);
+				// Get Node Longitude
+				double long longitude = stold(match[3]);
+				int x = getX(longitude, meta);
 
-			// Add Node
-			graph->addVertex(mappedID, x, y);
-			++newNodes;
-			++mappedID;
+				// Add Node
+				graph->addVertex(lineID, x, y);
+				++newNodes;
+			} catch (runtime_error &e) {
+				cerr << e.what() << endl;
+				cerr << "Found numeric field not representable in " << filename << endl;
+				cerr << "Line: " << lineID << endl;
+				return -2;
+			}
 		}
 
+		++lineID;
 		getline(file, line);
 	}
 
 	file.close();
-
-	if(newNodes == meta.nodes)
-		return 0;
-
-	return -1;
+	return 0;
 }
 
 // ** Roads: road_id;road_name;two_way
@@ -331,7 +408,7 @@ int loadNodes(string filename, MapMetaData &meta, Graph* &graph) {
 //    [2] : Road name (string)
 //    [3] : Two way (bool)
 int loadRoads(string filename, MapMetaData &meta, Graph* &graph) {
-	static const regex reg("^(\\d+);((?:[-0-9a-zA-ZÀ-ÿ,\\.]| )*);(False|True);?$");
+	static const regex reg("^(\\d+);(.*?);(False|True);?$");
 	static const string FalseStr = "False", TrueStr = "True";
 
 	ifstream file(filename);
@@ -341,31 +418,38 @@ int loadRoads(string filename, MapMetaData &meta, Graph* &graph) {
 	string line;
 	getline(file, line);
 
-	int newRoads = 0, mappedID = 1;
+	int newRoads = 0, lineID = 1;
 
 	while (!file.eof() && !file.fail()) {
 		smatch match;
 
 		if (regex_match(line, match, reg)) {
-			// Get Road ID
-			long long id = stoll(match[1]);
-			roadIdMap[id] = mappedID;
+			try {
+				// Get Road ID
+				long long id = stoll(match[1]);
+				roadIdMap[id] = lineID;
 
-			// Get Road name
-			string name = match[2];
-			roadNameMap[mappedID] = name;
+				// Get Road name
+				string name = match[2];
+				roadNameMap[lineID] = name;
 
-			// Get Road Direction
-			if(match[3] == TrueStr)
-				roadDirectionMap[mappedID] = true;
-			else
-				roadDirectionMap[mappedID] = false;
+				// Get Road Direction
+				if(match[3] == TrueStr)
+					roadDirectionMap[lineID] = true;
+				else
+					roadDirectionMap[lineID] = false;
 
-			// Register Road
-			++newRoads;
-			++mappedID;
+				// Register Road
+				++newRoads;
+			} catch (runtime_error &e) {
+				cerr << e.what() << endl;
+				cerr << "Found numeric field not representable in " << filename << endl;
+				cerr << "Line: " << lineID << endl;
+				return -2;
+			}
 		}
 
+		++lineID;
 		getline(file, line);
 	}
 
@@ -391,47 +475,56 @@ int loadSubroads(string filename, MapMetaData &meta, Graph* &graph) {
 	string line;
 	getline(file, line);
 
-	int newSubroads = 0, subRoadID = 1;
+	int newSubroads = 0, subRoadID = 1, lineID = 1;
 
 	while (!file.eof() && !file.fail()) {
 		smatch match;
 		long long id;
 
 		if (regex_match(line, match, reg)) {
-			// Get Road ID
-			id = stoll(match[1]);
-			int roadid = roadIdMap[id];
+			try {
+				// Get Road ID
+				id = stoll(match[1]);
+				int roadid = roadIdMap[id];
 
-			// Get Node 1
-			id = stoll(match[2]);
-			int node1id = nodeIdMap[id];
+				// Get Node 1
+				id = stoll(match[2]);
+				int node1id = nodeIdMap[id];
 
-			// Get Node 2
-			id = stoll(match[3]);
-			int node2id = nodeIdMap[id];
+				// Get Node 2
+				id = stoll(match[3]);
+				int node2id = nodeIdMap[id];
 
-			// Register Edges
-			Vertex* v1 = graph->getVertex(node1id);
-			Vertex* v2 = graph->getVertex(node2id);
-			double weight = graph->distance(v1, v2);
+				// Register Edges
+				Vertex* v1 = graph->getVertex(node1id);
+				Vertex* v2 = graph->getVertex(node2id);
+				double weight = graph->distance(v1, v2);
 
-			graph->addEdge(subRoadID, node1id, node2id, weight);
-			++newSubroads;
-			++subRoadID;
-			if (roadDirectionMap[roadid]) {
-				// Add reverse edge
-				graph->addEdge(subRoadID, node2id, node1id, weight);
+				graph->addEdge(subRoadID, v1, v2, weight);
 				++newSubroads;
 				++subRoadID;
+				if (roadDirectionMap[roadid]) {
+					// Add reverse edge
+					graph->addEdge(subRoadID, v2, v1, weight);
+					++newSubroads;
+					++subRoadID;
+				}
+			} catch (runtime_error &e) {
+				cerr << e.what() << endl;
+				cerr << "Found numeric field not representable in " << filename << endl;
+				cerr << "Line: " << lineID << endl;
+				return -2;
 			}
 		}
 
+		++lineID;
 		getline(file, line);
 	}
 
 	file.close();
 	return newSubroads;
 }
+
 
 
 ////////////////////
@@ -441,13 +534,20 @@ int loadSubroads(string filename, MapMetaData &meta, Graph* &graph) {
 int testLoadMeta(string path) {
 	try {
 		MapMetaData meta;
-		loadMeta(path + meta_suffix, meta);
+		if (loadMeta(path + meta_suffix, meta) != 0) {
+			return -1;
+		}
 		cout << "Min Longitude: " << meta.min_longitude << endl;
 		cout << "Max Longitude: " << meta.max_longitude << endl;
 		cout << "Min Latitude: " << meta.min_latitude << endl;
 		cout << "Max Latitude: " << meta.max_latitude << endl;
 		cout << "Nodes: " << meta.nodes << endl;
 		cout << "Edges: " << meta.edges << endl;
+		cout << "Boundaries: " << meta.boundaries << endl;
+		cout << "Show Edge Labels: " << showEdgeLabels << endl;
+		cout << "Show Edge Weights: " << showEdgeLabels << endl;
+		cout << "Show Edge Flows: " << showEdgeLabels << endl << endl;
+
 		cout << "Estimated X: " << meta.width << endl;
 		cout << "Estimated Y: " << meta.height << endl;
 		cout << "Load Meta Successful" << endl;
@@ -468,7 +568,9 @@ int testLoadNodes(string path) {
 
 		Graph* graph = new Graph(meta.width, meta.height);
 
-		loadNodes(path + nodes_suffix, meta, graph);
+		if (loadNodes(path + nodes_suffix, meta, graph) != 0) {
+			return -1;
+		}
 		showBoundaries(meta, graph);
 		graph->update();
 
@@ -476,7 +578,7 @@ int testLoadNodes(string path) {
 		auto vertexSet = graph->getAllVertexSet();
 		for (auto v : vertexSet) {
 			cout << v << endl;
-			if (graph->findVertex(v->getId()) == nullptr)
+			if (graph->findVertex(v->getID()) == nullptr)
 				throw logic_error("Node not found in Graph");
 		}
 
@@ -501,7 +603,9 @@ int testLoadRoads(string path) {
 		showBoundaries(meta, graph);
 		graph->update();
 
-		loadRoads(path + roads_suffix, meta, graph);
+		if (loadRoads(path + roads_suffix, meta, graph) != 0) {
+			return -1;
+		}
 
 		for (auto road : roadIdMap) {
 			int id = road.second;
@@ -534,7 +638,9 @@ int testLoadSubroads(string path) {
 
 		loadRoads(path + roads_suffix, meta, graph);
 
-		loadSubroads(path + subroads_suffix, meta, graph);
+		if (loadSubroads(path + subroads_suffix, meta, graph) != 0) {
+			return -1;
+		}
 
 		auto vertexSet = graph->getAllVertexSet();
 		for (auto v : vertexSet) {
@@ -571,6 +677,10 @@ int testLoadMap(string path) {
 
 int testNewMap(string path) {
 	int status;
+
+	if (!checkFilename(path)) {
+		return -1;
+	}
 
 	status = testLoadMeta(path);
 	if (status != 0)

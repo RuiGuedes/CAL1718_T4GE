@@ -98,9 +98,10 @@ int main() {
 //	cout << endl << "Loading map information ..." << endl << endl;
 
 	//loadMap("../resource/small", graph);
-	loadMap("./resource/small", graph);
+	loadMap("./resource/newyork_large", graph);
 
-	mainMenu();
+	//mainMenu();
+	getchar();
 	return 0;
 }
 

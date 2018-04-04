@@ -1,10 +1,13 @@
-#include "Graph.h"
-
-#include <limits>
 #include <math.h>
 #include <algorithm>
 
-#define INF numeric_limits<double>::max()
+#include "Graph.h"
+
+bool graphLoaded = false;
+bool showEdgeLabels = false;
+bool showEdgeWeights = false;
+bool showEdgeFlows = false;
+
 
 /*
  * @brief Checks if a pair of integers is
@@ -153,10 +156,7 @@ bool Graph::setBackground(string path) const {
  * @brief Graph constructor, taking
  * display width and display height in grid entries
  */
-Graph::Graph(int width, int height, bool showEdgeLabel,
-		bool showEdgeWeight, bool showEdgeFlux):
-	width(width), height(height), showEdgeLabel(showEdgeLabel),
-	showEdgeWeight(showEdgeWeight), showEdgeFlux(showEdgeFlux) {
+Graph::Graph(int width, int height): width(width), height(height) {
 	gv = new GraphViewer(width, height, false);
 	gv->createWindow(GRAPH_VIEWER_WIDTH, GRAPH_VIEWER_HEIGHT);
 	defineVertexColor(VERTEX_CLEAR_COLOR);
@@ -221,12 +221,12 @@ bool Graph::addVertex(int id, int x, int y, bool accidented) {
  * @throws out_of_range if Vertex out of graph bounds
  */
 bool Graph::addVertex(Vertex* v) {
-	if (findVertex(v->getId())) {
-		throw std::logic_error("Repeated vertex id " + to_string(v->getId()));
+	if (findVertex(v->getID())) {
+		throw std::logic_error("Repeated vertex id " + to_string(v->getID()));
 	} else if (!withinBounds(v->getX(), v->getY())) {
 		throw std::out_of_range("Vertex out of graph bounds");
 	} else {
-		int id = v->getId();
+		int id = v->getID();
 		v->_sgraph(this);
 		if (v->isAccidented()) {
 			accidentedVertexSet.push_back(v);
@@ -257,7 +257,7 @@ Vertex* Graph::findVertex(int id) const {
  * @return The vertex if found, nullptr otherwise
  */
 Vertex* Graph::getVertex(int id) const {
-	const auto getId = [&id](Vertex *v) -> int { return v->getId() == id; };
+	const auto getId = [&id](Vertex *v) -> int { return v->getID() == id; };
 
 	// Look for vertex in vertexSet
 	auto it = find_if(vertexSet.cbegin(), vertexSet.cend(), getId);
@@ -429,7 +429,7 @@ void Graph::removeVertex(Vertex* v) {
 		delete v;
 		accidentedVertexSet.erase(it);
 	} else {
-		int id = v->getId();
+		int id = v->getID();
 		auto it = find(vertexSet.begin(),
 				vertexSet.end(), v);
 		delete v;
@@ -492,7 +492,7 @@ bool Graph::addEdge(Edge *e) {
 	if (vsource == nullptr || vdest == nullptr) {
 		throw std::invalid_argument("Vertex not found");
 	}
-	if (findEdge(e->getId()) != nullptr) {
+	if (findEdge(e->getID()) != nullptr) {
 		throw std::logic_error("Repeated edge id");
 	}
 	// Delegate to vertex
@@ -602,43 +602,6 @@ void Graph::removeEdge(Edge* e) {
 
 
 
-bool Graph::bfs(Vertex* vsource) {
-	return true;
-}
-
-bool Graph::bfs(Vertex* vsource, Vertex* vdest) {
-	return true;
-}
-
-bool Graph::dijkstraDist(Vertex* vsource) {
-	return true;
-}
-
-bool Graph::dijkstraDist(Vertex* vsource, Vertex* vdest) {
-	return true;
-}
-
-bool Graph::AstarDist(Vertex* vsource, Vertex* vdest) {
-	return true;
-}
-
-bool Graph::floydWarshallDist() {
-	return true;
-}
-
-bool Graph::johnsonDist() {
-	return true;
-}
-
-
-
-vector<Vertex*> Graph::getPath(Vertex* source, Vertex* dest) const {
-	// TODO
-	return vector<Vertex*>();
-}
-
-
-
 ostream& Graph::operator<<(ostream& out) const {
 	for (auto vertex : vertexSet)
 		out << vertex;
@@ -713,7 +676,7 @@ Vertex::~Vertex() {
 /*
  * @brief Return the vertex id
  */
-int Vertex::getId() const {
+int Vertex::getID() const {
 	return id;
 }
 
@@ -835,18 +798,18 @@ bool Vertex::addEdge(Edge* e) {
 	} else {
 		adj.push_back(e);
 	}
-	int id = e->getId();
+	int id = e->getID();
 	e->_sgraph(graph);
-	graph->gv->addEdge(id, e->getSource()->getId(),
-				e->getDest()->getId(), EdgeType::DIRECTED);
+	graph->gv->addEdge(id, e->getSource()->getID(),
+				e->getDest()->getID(), EdgeType::DIRECTED);
 	// * Set Edge Label
-	if (graph->showEdgeLabel)
+	if (showEdgeLabels)
 		graph->setEdgeLabel(id, to_string(id));
 	// * Set Edge Color
 	if (e->isAccidented())
 		graph->setEdgeColor(id, EDGE_ACCIDENTED_COLOR);
 	// * Set Edge Weight
-	if (graph->showEdgeWeight)
+	if (showEdgeWeights)
 		graph->setEdgeWeight(id, e->getWeight());
 	// No graph->update()
 	return true;
@@ -865,7 +828,7 @@ Edge* Vertex::findEdge(int eid) const {
  * @return The edge or nullptr if not found
  */
 Edge* Vertex::getEdge(int eid) const {
-	const auto getEid = [&eid](Edge *e) -> bool { return e->getId() == eid; };
+	const auto getEid = [&eid](Edge *e) -> bool { return e->getID() == eid; };
 	auto it = find_if(adj.cbegin(), adj.cend(), getEid);
 	if (it != adj.cend()) return *it;
 
@@ -997,7 +960,7 @@ void Vertex::removeEdge(Edge* edge) {
 	if (edge == nullptr) {
 		throw std::invalid_argument("Edge not found");
 	}
-	if (!findEdge(edge->getId())) {
+	if (!findEdge(edge->getID())) {
 		throw std::invalid_argument("Edge not from this vertex");
 	}
 	if (edge->isAccidented()) {
@@ -1006,7 +969,7 @@ void Vertex::removeEdge(Edge* edge) {
 		delete edge;
 		accidentedAdj.erase(it);
 	} else {
-		int id = edge->getId();
+		int id = edge->getID();
 		auto it = find(adj.begin(),
 				adj.end(), edge);
 		delete edge;
@@ -1035,7 +998,7 @@ bool Vertex::operator!=(Vertex* v) const {
 }
 
 ostream& operator<<(ostream& out, Vertex* v) {
-	out << "ID = " << v->getId() << "; ";
+	out << "ID = " << v->getID() << "; ";
 	out << "(" << v->getX() << "," << v->getY() << "); ";
 	out << "#Good = " << v->getAdj().size() << "; ";
 	out << "#Bad = " << v->getAccidentedAdj().size();
@@ -1087,7 +1050,7 @@ Vertex* Edge::getDest() const {
 /*
  * @brief Return's the edge's id
  */
-int Edge::getId() const {
+int Edge::getID() const {
 	return id;
 }
 
@@ -1146,7 +1109,7 @@ bool Edge::accident() {
  */
 void Edge::setWeight(double weight) {
 	this->weight = weight;
-	if (graph->showEdgeWeight)
+	if (showEdgeWeights)
 		graph->setEdgeWeight(id, weight);
 }
 
@@ -1169,9 +1132,9 @@ bool Edge::operator!=(Edge* e) const {
 }
 
 ostream& operator<<(ostream& out, Edge* e) {
-	out << "EID = " << e->getId() << "; ";
+	out << "EID = " << e->getID() << "; ";
 	out << "Weight = " << e->getWeight() << "; ";
-	out << "(" << e->getSource()->getId() << " -> " << e->getDest()->getId() << "); ";
+	out << "(" << e->getSource()->getID() << " -> " << e->getDest()->getID() << "); ";
 	return out;
 }
 
