@@ -121,6 +121,8 @@ void fixRoadAccident() {
 		else
 			cout << "Invalid node (" << option << "). Try again !" << endl << endl;
 	}
+	graph->setVertexColor(origin, VERTEX_SELECTED_COLOR);
+	graph->rearrange();
 
 	// Get destination
 	while(1) {
@@ -147,4 +149,6 @@ void fixRoadAccident() {
 
 	// Fix origin-destination
 	origin->fixEdge(destination);
+	graph->setVertexDefaultColor(origin);
+	graph->rearrange();
 }

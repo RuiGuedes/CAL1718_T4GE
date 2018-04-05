@@ -14,8 +14,10 @@ using namespace std;
 #define GRAPH_VIEWER_HEIGHT       ((int)600)
 #define VERTEX_CLEAR_COLOR        BLUE
 #define VERTEX_ACCIDENTED_COLOR   RED
+#define VERTEX_SELECTED_COLOR     GREEN
 #define EDGE_CLEAR_COLOR          BLACK
 #define EDGE_ACCIDENTED_COLOR     RED
+#define EDGE_SELECTED_COLOR       GREEN
 
 class Edge;
 class Graph;
@@ -43,17 +45,19 @@ public:
 	void update() const;
 	void rearrange() const;
 
-	bool setVertexLabel(int id, string label) const;
-	bool setVertexColor(int id, string color) const;
+	bool setVertexLabel(Vertex *v, string label) const;
+	bool setVertexColor(Vertex *v, string color) const;
 	bool defineVertexColor(string color) const;
+	bool setVertexDefaultColor(Vertex *v) const;
 
-	bool setEdgeLabel(int eid, string label) const;
-	bool setEdgeWeight(int id, int weight) const;
-	bool setEdgeFlow(int id, int flow) const;
-	bool setEdgeColor(int eid, string color) const;
+	bool setEdgeLabel(Edge *e, string label) const;
+	bool setEdgeWeight(Edge *e, int weight) const;
+	bool setEdgeFlow(Edge *e, int flow) const;
+	bool setEdgeColor(Edge *e, string color) const;
 	bool defineEdgeColor(string color) const;
+	bool setEdgeDefaultColor(Edge *e) const;
 
-	bool setEdgeThickness(int id, int thickness) const;
+	bool setEdgeThickness(Edge *e, int thickness) const;
 	bool setBackground(string path) const;
 	/////
 

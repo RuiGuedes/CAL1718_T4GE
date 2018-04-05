@@ -77,11 +77,8 @@ void causeIntersectionAccident() {
 		cin >> option;
 
 		if(validIDInput(option)) {
-			cout << "DEBUG\n";
 			int node = stoi(option);
-			cout << "DEBUG\n";
 			v = graph->getVertex(node);
-			cout << "DEBUG VERTEX " << v->getID() << endl;
 			if (v != nullptr) {
 				break;
 			} else {
@@ -92,14 +89,8 @@ void causeIntersectionAccident() {
 			cout << "Invalid node (" << option << "). Try again !" << endl << endl;
 	}
 
-	cout << "DEBUG VERTEX " << v->getID() << endl;
-	getchar();
-
 	// Cause accident
 	v->accident();
-
-	cout << "DEBUG VERTEX " << v->getID() << endl;
-	getchar();
 }
 
 /*
@@ -130,6 +121,9 @@ void causeRoadAccident() {
 		else
 			cout << "Invalid node (" << option << "). Try again !" << endl << endl;
 	}
+	// Set color to green:
+	graph->setVertexColor(origin, VERTEX_SELECTED_COLOR);
+	graph->rearrange();
 
 	// Get destination
 	while(1) {
@@ -156,5 +150,7 @@ void causeRoadAccident() {
 
 	// Cause accident
 	origin->accidentEdge(destination);
-	//updateSystem(startingNode,destinationNode);
+	// Set color back to whatever it was:
+	graph->setVertexDefaultColor(origin);
+	graph->rearrange();
 }

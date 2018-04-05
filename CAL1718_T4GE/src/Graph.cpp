@@ -58,16 +58,18 @@ void Graph::rearrange() const {
  * GRAPHVIEWER
  * @brief Define o texto de um vértice em particular
  */
-bool Graph::setVertexLabel(int id, string label) const {
-	return gv->setVertexLabel(id, label);
+bool Graph::setVertexLabel(Vertex *v, string label) const {
+	if (v == nullptr) return false;
+	return gv->setVertexLabel(v->getID(), label);
 }
 
 /*
  * GRAPHVIEWER
  * @brief Define a cor de um vértice em particular
  */
-bool Graph::setVertexColor(int id, string color) const {
-	return gv->setVertexColor(id, color);
+bool Graph::setVertexColor(Vertex *v, string color) const {
+	if (v == nullptr) return false;
+	return gv->setVertexColor(v->getID(), color);
 }
 
 /*
@@ -80,11 +82,26 @@ bool Graph::defineVertexColor(string color) const {
 
 /*
  * GRAPHVIEWER
+ * @brief Define a cor do vértice de acordo com o
+ * seu estado (acidentado ou não)
+ */
+bool Graph::setVertexDefaultColor(Vertex *v) const {
+	if (v == nullptr) return false;
+	if (v->isAccidented()) {
+		return setVertexColor(v, VERTEX_ACCIDENTED_COLOR);
+	} else {
+		return setVertexColor(v, VERTEX_CLEAR_COLOR);
+	}
+}
+
+/*
+ * GRAPHVIEWER
  * @brief Define o label de uma aresta em particular
  * w: PESO, f: FLUXO, LABEL
  */
-bool Graph::setEdgeLabel(int eid, string label) const {
-	return gv->setEdgeLabel(eid, label);
+bool Graph::setEdgeLabel(Edge *e, string label) const {
+	if (e == nullptr) return false;
+	return gv->setEdgeLabel(e->getID(), label);
 }
 
 /*
@@ -92,8 +109,9 @@ bool Graph::setEdgeLabel(int eid, string label) const {
  * @brief Define o peso de uma aresta em particular
  * w: PESO, f: FLUXO, LABEL
  */
-bool Graph::setEdgeWeight(int id, int weight) const {
-	return gv->setEdgeWeight(id, weight);
+bool Graph::setEdgeWeight(Edge *e, int weight) const {
+	if (e == nullptr) return false;
+	return gv->setEdgeWeight(e->getID(), weight);
 }
 
 /*
@@ -101,16 +119,18 @@ bool Graph::setEdgeWeight(int id, int weight) const {
  * @brief Define o fluxo de uma aresta em particular
  * w: PESO, f: FLUXO, LABEL
  */
-bool Graph::setEdgeFlow(int id, int flow) const {
-	return gv->setEdgeFlow(id, flow);
+bool Graph::setEdgeFlow(Edge *e, int flow) const {
+	if (e == nullptr) return false;
+	return gv->setEdgeFlow(e->getID(), flow);
 }
 
 /*
  * GRAPHVIEWER
  * @brief Define a cor de uma aresta em particular
  */
-bool Graph::setEdgeColor(int eid, string color) const {
-	return gv->setEdgeColor(eid, color);
+bool Graph::setEdgeColor(Edge *e, string color) const {
+	if (e == nullptr) return false;
+	return gv->setEdgeColor(e->getID(), color);
 }
 
 /*
@@ -126,8 +146,9 @@ bool Graph::defineEdgeColor(string color) const {
  * @brief Define a espessura de uma aresta em particular
  * @param thickness O default é thickness 1.
  */
-bool Graph::setEdgeThickness(int id, int thickness) const {
-	return gv->setEdgeThickness(id, thickness);
+bool Graph::setEdgeThickness(Edge *e, int thickness) const {
+	if (e == nullptr) return false;
+	return gv->setEdgeThickness(e->getID(), thickness);
 }
 
 /*
@@ -137,6 +158,20 @@ bool Graph::setEdgeThickness(int id, int thickness) const {
  */
 bool Graph::setBackground(string path) const {
 	return gv->setBackground(path);
+}
+
+/*
+ * GRAPHVIEWER
+ * @brief Define a cor do vértice de acordo com o
+ * seu estado (acidentado ou não)
+ */
+bool Graph::setEdgeDefaultColor(Edge *e) const {
+	if (e == nullptr) return false;
+	if (e->isAccidented()) {
+		return setEdgeColor(e, VERTEX_ACCIDENTED_COLOR);
+	} else {
+		return setEdgeColor(e, VERTEX_CLEAR_COLOR);
+	}
 }
 
 
@@ -193,10 +228,10 @@ bool Graph::addVertex(int id, int x, int y, bool accidented) {
 		}
 		gv->addNode(id, x, y);
 		// * Set Vertex Label
-		setVertexLabel(id, to_string(id));
+		setVertexLabel(v, to_string(id));
 		// * Set Vertex Color
 		if (v->isAccidented())
-			setVertexColor(id, VERTEX_ACCIDENTED_COLOR);
+			setVertexColor(v, VERTEX_ACCIDENTED_COLOR);
 		// No graph->update()
 		return true;
 	}
@@ -226,10 +261,10 @@ bool Graph::addVertex(Vertex* v) {
 		}
 		gv->addNode(id, v->getX(), v->getY());
 		// * Set Vertex Label
-		setVertexLabel(id, to_string(id));
+		setVertexLabel(v, to_string(id));
 		// * Set Vertex Color
 		if (v->isAccidented())
-			setVertexColor(id, VERTEX_ACCIDENTED_COLOR);
+			setVertexColor(v, VERTEX_ACCIDENTED_COLOR);
 		// No graph->update()
 		return true;
 	}
@@ -789,13 +824,13 @@ bool Vertex::addEdge(Edge* e) {
 	graph->gv->addEdge(id, e->getSource()->getID(), e->getDest()->getID(), EdgeType::DIRECTED);
 	// * Set Edge Label
 	if (showEdgeLabels)
-		graph->setEdgeLabel(id, to_string(id));
+		graph->setEdgeLabel(e, to_string(id));
 	// * Set Edge Color
 	if (e->isAccidented())
-		graph->setEdgeColor(id, EDGE_ACCIDENTED_COLOR);
+		graph->setEdgeColor(e, EDGE_ACCIDENTED_COLOR);
 	// * Set Edge Weight
 	if (showEdgeWeights)
-		graph->setEdgeWeight(id, e->getWeight());
+		graph->setEdgeWeight(e, e->getWeight());
 	// No graph->update()
 	return true;
 }
@@ -861,7 +896,7 @@ bool Vertex::fix() {
 	if (accidented) {
 		accidented = false;
 		// * Set Vertex Color
-		graph->setVertexColor(id, VERTEX_CLEAR_COLOR);
+		graph->setVertexColor(this, VERTEX_CLEAR_COLOR);
 		// Move back to vertexSet
 		graph->moveToVertexSet(this);
 		return true;
@@ -878,7 +913,7 @@ bool Vertex::accident() {
 	if (!accidented) {
 		accidented = true;
 		// * Set Vertex Color
-		graph->setVertexColor(id, VERTEX_ACCIDENTED_COLOR);
+		graph->setVertexColor(this, VERTEX_ACCIDENTED_COLOR);
 		// Move to accidentedVertexSet
 		graph->moveToAccidentedVertexSet(this);
 		return true;
@@ -1084,7 +1119,7 @@ bool Edge::fix() {
 	if (accidented) {
 		accidented = false;
 		// * Set Edge Color
-		graph->setEdgeColor(id, EDGE_CLEAR_COLOR);
+		graph->setEdgeColor(this, EDGE_CLEAR_COLOR);
 		// Move back to adj
 		source->moveToAdj(this);
 		return true;
@@ -1102,7 +1137,7 @@ bool Edge::accident() {
 	if (!accidented) {
 		accidented = true;
 		// * Set Edge Color
-		graph->setEdgeColor(id, EDGE_ACCIDENTED_COLOR);
+		graph->setEdgeColor(this, EDGE_ACCIDENTED_COLOR);
 		// Move to accidentedAdj
 		source->moveToAccidentedAdj(this);
 		return true;
@@ -1117,7 +1152,7 @@ bool Edge::accident() {
 void Edge::setWeight(double weight) {
 	this->weight = weight;
 	if (showEdgeWeights)
-		graph->setEdgeWeight(id, weight);
+		graph->setEdgeWeight(this, weight);
 }
 
 
