@@ -15,6 +15,7 @@ static constexpr long double default_density = 0.000250;
 struct MapMetaData {
 	long double min_longitude, max_longitude;
 	long double min_latitude, max_latitude;
+	double scale;
 	int nodes, edges;
 	int width = 0, height = 0;
 	bool boundaries = false;

@@ -85,13 +85,16 @@ static void estimateMeta(MapMetaData &meta) {
 	if (meta.width == 0 && meta.height == 0) {
 		meta.width = ceil(Xd);
 		meta.height = ceil(Yd);
+		meta.scale = distanceXkm / Xd;
 	} else {
 		if (meta.width != 0 && meta.height == 0) {
 			Yd = static_cast<long double>(meta.width) * ratio;
 			meta.height = ceil(Yd);
+			meta.scale = distanceYkm / Yd;
 		} else if (meta.width == 0 && meta.height != 0) {
 			Xd = static_cast<long double>(meta.height) / ratio;
 			meta.width = ceil(Xd);
+			meta.scale = distanceXkm / Xd;
 		}
 	}
 }
@@ -200,7 +203,7 @@ int loadMap(string filename, Graph* &graph, bool boundaries) {
 	}
 
 	// Initialize the graph
-	graph = new Graph(meta.width, meta.height);
+	graph = new Graph(meta.width, meta.height, meta.scale);
 
 	// Load Nodes, Roads and Subroads
 	if (loadNodes(filename + nodes_suffix, meta, graph) != 0) {
@@ -568,9 +571,9 @@ int testLoadMeta(string path) {
 		cout << "Show Edge Weights: " << showEdgeLabels << endl;
 		cout << "Show Edge Flows: " << showEdgeLabels << endl << endl;
 
+		cout << "Computed Scale: " << meta.scale << endl;
 		cout << "Estimated X: " << meta.width << endl;
 		cout << "Estimated Y: " << meta.height << endl;
-		cout << "Load Meta Successful" << endl;
 
 		getchar();
 		return 0;

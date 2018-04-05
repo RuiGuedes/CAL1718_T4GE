@@ -184,7 +184,7 @@ bool Graph::setBackground(string path) const {
  * @brief Graph constructor, taking
  * display width and display height in grid entries
  */
-Graph::Graph(int width, int height): width(width), height(height) {
+Graph::Graph(int width, int height, double scale): width(width), height(height), scale(scale) {
 	gv = new GraphViewer(width, height, false);
 	gv->createWindow(GRAPH_VIEWER_WIDTH, GRAPH_VIEWER_HEIGHT);
 	defineVertexColor(VERTEX_CLEAR_COLOR);
@@ -359,7 +359,7 @@ double Graph::distance(Vertex* v1, Vertex* v2) const {
 	// long long because of overflow precautions
 	long long x1 = v1->getX(), y1 = v1->getY();
 	long long x2 = v2->getX(), y2 = v2->getY();
-	return sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
+	return scale * sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
 }
 
 /*
@@ -371,7 +371,7 @@ double Graph::length(Edge* e) const {
 	if (e == nullptr) {
 		throw std::invalid_argument("Edge not found");
 	}
-	return distance(e->getSource(), e->getDest());
+	return e->getDistance();
 }
 
 /*
@@ -730,7 +730,7 @@ double Vertex::distanceTo(Vertex* dest) const {
 	}
 	long long x1 = x, y1 = y;
 	long long x2 = dest->getX(), y2 = dest->getY();
-	return sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
+	return graph->scale * sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
 }
 
 /*

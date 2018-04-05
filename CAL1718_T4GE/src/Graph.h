@@ -43,6 +43,7 @@ class Graph {
 	vector<Vertex*> vertexSet;
 	vector<Vertex*> accidentedVertexSet;
 	GraphViewer *gv;
+	double scale;
 
 	// ***** Auxiliary
 	bool withinBounds(int x, int y) const;
@@ -71,7 +72,7 @@ public:
 	/////
 
 	///// ***** Constructors and destructor
-	Graph(int width, int height);
+	Graph(int width, int height, double scale = 1);
 	~Graph();
 
 	///// ***** Vertex
