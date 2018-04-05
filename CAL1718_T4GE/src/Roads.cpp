@@ -3,6 +3,12 @@
 
 #include "Graph.h"
 
+static int maxCapacityEstimation(double distance) {
+	return 10 + (distance * 0.25);
+}
+
+
+
 ////////////////
 // Class Road //
 ////////////////
@@ -57,13 +63,14 @@ ostream& operator<<(ostream& out, Road* r) {
 
 
 
+
 ///////////////////
 // Class Subroad //
 ///////////////////
 
 Subroad::Subroad(double distance, Road* road):
 		distance(distance), road(road) {
-	maxCapacity = ceil(distance * 300 + 10);
+	maxCapacity = maxCapacityEstimation(distance);
 	actualCapacity = (rand() % maxCapacity);
 }
 

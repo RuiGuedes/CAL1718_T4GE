@@ -651,7 +651,6 @@ ostream& operator<<(ostream& out, Graph* graph) {
 
 
 
-
 /*
  * @brief (Private) Moves edge e from accidentedAdj to adj.
  * e is in accidentedAdj.
@@ -1021,7 +1020,6 @@ ostream& operator<<(ostream& out, Vertex* v) {
 	out << (v->isAccidented() ? "Accidented;" : "Clear;");
 	return out;
 }
-
 
 
 

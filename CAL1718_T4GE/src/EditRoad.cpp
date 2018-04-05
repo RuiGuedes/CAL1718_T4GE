@@ -69,8 +69,12 @@ void editRoadInfo() {
 			cout << "Invalid node (" << option << ") Try again !" << endl;
 	}
 
-	// Forward to editRoadInformationInterface
-	editRoadInformationInterface(origin->getEdge(destination));
+	Edge *edge = origin->findEdge(destination);
+	graph->setEdgeColor(edge, EDGE_SELECTED_COLOR);
+	graph->rearrange();
+	editRoadInformationInterface(edge);
+	graph->setEdgeDefaultColor(edge);
+	graph->rearrange();
 }
 
 
