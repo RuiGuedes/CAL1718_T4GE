@@ -104,10 +104,14 @@ int main() {
 
 	//loadMap("../resource/small", graph);
 
-	//loadMap("./resource/newyork_large", graph);
-	testNewMap("./resource/newyork_large");
+	loadMap("./resource/newyork", graph);
+	//testNewMap("./resource/newyork_large");
 
-	//mainMenu();
+	try {
+	mainMenu();
+	} catch (exception &e) {
+		cout << e.what() << endl;
+	}
 	getchar();
 	return 0;
 }

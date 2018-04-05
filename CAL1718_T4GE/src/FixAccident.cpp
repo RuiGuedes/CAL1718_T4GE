@@ -77,7 +77,7 @@ void fixIntersectionAccident() {
 
 		if(validIDInput(option)) {
 			int node = stoi(option);
-			Vertex* v = graph->getVertex(node);
+			v = graph->getVertex(node);
 			if (v != nullptr) {
 				break;
 			} else {

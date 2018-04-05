@@ -24,7 +24,6 @@ bool Graph::withinBounds(int x, int y) const {
 void Graph::moveToVertexSet(Vertex *v) {
 	accidentedVertexSet.erase(remove(accidentedVertexSet.begin(),accidentedVertexSet.end(), v), accidentedVertexSet.end());
 	vertexSet.push_back(v);
-	sort(vertexSet.begin(), vertexSet.end());
 	update();
 }
 
@@ -35,7 +34,6 @@ void Graph::moveToVertexSet(Vertex *v) {
 void Graph::moveToAccidentedVertexSet(Vertex *v) {
 	vertexSet.erase(remove(vertexSet.begin(),vertexSet.end(), v),vertexSet.end());
 	accidentedVertexSet.push_back(v);
-	sort(accidentedVertexSet.begin(), accidentedVertexSet.end());
 	update();
 }
 
@@ -621,7 +619,6 @@ ostream& Graph::operator<<(ostream& out) const {
 void Vertex::moveToAdj(Edge *e) {
 	accidentedAdj.erase(remove(accidentedAdj.begin(),accidentedAdj.end(), e),accidentedAdj.end());
 	adj.push_back(e);
-	sort(adj.begin(), adj.end());
 	graph->update();
 }
 
@@ -632,7 +629,6 @@ void Vertex::moveToAdj(Edge *e) {
 void Vertex::moveToAccidentedAdj(Edge *e) {
 	adj.erase(remove(adj.begin(),adj.end(), e),adj.end());
 	accidentedAdj.push_back(e);
-	sort(accidentedAdj.begin(), accidentedAdj.end());
 	graph->update();
 }
 
@@ -864,10 +860,10 @@ Edge* Vertex::getEdge(Vertex* vdest) const {
 bool Vertex::fix() {
 	if (accidented) {
 		accidented = false;
-		// Move back to vertexSet
-		graph->moveToVertexSet(this);
 		// * Set Vertex Color
 		graph->setVertexColor(id, VERTEX_CLEAR_COLOR);
+		// Move back to vertexSet
+		graph->moveToVertexSet(this);
 		return true;
 	} else {
 		return false;
@@ -881,10 +877,10 @@ bool Vertex::fix() {
 bool Vertex::accident() {
 	if (!accidented) {
 		accidented = true;
-		// Move to accidentedVertexSet
-		graph->moveToAccidentedVertexSet(this);
 		// * Set Vertex Color
 		graph->setVertexColor(id, VERTEX_ACCIDENTED_COLOR);
+		// Move to accidentedVertexSet
+		graph->moveToAccidentedVertexSet(this);
 		return true;
 	} else {
 		return false;
@@ -1087,10 +1083,10 @@ int Edge::calculateAverageSpeed() const {
 bool Edge::fix() {
 	if (accidented) {
 		accidented = false;
-		// Move back to adj
-		source->moveToAdj(this);
 		// * Set Edge Color
 		graph->setEdgeColor(id, EDGE_CLEAR_COLOR);
+		// Move back to adj
+		source->moveToAdj(this);
 		return true;
 	} else {
 		return false;
@@ -1105,10 +1101,10 @@ bool Edge::fix() {
 bool Edge::accident() {
 	if (!accidented) {
 		accidented = true;
-		// Move to accidentedAdj
-		source->moveToAccidentedAdj(this);
 		// * Set Edge Color
 		graph->setEdgeColor(id, EDGE_ACCIDENTED_COLOR);
+		// Move to accidentedAdj
+		source->moveToAccidentedAdj(this);
 		return true;
 	} else {
 		return false;

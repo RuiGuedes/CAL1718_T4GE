@@ -77,8 +77,11 @@ void causeIntersectionAccident() {
 		cin >> option;
 
 		if(validIDInput(option)) {
+			cout << "DEBUG\n";
 			int node = stoi(option);
-			Vertex* v = graph->getVertex(node);
+			cout << "DEBUG\n";
+			v = graph->getVertex(node);
+			cout << "DEBUG VERTEX " << v->getID() << endl;
 			if (v != nullptr) {
 				break;
 			} else {
@@ -89,8 +92,14 @@ void causeIntersectionAccident() {
 			cout << "Invalid node (" << option << "). Try again !" << endl << endl;
 	}
 
+	cout << "DEBUG VERTEX " << v->getID() << endl;
+	getchar();
+
 	// Cause accident
 	v->accident();
+
+	cout << "DEBUG VERTEX " << v->getID() << endl;
+	getchar();
 }
 
 /*
