@@ -77,41 +77,35 @@ void systemInformation() {
 	system("pause");
 }
 
-int main() {
+int main(int argc, char* argv[]) {
 	srand(time(0));
-//	ifstream file;
-//	string filename;
-//
-//	cout << "Select map file" << endl << endl;
-//
-//	while(1) {
-//
-//		cout << "Filename: ";
-//		cin >> filename;
-//
-//		file.open("../resource/" + filename + "_meta.txt");
-//
-//		if (file.is_open()) {
-//			file.close();
-//			break;
-//		}
-//		else
-//			cout << "Invalid filename. Try again !" << endl << endl;
-//
-//	}
-//
-//	cout << endl << "Loading map information ..." << endl << endl;
 
-	//loadMap("../resource/small", graph);
+	ifstream file;
+	string filename;
 
-	loadMap("./resource/newyork", graph);
-	//testNewMap("./resource/newyork_large");
+	cout << "Select map file" << endl;
+	cout << "Available by default: gporto, newyork, newyork_large, small" << endl << endl;
 
-	try {
-	mainMenu();
-	} catch (exception &e) {
-		cout << e.what() << endl;
+	while(1) {
+		cout << "Filename: ";
+		cin >> filename;
+
+		filename = "./resource/" + filename;
+
+		if (checkFilename(filename))
+			break;
+		else
+			cout << "Invalid filename. Try again !" << endl << endl;
 	}
-	getchar();
+
+	cout << endl << "Loading map information ..." << endl << endl;
+
+	if (argc == 1) {
+		loadMap(filename, graph);
+		mainMenu();
+	} else {
+		testNewMap(filename);
+	}
+
 	return 0;
 }

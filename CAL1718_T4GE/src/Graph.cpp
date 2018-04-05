@@ -1013,17 +1013,12 @@ void Vertex::removeEdge(Edge* edge) {
 
 
 /*
- * @brief Prints vertex's basic info
+ * @brief Prints vertex's basic info (one liner)
  */
 ostream& operator<<(ostream& out, Vertex* v) {
-	out << "ID = " << v->getID() << "; ";
+	out << "ID=" << v->getID() << "; ";
 	out << "(" << v->getX() << "," << v->getY() << "); ";
-	if (v->isAccidented())
-		out << "Clear;\n";
-	else
-		out << "Accidented;\n";
-	//out << "#Good = " << v->getAdj().size() << "; ";
-	//out << "#Bad = " << v->getAccidentedAdj().size();
+	out << (v->isAccidented() ? "Accidented;" : "Clear;");
 	return out;
 }
 
@@ -1181,21 +1176,15 @@ bool Edge::setActualCapacity(int capacity) {
 
 
 /*
- * @brief Prints the edge's basic info
- * According to printEdgeInfo    @EditRoad.cpp
+ * @brief Prints the edge's basic info (one liner)
  */
 ostream& operator<<(ostream& out, Edge* e) {
-	Road* road = e->getRoad();
-	out << "Edge information:" << endl;
-	out << "ID -> " << e->getID() << endl;
-	if(road->getName().empty())
-		out << "Name -> -----" << endl;
-	else
-		out << "Name -> " << road->getName() << endl;
-	out << "Average speed -> " << e->calculateAverageSpeed() << endl;
-	out << "Distance -> " << e->getDistance() << " meters" << endl;
-	out << "Amount of cars -> " << e->getActualCapacity() << " cars" << endl;
-	out << "Maximum capacity -> " << e->getMaxCapacity() << " cars" << endl << endl;
+	out << "ID=" << e->getID() << "; ";
+	out << "ROAD=" << e->getRoad()->getName() << "; ";
+	out << "SPEED=" << e->calculateAverageSpeed() << "; ";
+	out << "DIST=" << e->getDistance() << " m; ";
+	out << "ACTUAL_CAP=" << e->getActualCapacity() << "; ";
+	out << "MAX_CAP=" << e->getMaxCapacity();
 	return out;
 }
 

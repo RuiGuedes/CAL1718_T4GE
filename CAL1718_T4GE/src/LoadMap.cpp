@@ -62,7 +62,7 @@ static void estimateMeta(MapMetaData &meta) {
 		meta.height = 0;
 	}
 
-	long double avg_latitude = (meta.min_latitude + meta.max_latitude) / 2;
+	long double avg_latitude = (meta.min_latitude + meta.max_latitude) / 2.0;
 	long double delta_latitude = meta.max_latitude - meta.min_latitude;
 	long double delta_longitude = meta.max_longitude - meta.min_longitude;
 
@@ -82,19 +82,25 @@ static void estimateMeta(MapMetaData &meta) {
 	long double Xd = sqrt(meta.nodes / (meta.density * ratio));
 	long double Yd = Xd * ratio;
 
+	// Case 1: Use density
 	if (meta.width == 0 && meta.height == 0) {
 		meta.width = ceil(Xd);
 		meta.height = ceil(Yd);
-		meta.scale = distanceXkm / Xd;
+		meta.scale = 1000.0 * distanceXkm / Xd;
 	} else {
+		// Case 2: Use width
 		if (meta.width != 0 && meta.height == 0) {
 			Yd = static_cast<long double>(meta.width) * ratio;
 			meta.height = ceil(Yd);
-			meta.scale = distanceYkm / Yd;
-		} else if (meta.width == 0 && meta.height != 0) {
+			meta.scale = 1000.0 * distanceYkm / Yd;
+			meta.density = static_cast<long double>(meta.nodes) / (Xd * Yd);
+		}
+		// Case 3: Use height
+		else if (meta.width == 0 && meta.height != 0) {
 			Xd = static_cast<long double>(meta.height) / ratio;
 			meta.width = ceil(Xd);
-			meta.scale = distanceXkm / Xd;
+			meta.scale = 1000.0 * distanceXkm / Xd;
+			meta.density = static_cast<long double>(meta.nodes) / (Xd * Yd);
 		}
 	}
 }
@@ -104,7 +110,7 @@ static void estimateMeta(MapMetaData &meta) {
  * Adds dummy boundary vertices around the map (around 20 per side)
  * @param ...
  */
-void showBoundaries(MapMetaData &meta, Graph* &graph) {
+void showBoundaries(MapMetaData &meta, Graph* graph) {
 	int ID = -1000;
 
 	// Corners
@@ -135,13 +141,13 @@ void showBoundaries(MapMetaData &meta, Graph* &graph) {
  * Checks if all files are present and openable
  * Extremely rigid -- exits if some file is not found
  */
-static bool checkFilename(string filename) {
+bool checkFilename(string filename) {
 	ifstream file;
 
 	file.open(filename + meta_suffix);
 	if (!file.is_open() || !file.good()) {
 		cout << "Meta file not found (" << filename + meta_suffix << ")" << endl;
-		//getchar();
+		//system("pause");
 		return false;
 	}
 	file.close();
@@ -149,7 +155,7 @@ static bool checkFilename(string filename) {
 	file.open(filename + nodes_suffix);
 	if (!file.is_open() || !file.good()) {
 		cout << "Nodes file not found (" << filename + nodes_suffix << ")" << endl;
-		//getchar();
+		//system("pause");
 		return false;
 	}
 	file.close();
@@ -157,7 +163,7 @@ static bool checkFilename(string filename) {
 	file.open(filename + roads_suffix);
 	if (!file.is_open() || !file.good()) {
 		cout << "Roads file not found (" << filename + roads_suffix << ")" << endl;
-		//getchar();
+		//system("pause");
 		return false;
 	}
 	file.close();
@@ -165,7 +171,7 @@ static bool checkFilename(string filename) {
 	file.open(filename + subroads_suffix);
 	if (!file.is_open() || !file.good()) {
 		cout << "Subroads file not found (" << filename + subroads_suffix << ")" << endl;
-		//getchar();
+		//system("pause");
 		return false;
 	}
 	file.close();
@@ -343,7 +349,7 @@ int loadMeta(string filename, MapMetaData &meta) {
 //    [3] : Longitude in degrees (long double)
 //    [4]*: Longitude in radians (long double)
 //    [5]*: Latitude in radians (long double)
-int loadNodes(string filename, MapMetaData &meta, Graph* &graph) {
+int loadNodes(string filename, MapMetaData &meta, Graph* graph) {
 	static const regex reg("^(\\d+);(-?\\d+.?\\d*);(-?\\d+.?\\d*);(?:-?\\d+.?\\d*);(?:-?\\d+.?\\d*);?$");
 
 	ifstream file(filename);
@@ -400,7 +406,7 @@ int loadNodes(string filename, MapMetaData &meta, Graph* &graph) {
 //    [1] : Road id (long long)
 //    [2] : Road name (string)
 //    [3] : Two way (bool)
-int loadRoads(string filename, MapMetaData &meta, Graph* &graph) {
+int loadRoads(string filename, MapMetaData &meta, Graph* graph) {
 	static const regex reg("^(\\d+);(.*?);(False|True);?$");
 	static const string FalseStr = "False", TrueStr = "True";
 
@@ -460,7 +466,7 @@ int loadRoads(string filename, MapMetaData &meta, Graph* &graph) {
 //    [1] : Road id
 //    [2] : Node 1 id
 //    [3] : Node 2 id
-int loadSubroads(string filename, MapMetaData &meta, Graph* &graph) {
+int loadSubroads(string filename, MapMetaData &meta, Graph* graph) {
 	static const regex reg("^(\\d+);(\\d+);(\\d+);?$");
 
 	ifstream file(filename);
@@ -566,6 +572,7 @@ int testLoadMeta(string path) {
 		cout << "Max Latitude: " << meta.max_latitude << endl;
 		cout << "Nodes: " << meta.nodes << endl;
 		cout << "Edges: " << meta.edges << endl;
+		cout << "Density: " << meta.density << endl;
 		cout << "Boundaries: " << meta.boundaries << endl;
 		cout << "Show Edge Labels: " << showEdgeLabels << endl;
 		cout << "Show Edge Weights: " << showEdgeLabels << endl;
@@ -575,11 +582,11 @@ int testLoadMeta(string path) {
 		cout << "Estimated X: " << meta.width << endl;
 		cout << "Estimated Y: " << meta.height << endl;
 
-		getchar();
+		system("pause");
 		return 0;
 	} catch (exception &e) {
 		cout << "Load Meta Failed\n" << e.what() << endl;
-		getchar();
+		system("pause");
 		return -1;
 	}
 }
@@ -615,16 +622,14 @@ int testLoadNodes(string path) {
 		auto vertexSet = graph->getAllVertexSet();
 		for (auto v : vertexSet) {
 			cout << v << endl;
-			if (graph->findVertex(v->getID()) == nullptr)
-				throw logic_error("Node not found in Graph");
 		}
 
-		getchar();
+		system("pause");
 		delete graph;
 		return 0;
 	} catch (std::exception &e) {
 		cout << "Load Nodes Failed\n" << e.what() << std::endl;
-		getchar();
+		system("pause");
 		return -1;
 	}
 }
@@ -660,21 +665,16 @@ int testLoadRoads(string path) {
 		graph->update();
 
 		// *** Test
-		cout << "MADE IT " << endl;
-		for (auto r : roadMap) {
-			Road* road = r.second;
-			cout << "ID=" << road->getID() << " ; ";
-			cout << "NAME=" << road->getName() << " ; ";
-			cout << "TWOWAY=" << (road->isBidirectional() ? "true" : "false");
-			cout << " ; " << endl;
+		for (auto const& pair : roadMap) {
+			cout << pair.second << endl;
 		}
 
-		getchar();
+		system("pause");
 		delete graph;
 		return 0;
 	} catch (exception &e) {
 		cout << "Load Roads Failed\n" << e.what() << endl;
-		getchar();
+		system("pause");
 		return -1;
 	}
 }
@@ -720,12 +720,12 @@ int testLoadSubroads(string path) {
 			}
 		}
 
-		getchar();
+		system("pause");
 		delete graph;
 		return 0;
 	} catch (exception &e) {
 		cout << "Load Roads Failed\n" << e.what() << endl;
-		getchar();
+		system("pause");
 		return -1;
 	}
 }
@@ -736,12 +736,12 @@ int testLoadMap(string path) {
 
 		loadMap(path, graph, true);
 
-		getchar();
+		system("pause");
 		delete graph;
 		return 0;
 	} catch (exception &e) {
 		cout << "Load Meta Failed\n" << e.what() << endl;
-		getchar();
+		system("pause");
 		return -1;
 	}
 }
@@ -781,6 +781,6 @@ int testNewMap(string path) {
 	if (status != 0)
 		return -1;
 
-	getchar();
+	system("pause");
 	exit(0);
 }

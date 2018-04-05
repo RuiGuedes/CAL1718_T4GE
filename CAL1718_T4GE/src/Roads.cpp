@@ -47,6 +47,13 @@ bool Road::setTotalDistance(double distance) {
 }
 
 
+ostream& operator<<(ostream& out, Road* r) {
+	out << "ID=" << r->getID() << "; ";
+	out << "NAME=" << r->getName() << "; ";
+	out << "TWOWAY=" << (r->isBidirectional() ? "true;" : "false;");
+	return out;
+}
+
 
 
 

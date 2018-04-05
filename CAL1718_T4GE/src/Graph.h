@@ -269,6 +269,7 @@ public:
 
 	bool setTotalDistance(double distance);
 
+	friend ostream& operator<<(ostream& out, Road* r);
 	friend class Subroad;
 };
 

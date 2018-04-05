@@ -22,15 +22,19 @@ struct MapMetaData {
 	long double density = default_density;
 };
 
+void showBoundaries(MapMetaData &meta, Graph* graph);
+
+bool checkFilename(string filename);
+
 int loadMap(string filename, Graph* &graph, bool boundaries = false);
 
 int loadMeta(string filename, MapMetaData &meta);
 
-int loadNodes(string filename, MapMetaData &meta, Graph* &graph);
+int loadNodes(string filename, MapMetaData &meta, Graph* graph);
 
-int loadRoads(string filename, MapMetaData &meta, Graph* &graph);
+int loadRoads(string filename, MapMetaData &meta, Graph* graph);
 
-int loadSubroads(string filename, MapMetaData &meta, Graph* &graph);
+int loadSubroads(string filename, MapMetaData &meta, Graph* graph);
 
 int testLoadMeta(string path);
 
