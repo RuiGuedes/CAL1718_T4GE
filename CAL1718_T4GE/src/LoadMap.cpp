@@ -12,14 +12,6 @@ static map<long long, int> nodeIdMap;
 static map<long long, int> roadIdMap;
 static map<int, Road*> roadMap;
 
-
-extern bool graphLoaded;
-extern bool showEdgeLabels;
-extern bool showEdgeWeights;
-extern bool showEdgeFlows;
-
-
-
 /////////////////////////
 // Auxiliary Functions //
 /////////////////////////

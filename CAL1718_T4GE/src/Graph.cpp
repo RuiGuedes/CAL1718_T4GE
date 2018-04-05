@@ -10,16 +10,18 @@ bool showEdgeFlows = false;
 
 
 /*
- * @brief Checks if a pair of integers is
+ * @brief (Private) Checks if a pair of integers is
  * within the bounds of the graph area
+ * @return True if it is, false otherwise
  */
 bool Graph::withinBounds(int x, int y) const {
 	return x >= 0 && y >= 0 && x <= width && y <= height;
 }
 
 /*
- * @brief Moves vertex v from accidentedVertexSet
- * to vertexSet. v in accidentedVertexSet check prior
+ * @brief (Private) Moves vertex v from
+ * accidentedVertexSet to vertexSet.
+ * v is in accidentedVertexSet.
  */
 void Graph::moveToVertexSet(Vertex *v) {
 	accidentedVertexSet.erase(remove(accidentedVertexSet.begin(),accidentedVertexSet.end(), v), accidentedVertexSet.end());
@@ -28,8 +30,9 @@ void Graph::moveToVertexSet(Vertex *v) {
 }
 
 /*
- * @brief Moves vertex v from vertexSet
- * to accidentedVertexSet. v in vertexSet check prior
+ * @brief (Private) Moves vertex v from
+ * vertexSet to accidentedVertexSet.
+ * v is in vertexSet.
  */
 void Graph::moveToAccidentedVertexSet(Vertex *v) {
 	vertexSet.erase(remove(vertexSet.begin(),vertexSet.end(), v),vertexSet.end());
@@ -40,7 +43,7 @@ void Graph::moveToAccidentedVertexSet(Vertex *v) {
 
 /*
  * GRAPHVIEWER
- * @brief Updates the graph window with new info
+ * @brief Updates the graph window with the new info
  */
 void Graph::update() const {
 	gv->rearrange();
@@ -48,7 +51,7 @@ void Graph::update() const {
 
 /*
  * GRAPHVIEWER
- * @brief Updates the graph window with new info
+ * @brief Updates the graph window with the new info
  */
 void Graph::rearrange() const {
 	gv->rearrange();
@@ -56,7 +59,7 @@ void Graph::rearrange() const {
 
 /*
  * GRAPHVIEWER
- * @brief Define o texto de um vértice em particular
+ * @brief Define the text of a particular vertex
  */
 bool Graph::setVertexLabel(Vertex *v, string label) const {
 	if (v == nullptr) return false;
@@ -65,7 +68,7 @@ bool Graph::setVertexLabel(Vertex *v, string label) const {
 
 /*
  * GRAPHVIEWER
- * @brief Define a cor de um vértice em particular
+ * @brief Define the color of a particular vertex
  */
 bool Graph::setVertexColor(Vertex *v, string color) const {
 	if (v == nullptr) return false;
@@ -74,7 +77,7 @@ bool Graph::setVertexColor(Vertex *v, string color) const {
 
 /*
  * GRAPHVIEWER
- * @brief Define a cor default de todos os vértices
+ * @brief Define the default color for all vertices
  */
 bool Graph::defineVertexColor(string color) const {
 	return gv->defineVertexColor(color);
@@ -82,8 +85,9 @@ bool Graph::defineVertexColor(string color) const {
 
 /*
  * GRAPHVIEWER
- * @brief Define a cor do vértice de acordo com o
- * seu estado (acidentado ou não)
+ * @brief Reset the vertex's color to the expected color
+ * VERTEX_ACCIDENTED_COLOR if the vertex is accidented
+ * VERTEX_CLEAR_COLOR if the vertex is clear
  */
 bool Graph::setVertexDefaultColor(Vertex *v) const {
 	if (v == nullptr) return false;
@@ -96,7 +100,7 @@ bool Graph::setVertexDefaultColor(Vertex *v) const {
 
 /*
  * GRAPHVIEWER
- * @brief Define o label de uma aresta em particular
+ * @brief Define the label of a particular edge
  * w: PESO, f: FLUXO, LABEL
  */
 bool Graph::setEdgeLabel(Edge *e, string label) const {
@@ -106,7 +110,7 @@ bool Graph::setEdgeLabel(Edge *e, string label) const {
 
 /*
  * GRAPHVIEWER
- * @brief Define o peso de uma aresta em particular
+ * @brief Define the weight of a particular edge
  * w: PESO, f: FLUXO, LABEL
  */
 bool Graph::setEdgeWeight(Edge *e, int weight) const {
@@ -116,7 +120,7 @@ bool Graph::setEdgeWeight(Edge *e, int weight) const {
 
 /*
  * GRAPHVIEWER
- * @brief Define o fluxo de uma aresta em particular
+ * @brief Define the flow of a particular edge
  * w: PESO, f: FLUXO, LABEL
  */
 bool Graph::setEdgeFlow(Edge *e, int flow) const {
@@ -126,7 +130,7 @@ bool Graph::setEdgeFlow(Edge *e, int flow) const {
 
 /*
  * GRAPHVIEWER
- * @brief Define a cor de uma aresta em particular
+ * @brief Define the color of a particular edge
  */
 bool Graph::setEdgeColor(Edge *e, string color) const {
 	if (e == nullptr) return false;
@@ -135,7 +139,7 @@ bool Graph::setEdgeColor(Edge *e, string color) const {
 
 /*
  * GRAPHVIEWER
- * @brief Define a cor default de todas as arestas
+ * @brief Define the default color for all edges
  */
 bool Graph::defineEdgeColor(string color) const {
 	return gv->defineEdgeColor(color);
@@ -143,8 +147,23 @@ bool Graph::defineEdgeColor(string color) const {
 
 /*
  * GRAPHVIEWER
- * @brief Define a espessura de uma aresta em particular
- * @param thickness O default é thickness 1.
+ * @brief Reset the edge's color to the expected color
+ * EDGE_ACCIDENTED_COLOR if the edge is accidented
+ * EDGe_CLEAR_COLOR if the edge is clear
+ */
+bool Graph::setEdgeDefaultColor(Edge *e) const {
+	if (e == nullptr) return false;
+	if (e->isAccidented()) {
+		return setEdgeColor(e, EDGE_ACCIDENTED_COLOR);
+	} else {
+		return setEdgeColor(e, EDGE_CLEAR_COLOR);
+	}
+}
+
+/*
+ * GRAPHVIEWER
+ * @brief Define the thickness of a particular edge
+ * @param thickness The edge's thickness (default is 1)
  */
 bool Graph::setEdgeThickness(Edge *e, int thickness) const {
 	if (e == nullptr) return false;
@@ -153,29 +172,12 @@ bool Graph::setEdgeThickness(Edge *e, int thickness) const {
 
 /*
  * GRAPHVIEWER
- * @brief Define a imagem de fundo do grafo.
- * @param path Caminho para o ficheiro da imagem.
+ * @brief Define the graph's background
+ * @param path Path to the image file
  */
 bool Graph::setBackground(string path) const {
 	return gv->setBackground(path);
 }
-
-/*
- * GRAPHVIEWER
- * @brief Define a cor do vértice de acordo com o
- * seu estado (acidentado ou não)
- */
-bool Graph::setEdgeDefaultColor(Edge *e) const {
-	if (e == nullptr) return false;
-	if (e->isAccidented()) {
-		return setEdgeColor(e, VERTEX_ACCIDENTED_COLOR);
-	} else {
-		return setEdgeColor(e, VERTEX_CLEAR_COLOR);
-	}
-}
-
-
-
 
 
 /*
@@ -629,11 +631,14 @@ void Graph::removeEdge(Edge* e) {
 }
 
 
-
-ostream& Graph::operator<<(ostream& out) const {
-	for (auto vertex : vertexSet)
+/*
+ * @brief Calls << for all of the graph's vertices,
+ * printing them
+ */
+ostream& operator<<(ostream& out, Graph* graph) {
+	for (auto vertex : graph->vertexSet)
 		out << vertex;
-	for (auto vertex : accidentedVertexSet)
+	for (auto vertex : graph->accidentedVertexSet)
 		out << vertex;
 	return out;
 }
@@ -648,8 +653,8 @@ ostream& Graph::operator<<(ostream& out) const {
 
 
 /*
- * @brief Moves edge e from accidentedAdj
- * to adj. v in accidentedAdj check prior
+ * @brief (Private) Moves edge e from accidentedAdj to adj.
+ * e is in accidentedAdj.
  */
 void Vertex::moveToAdj(Edge *e) {
 	accidentedAdj.erase(remove(accidentedAdj.begin(),accidentedAdj.end(), e),accidentedAdj.end());
@@ -658,8 +663,8 @@ void Vertex::moveToAdj(Edge *e) {
 }
 
 /*
- * @brief Moves edge e from adj
- * to accidentedAdj. v in adj check prior
+ * @brief (Private) Moves edge e from adj to accidentedAdj.
+ * e is in adj.
  */
 void Vertex::moveToAccidentedAdj(Edge *e) {
 	adj.erase(remove(adj.begin(),adj.end(), e),adj.end());
@@ -999,28 +1004,18 @@ void Vertex::removeEdge(Edge* edge) {
 }
 
 
-
-bool Vertex::operator<(Vertex* v) const {
-	return id < v->id;
-}
-
-bool Vertex::operator>(Vertex* v) const {
-	return id > v->id;
-}
-
-bool Vertex::operator==(Vertex* v) const {
-	return id == v->id;
-}
-
-bool Vertex::operator!=(Vertex* v) const {
-	return id != v->id;
-}
-
+/*
+ * @brief Prints vertex's basic info
+ */
 ostream& operator<<(ostream& out, Vertex* v) {
 	out << "ID = " << v->getID() << "; ";
 	out << "(" << v->getX() << "," << v->getY() << "); ";
-	out << "#Good = " << v->getAdj().size() << "; ";
-	out << "#Bad = " << v->getAccidentedAdj().size();
+	if (v->isAccidented())
+		out << "Clear;\n";
+	else
+		out << "Accidented;\n";
+	//out << "#Good = " << v->getAdj().size() << "; ";
+	//out << "#Bad = " << v->getAccidentedAdj().size();
 	return out;
 }
 
@@ -1079,6 +1074,9 @@ double Edge::getWeight() const {
 	return weight;
 }
 
+/*
+ * @brief Return's the edge's Road (not Subroad)
+ */
 Road* Edge::getRoad() const {
 	return subroad->getRoad();
 }
@@ -1090,22 +1088,31 @@ bool Edge::isAccidented() const {
 	return accidented;
 }
 
-
+/*
+ * @brief Return the underlying subroad's total length
+ */
 double Edge::getDistance() const {
 	return subroad->getDistance();
 }
 
-
+/*
+ * @brief Return the edge's actual Car capacity
+ */
 int Edge::getActualCapacity() const {
 	return subroad->getActualCapacity();
 }
 
-
+/*
+ * @brief Return the edge's maximum Car capacity
+ */
 int Edge::getMaxCapacity() const {
 	return subroad->getMaxCapacity();
 }
 
-
+/*
+ * @brief Compute the edge's expected average speed
+ * (based on actual capacity and max capacity)
+ */
 int Edge::calculateAverageSpeed() const {
 	return subroad->calculateAverageSpeed();
 }
@@ -1155,33 +1162,32 @@ void Edge::setWeight(double weight) {
 		graph->setEdgeWeight(this, weight);
 }
 
-
+/*
+ * @brief Sets the edge's actual Car capacity
+ * @return True if within the bounds set by max capacity
+ *         False otherwise
+ */
 bool Edge::setActualCapacity(int capacity) {
 	return subroad->setActualCapacity(capacity);
 }
 
 
-
-bool Edge::operator<(Edge* e) const {
-	return id < e->id;
-}
-
-bool Edge::operator>(Edge* e) const {
-	return id > e->id;
-}
-
-bool Edge::operator==(Edge* e) const {
-	return id == e->id;
-}
-
-bool Edge::operator!=(Edge* e) const {
-	return id != e->id;
-}
-
+/*
+ * @brief Prints the edge's basic info
+ * According to printEdgeInfo    @EditRoad.cpp
+ */
 ostream& operator<<(ostream& out, Edge* e) {
-	out << "EID = " << e->getID() << "; ";
-	out << "Weight = " << e->getWeight() << "; ";
-	out << "(" << e->getSource()->getID() << " -> " << e->getDest()->getID() << "); ";
+	Road* road = e->getRoad();
+	out << "Edge information:" << endl;
+	out << "ID -> " << e->getID() << endl;
+	if(road->getName().empty())
+		out << "Name -> -----" << endl;
+	else
+		out << "Name -> " << road->getName() << endl;
+	out << "Average speed -> " << e->calculateAverageSpeed() << endl;
+	out << "Distance -> " << e->getDistance() << " meters" << endl;
+	out << "Amount of cars -> " << e->getActualCapacity() << " cars" << endl;
+	out << "Maximum capacity -> " << e->getMaxCapacity() << " cars" << endl << endl;
 	return out;
 }
 

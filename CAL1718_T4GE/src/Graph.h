@@ -12,18 +12,27 @@ using namespace std;
 
 #define GRAPH_VIEWER_WIDTH        ((int)600)
 #define GRAPH_VIEWER_HEIGHT       ((int)600)
+
 #define VERTEX_CLEAR_COLOR        BLUE
 #define VERTEX_ACCIDENTED_COLOR   RED
 #define VERTEX_SELECTED_COLOR     GREEN
+#define VERTEX_UNREACHABLE_COLOR  YELLOW
+
 #define EDGE_CLEAR_COLOR          BLACK
 #define EDGE_ACCIDENTED_COLOR     RED
 #define EDGE_SELECTED_COLOR       GREEN
+#define EDGE_UNREACHABLE_COLOR    YELLOW
 
 class Edge;
 class Graph;
 class Vertex;
 class Road;
 class Subroad;
+
+extern bool graphLoaded;
+extern bool showEdgeLabels;
+extern bool showEdgeWeights;
+extern bool showEdgeFlows;
 
 //////////////////////////
 /////// Class Graph //////
@@ -115,7 +124,7 @@ public:
 	/////
 
 	///// ***** Operations
-	ostream& operator<<(ostream &out) const;
+	friend ostream& operator<<(ostream &out, Graph* graph);
 	friend class Vertex;
 	friend class Edge;
 };
@@ -178,10 +187,7 @@ public:
 	/////
 
 	///// ***** Operations
-	bool operator<(Vertex *v) const; // MutablePriorityQueue
-	bool operator>(Vertex *v) const;
-	bool operator==(Vertex *v) const;
-	bool operator!=(Vertex *v) const;
+	bool operator<(Vertex v) const;
 	friend ostream& operator<<(ostream &out, Vertex* v);
 	friend class Graph;
 	friend class Edge;
@@ -231,10 +237,6 @@ public:
 	/////
 
 	// ***** Operations
-	bool operator<(Edge *e) const; // MutablePriorityQueue
-	bool operator>(Edge *e) const;
-	bool operator==(Edge *e) const;
-	bool operator!=(Edge *e) const;
 	friend ostream& operator<<(ostream &out, Edge* e);
 	friend class Graph;
 	friend class Vertex;
@@ -258,18 +260,13 @@ class Road {
 public:
 	Road(int rid, string name, bool bothways = false);
 
-	///// ***** Road CRUD
-	// C
-	// R
 	int getID() const;
 	string getName() const;
 	bool isBidirectional() const;
 	double getTotalDistance() const;
 	int getAverageSpeed() const;
-	// U
+
 	bool setTotalDistance(double distance);
-	// D
-	/////
 
 	friend class Subroad;
 };
@@ -292,7 +289,6 @@ class Subroad {
 public:
 	Subroad(double distance, Road* road);
 
-	///// ***** Subroad CRUD
 	Road *getRoad() const;
 	double getDistance() const;
 	int getActualCapacity() const;
@@ -300,7 +296,6 @@ public:
 	int calculateAverageSpeed() const;
 
 	bool setActualCapacity(int actualCapacity);
-	/////
 
 	friend class Road;
 };
