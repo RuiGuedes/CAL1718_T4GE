@@ -902,6 +902,10 @@ bool Vertex::fix() {
 		accidented = false;
 		// * Set Vertex Color
 		graph->setVertexColor(this, VERTEX_CLEAR_COLOR);
+		// * Fix edges ?
+		for (Edge *e : accidentedAdj) {
+			e->fix();
+		}
 		// Move back to vertexSet
 		graph->moveToVertexSet(this);
 		return true;
@@ -919,6 +923,10 @@ bool Vertex::accident() {
 		accidented = true;
 		// * Set Vertex Color
 		graph->setVertexColor(this, VERTEX_ACCIDENTED_COLOR);
+		// * Accident edges ?
+		for (Edge *e : adj) {
+			e->accident();
+		}
 		// Move to accidentedVertexSet
 		graph->moveToAccidentedVertexSet(this);
 		return true;
