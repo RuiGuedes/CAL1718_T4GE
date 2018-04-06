@@ -548,7 +548,6 @@ int loadSubroads(string filename, MapMetaData &meta, Graph* graph) {
 }
 
 
-
 ////////////////////
 // Test Functions //
 ////////////////////

@@ -90,7 +90,7 @@ int main(int argc, char* argv[]) {
 		cout << "Filename: ";
 		cin >> filename;
 
-		filename = "../resource/" + filename;
+		filename = "./resource/" + filename;
 
 		if (checkFilename(filename))
 			break;
