@@ -351,27 +351,14 @@ vector<Vertex*> Graph::getAllVertexSet() const {
 /*
  * @brief Returns the path between two vertices
  */
-vector<Vertex*> Graph::getPath(Vertex* origin, Vertex* dest) const {
-	vector<Vertex*> res;
-
-//	for (auto v: vertexSet){
-//		if (v->id == dest) {
-//			des = v;
-//			break;
-//		}
-//	}
-
-	while( dest != origin ){
-		res.push_back(dest);
-		dest = dest->getPath();
-	}
-	res.push_back(dest);
-
-	vector<Vertex*> aux = res;
-
-	for(unsigned int i=0; i<res.size();i++)
-		res[i] = aux [aux.size()-i-1];
-
+vector<int> Graph::getPath(Vertex* origin, Vertex* dest) const {
+	vector<int> res;
+	auto v = this->findVertex(dest->getID());
+	if (v == nullptr || v->dist == INF) // missing or disconnected
+		return res;
+	for ( ; v != nullptr; v = v->path)
+		res.push_back(v->getID());
+	reverse(res.begin(), res.end());
 	return res;
 }
 
@@ -711,8 +698,8 @@ void Vertex::_sgraph(Graph* graph) {
  * conditional accidented, defaulting to false
  */
 Vertex::Vertex(int id, int x, int y, bool accidented):
-			id(id), x(x), y(y), accidented(accidented),
-			graph(nullptr) {}
+							id(id), x(x), y(y), accidented(accidented),
+							graph(nullptr) {}
 
 /*
  * @brief Vertex destructor, destroys all its own edges
@@ -1083,8 +1070,8 @@ void Edge::_sgraph(Graph* graph) {
  */
 Edge::Edge(int id, Vertex* vsource, Vertex* vdest,
 		double weight, Subroad* subroad, bool accidented):
-			id(id), source(vsource), dest(vdest), weight(weight),
-			accidented(accidented), subroad(subroad) {}
+							id(id), source(vsource), dest(vdest), weight(weight),
+							accidented(accidented), subroad(subroad) {}
 
 /*
  * @brief Return's the edge's source vertex
@@ -1111,7 +1098,7 @@ int Edge::getID() const {
  * @brief Return's the edge's weight
  */
 double Edge::getWeight() const {
-	return weight;
+	return subroad->getDistance()/subroad->calculateAverageSpeed();
 }
 
 /*
@@ -1227,27 +1214,29 @@ ostream& operator<<(ostream& out, Edge* e) {
 
 
 
-
-
 void Graph::dijkstraDist(Vertex* vsource) {
 	MutablePriorityQueue<Vertex> q;
 	for (auto v : vertexSet) {
-		if (v != vsource) {
+
+		if (v == vsource) {
+			cout << "FIND\n";
 			v->dist = 0;
 			v->path = NULL;
 			q.insert(v);
 		}
 		else {
+			cout << "DIFF DIST\n";
 			v->dist = INF;
 			v->path = NULL;
 		}
 	}
 
+	cout << "OUT\n";
 	while (!q.empty()) {
 		Vertex* v = q.extractMin();
-
+		cout << "EXTRACT\n";
 		for(auto w : v->adj) {
-
+			cout << "IN\n";
 			if(w->dest->dist > v->dist + w->getWeight()) {
 				double oldDist = w->dest->dist;
 

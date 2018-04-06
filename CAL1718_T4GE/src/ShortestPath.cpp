@@ -5,7 +5,7 @@
 //////////////////////////
 
 vector<int> checkUnreachableNodes();
-vector<int> pathGraphAnimation(vector<Vertex*> path);
+vector<int> pathGraphAnimation(vector<int> path);
 void resetGraphState(vector<int> unreachableNodes,vector<int> pathIndex);
 
 void getShortestPath() {
@@ -38,9 +38,11 @@ void getShortestPath() {
 			cout << "Invalid node (" << option << "). Try again !" << endl << endl;
 	}
 
+	cout <<"BEFORE\n";
 	graph->dijkstraDist(origin);
 
 	vector<int> unreachableNodes = checkUnreachableNodes();
+	cout <<"AFTER\n";
 	vector<int> pathIndex;
 
 	if((unreachableNodes.size() + graph->getAccidentedVertexSet().size()) > (unsigned int)graph->getTotalVertices())
@@ -56,7 +58,7 @@ void getShortestPath() {
 				destinationNode = stoi(option);
 				destination = graph->findVertex(destinationNode);
 
-				if(destination == NULL)
+				if(destination == nullptr)
 					cout << "Accidented node (" << option << ") Try again !" << endl << endl;
 				else if(destination->getDist() == INF)
 					cout << "Unreachable node (" << option << ") Try again !" << endl << endl;
@@ -69,7 +71,13 @@ void getShortestPath() {
 				cout << "Invalid node (" << option << ") Try again !" << endl << endl;
 		}
 
-		pathIndex = pathGraphAnimation(graph->getPath(origin,destination));
+		pathIndex = graph->getPath(origin,destination);
+
+		for(unsigned int i = 0; i < pathIndex.size(); i++)
+					cout << pathIndex.at(i) << "   ";
+
+		pathGraphAnimation(pathIndex);
+
 		cout << endl << "Time spent: " << destination->getDist() << " seconds" << endl << endl;
 	}
 
@@ -94,12 +102,12 @@ vector<int> checkUnreachableNodes() {
 	return unreachableNodes;
 }
 
-vector<int> pathGraphAnimation(vector<Vertex*> path) {
+vector<int> pathGraphAnimation(vector<int> path) {
 	vector<int> pathIndex;
 
 	for(unsigned int i = 0; i < path.size(); i++) {
-		pathIndex.push_back(path.at(i)->getID());
-		graph->setVertexColor(path.at(i),"green");
+		pathIndex.push_back(path.at(i));
+		graph->setVertexColor(graph->findVertex(path.at(i)),"green");
 		graph->rearrange();
 		Sleep(500);
 	}

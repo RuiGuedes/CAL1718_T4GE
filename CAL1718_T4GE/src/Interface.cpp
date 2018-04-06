@@ -53,7 +53,7 @@ void mainMenu() {
 			editRoadInfo();
 			break;
 		case 4:
-			//getShortestPath();
+			getShortestPath();
 			break;
 		case 5:
 			systemInformation();
@@ -81,24 +81,25 @@ int main(int argc, char* argv[]) {
 	srand(time(0));
 
 	ifstream file;
-	string filename;
+	//string filename;
+	string filename = "./resource/gporto";
 
 	cout << "Select map file" << endl;
 	cout << "Available maps: gporto, newyork, newyork_large, small" << endl << endl;
 
-	while(1) {
-		cout << "Filename: ";
-		cin >> filename;
-
-		filename = "./resource/" + filename;
-
-		if (checkFilename(filename))
-			break;
-		else
-			cout << "Invalid filename. Try again !" << endl << endl;
-	}
-
-	cout << endl << "Loading map information ..." << endl << endl;
+//	while(1) {
+//		cout << "Filename: ";
+//		cin >> filename;
+//
+//		filename = "./resource/" + filename;
+//
+//		if (checkFilename(filename))
+//			break;
+//		else
+//			cout << "Invalid filename. Try again !" << endl << endl;
+//	}
+//
+//	cout << endl << "Loading map information ..." << endl << endl;
 
 	if (argc == 1) {
 		loadMap(filename, graph);

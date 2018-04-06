@@ -90,7 +90,7 @@ public:
 	vector<Vertex*> getVertexSet() const;
 	vector<Vertex*> getAccidentedVertexSet() const;
 	vector<Vertex*> getAllVertexSet() const;
-	vector<Vertex*> getPath(Vertex* origin, Vertex* dest) const;
+	vector<int> getPath(Vertex* origin, Vertex* dest) const;
 	double distance(Vertex *v1, Vertex *v2) const;
 	double length(Edge *e) const;
 	bool connectedTo(Vertex *v1, Vertex *v2, bool bothways = false) const;

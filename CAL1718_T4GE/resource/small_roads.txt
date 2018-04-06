@@ -1,4 +1,6 @@
-1;Avenida da Boavista;False
-2;CircunvalaÃ§Ã£o;True
+1;Rotunda ABC;False
+2;Circunvalação;True
 3;Rotunda ABC;False
 4;Roberto Frias;False
+5;Zé;False
+6;Maria Madalena;False
