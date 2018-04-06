@@ -348,6 +348,33 @@ vector<Vertex*> Graph::getAllVertexSet() const {
 	return set;
 }
 
+/*
+ * @brief Returns the path between two vertices
+ */
+vector<Vertex*> Graph::getPath(Vertex* origin, Vertex* dest) const {
+	vector<Vertex*> res;
+
+//	for (auto v: vertexSet){
+//		if (v->id == dest) {
+//			des = v;
+//			break;
+//		}
+//	}
+
+	while( dest != origin ){
+		res.push_back(dest);
+		dest = dest->getPath();
+	}
+	res.push_back(dest);
+
+	vector<Vertex*> aux = res;
+
+	for(unsigned int i=0; i<res.size();i++)
+		res[i] = aux [aux.size()-i-1];
+
+	return res;
+}
+
 /* @brief Computes the distance between vertices
  * v1 and v2.
  * @throws invalid_argument if either Vertex is nullptr
@@ -684,8 +711,8 @@ void Vertex::_sgraph(Graph* graph) {
  * conditional accidented, defaulting to false
  */
 Vertex::Vertex(int id, int x, int y, bool accidented):
-	id(id), x(x), y(y), accidented(accidented),
-	graph(nullptr) {}
+			id(id), x(x), y(y), accidented(accidented),
+			graph(nullptr) {}
 
 /*
  * @brief Vertex destructor, destroys all its own edges
@@ -716,6 +743,13 @@ int Vertex::getX() const {
  */
 int Vertex::getY() const {
 	return y;
+}
+
+/*
+ * @brief Return the distance to the previous vertex "path".
+ */
+double Vertex::getDist() const {
+	return this->dist;
 }
 
 /*
@@ -792,12 +826,11 @@ Vertex* Vertex::getPredecessor() const {
 }
 
 /*
- * @brief Return the entire path of vertices leading to
- * this vertex
- * @return The entire vector path, possibly empty
+ * @brief Return the previous vertex
+ * @return The vertex path, possibly empty
  */
-vector<Vertex*> Vertex::getPath() const {
-	return vector<Vertex*>(); // TODO
+Vertex* Vertex::getPath() const {
+	return this->path;
 }
 
 /*
@@ -1010,6 +1043,12 @@ void Vertex::removeEdge(Edge* edge) {
 	}
 }
 
+/*
+ * @brief Return true if "vertex" have greater distance
+ */
+bool Vertex::operator<(Vertex vertex) const {
+	return this->dist < vertex.dist;
+}
 
 /*
  * @brief Prints vertex's basic info (one liner)
@@ -1044,8 +1083,8 @@ void Edge::_sgraph(Graph* graph) {
  */
 Edge::Edge(int id, Vertex* vsource, Vertex* vdest,
 		double weight, Subroad* subroad, bool accidented):
-	id(id), source(vsource), dest(vdest), weight(weight),
-	accidented(accidented), subroad(subroad) {}
+			id(id), source(vsource), dest(vdest), weight(weight),
+			accidented(accidented), subroad(subroad) {}
 
 /*
  * @brief Return's the edge's source vertex
@@ -1189,7 +1228,7 @@ ostream& operator<<(ostream& out, Edge* e) {
 
 
 
-/*
+
 void Graph::dijkstraDist(Vertex* vsource) {
 	MutablePriorityQueue<Vertex> q;
 	for (auto v : vertexSet) {
@@ -1203,36 +1242,24 @@ void Graph::dijkstraDist(Vertex* vsource) {
 			v->path = NULL;
 		}
 	}
-	cout << "1\n\n";
+
 	while (!q.empty()) {
-		Vertex<T> *v = q.extractMin();
+		Vertex* v = q.extractMin();
 
 		for(auto w : v->adj) {
-			cout << w.road->getWeight() << "\n\n";
-			if(w.dest->dist > v->dist + w.road->getWeight()) {
-				cout << w.road->getWeight() << "\n\n";
-				double oldDist = w.dest->dist;
 
-				w.dest->dist = v->dist + w.road->getWeight();
-				w.dest->path = v;
+			if(w->dest->dist > v->dist + w->getWeight()) {
+				double oldDist = w->dest->dist;
+
+				w->dest->dist = v->dist + w->getWeight();
+				w->dest->path = v;
 
 				if(oldDist == INF)
-					q.insert(w.dest);
+					q.insert(w->dest);
 				else
-					q.decreaseKey(w.dest);
+					q.decreaseKey(w->dest);
 			}
-
 		}
 	}
-
 }
-*/
-
-
-
-
-
-
-
-
 

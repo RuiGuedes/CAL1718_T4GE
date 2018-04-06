@@ -7,6 +7,7 @@
 #include <list>
 
 #include "Graphviewer.h"
+#include "MutablePriorityQueue.h"
 
 using namespace std;
 
@@ -22,6 +23,8 @@ using namespace std;
 #define EDGE_ACCIDENTED_COLOR     RED
 #define EDGE_SELECTED_COLOR       GREEN
 #define EDGE_UNREACHABLE_COLOR    YELLOW
+
+#define INF std::numeric_limits<double>::max()
 
 class Edge;
 class Graph;
@@ -87,6 +90,7 @@ public:
 	vector<Vertex*> getVertexSet() const;
 	vector<Vertex*> getAccidentedVertexSet() const;
 	vector<Vertex*> getAllVertexSet() const;
+	vector<Vertex*> getPath(Vertex* origin, Vertex* dest) const;
 	double distance(Vertex *v1, Vertex *v2) const;
 	double length(Edge *e) const;
 	bool connectedTo(Vertex *v1, Vertex *v2, bool bothways = false) const;
@@ -120,6 +124,9 @@ public:
 	///// ***** Algorithms
 	// Dijkstra by distance, single source. Find shortest paths to all other vertices
 	bool dijkstraDist(Vertex *vsource, Vertex *vdest); // or int version
+
+	void dijkstraDist(Vertex* vsource);
+
 	// A* by distance. Find shortest path to destination vertex only
 	bool AstarDist(Vertex *vsource, Vertex *vdest);
 	/////
@@ -142,6 +149,8 @@ class Vertex {
 	const int id;
 	const int x, y;
 	bool accidented;
+	double dist = 0;
+	Vertex* path = nullptr;
 	vector<Edge*> adj;
 	vector<Edge*> accidentedAdj;
 	Graph* graph = nullptr;
@@ -150,6 +159,8 @@ class Vertex {
 	void moveToAccidentedAdj(Edge *e);
 
 public:
+	int queueIndex = 0;
+
 	///// ***** Constructor
 	void _sgraph(Graph* graph);
 	explicit Vertex(int id, int x, int y, bool accidented = false);
@@ -159,6 +170,7 @@ public:
 	int getID() const;
 	int getX() const; // could also make x a const public
 	int getY() const; // could also make y a const public
+	double getDist() const;
 	double distanceTo(Vertex *dest) const;
 	bool isAdjacentTo(Vertex *dest) const;
 	bool connectsTo(Vertex *dest) const;
@@ -166,7 +178,7 @@ public:
 	vector<Edge*> getAdj() const;
 	vector<Edge*> getAccidentedAdj() const;
 	Vertex *getPredecessor() const;
-	vector<Vertex*> getPath() const;
+	Vertex *getPath() const;
 	/////
 
 	///// ***** Edge CRUD

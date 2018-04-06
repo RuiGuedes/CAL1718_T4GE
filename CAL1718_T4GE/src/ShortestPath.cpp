@@ -5,13 +5,15 @@
 //////////////////////////
 
 vector<int> checkUnreachableNodes();
-vector<int> pathGraphAnimation(vector<int> path);
+vector<int> pathGraphAnimation(vector<Vertex*> path);
 void resetGraphState(vector<int> unreachableNodes,vector<int> pathIndex);
 
 void getShortestPath() {
 
 	string option;
 	int startingNode { }, destinationNode { };
+	Vertex* origin = nullptr;
+	Vertex* destination= nullptr;
 
 	cout << "Get Shortest Path" << endl << endl;
 
@@ -20,11 +22,12 @@ void getShortestPath() {
 		cout << "Select starting node: ";
 		cin >> option;
 
-		if(validNumberInput(option,myGraph.getNumVertex())) {
+		if(validIDInput(option,graph->getTotalVertices())) {
 			startingNode = stoi(option);
+			 origin = graph->findVertex(startingNode);
 
-			if(myGraph.findVertex(startingNode) != NULL) {
-				gv->setVertexColor(startingNode,"green");
+			if(origin != NULL) {
+				graph->setVertexColor(origin,"green");
 				break;
 			}
 			else {
@@ -35,12 +38,12 @@ void getShortestPath() {
 			cout << "Invalid node (" << option << "). Try again !" << endl << endl;
 	}
 
-	myGraph.dijkstraShortestPath(startingNode);
+	graph->dijkstraDist(origin);
 
 	vector<int> unreachableNodes = checkUnreachableNodes();
 	vector<int> pathIndex;
 
-	if((unreachableNodes.size() + myGraph.getAccidentedVertexSet().size()) >= (unsigned int)(myGraph.getNumVertex() - 1))
+	if((unreachableNodes.size() + graph->getAccidentedVertexSet().size()) > (unsigned int)graph->getTotalVertices())
 		cout << "There are no reachable nodes at the moment. " << endl << endl;
 	else {
 
@@ -49,12 +52,13 @@ void getShortestPath() {
 			cout << "Select destination node: ";
 			cin >> option;
 
-			if(validNumberInput(option,myGraph.getNumVertex())) {
+			if(validIDInput(option,graph->getTotalVertices())) {
 				destinationNode = stoi(option);
+				destination = graph->findVertex(destinationNode);
 
-				if(myGraph.findVertex(destinationNode) == NULL)
+				if(destination == NULL)
 					cout << "Accidented node (" << option << ") Try again !" << endl << endl;
-				else if(myGraph.findVertex(destinationNode)->getDist() == INF)
+				else if(destination->getDist() == INF)
 					cout << "Unreachable node (" << option << ") Try again !" << endl << endl;
 				else if(startingNode == destinationNode)
 					cout << "Same node as the one chosen to be the starting point. Try again !" << endl << endl;
@@ -65,8 +69,8 @@ void getShortestPath() {
 				cout << "Invalid node (" << option << ") Try again !" << endl << endl;
 		}
 
-		pathIndex = pathGraphAnimation(myGraph.getPath(startingNode,destinationNode));
-		cout << endl << "Time spent: " << myGraph.findVertex(destinationNode)->getDist() << " seconds" << endl << endl;
+		pathIndex = pathGraphAnimation(graph->getPath(origin,destination));
+		cout << endl << "Time spent: " << destination->getDist() << " seconds" << endl << endl;
 	}
 
 	system("pause");
@@ -79,23 +83,24 @@ vector<int> checkUnreachableNodes() {
 
 	cout << endl << "Checking for unreachable nodes ..." << endl << endl;
 
-	for(int i = 1; i <= myGraph.getNumVertex(); i++) {
-		if((myGraph.findVertex(i) != NULL) && (myGraph.findVertex(i)->getDist() == INF)) {
-			gv->setVertexColor(i,"yellow");
+	for(int i = 1; i <= graph->getTotalVertices(); i++) {
+		Vertex* v = graph->findVertex(i);
+		if((v != NULL) && (v->getDist() == INF)) {
+			graph->setVertexColor(v,"yellow");
 			unreachableNodes.push_back(i);
 		}
 	}
-	gv->rearrange();
+	graph->rearrange();
 	return unreachableNodes;
 }
 
-vector<int> pathGraphAnimation(vector<int> path) {
+vector<int> pathGraphAnimation(vector<Vertex*> path) {
 	vector<int> pathIndex;
 
 	for(unsigned int i = 0; i < path.size(); i++) {
-		pathIndex.push_back(path.at(i));
-		gv->setVertexColor(path.at(i),"green");
-		gv->rearrange();
+		pathIndex.push_back(path.at(i)->getID());
+		graph->setVertexColor(path.at(i),"green");
+		graph->rearrange();
 		Sleep(500);
 	}
 	return pathIndex;
@@ -103,11 +108,11 @@ vector<int> pathGraphAnimation(vector<int> path) {
 
 void resetGraphState(vector<int> unreachableNodes,vector<int> pathIndex) {
 	for(unsigned int i = 0; i < unreachableNodes.size(); i++)
-		gv->setVertexColor(unreachableNodes.at(i),"blue");
+		graph->setVertexColor(graph->findVertex(unreachableNodes.at(i)),"blue");
 
 	for(unsigned int i = 0; i < pathIndex.size(); i++)
-		gv->setVertexColor(pathIndex.at(i),"blue");
+		graph->setVertexColor(graph->findVertex(pathIndex.at(i)),"blue");
 
-	gv->rearrange();
+	graph->rearrange();
 }
 
