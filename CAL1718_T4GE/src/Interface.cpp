@@ -84,7 +84,7 @@ int main(int argc, char* argv[]) {
 	string filename;
 
 	cout << "Select map file" << endl;
-	cout << "Available by default: gporto, newyork, newyork_large, small" << endl << endl;
+	cout << "Available maps: gporto, newyork, newyork_large, small" << endl << endl;
 
 	while(1) {
 		cout << "Filename: ";
