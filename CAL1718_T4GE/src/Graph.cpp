@@ -1252,3 +1252,45 @@ void Graph::dijkstraDist(Vertex* vsource) {
 	}
 }
 
+void Graph::dijkstraDist(Vertex* vsource, Vertex *vdest) {
+	MutablePriorityQueue<Vertex> q;
+	for (auto v : vertexSet) {
+
+		if (v == vsource) {
+			v->dist = 0;
+			v->path = NULL;
+			q.insert(v);
+		}
+		else {
+			v->dist = INF;
+			v->path = NULL;
+		}
+	}
+
+	while (!q.empty()) {
+		Vertex* v = q.extractMin();
+
+		if(v == vdest)
+			return;
+
+		for(auto w : v->adj) {
+
+//			cout << "origem -> " << v->id << "   ";
+//			cout << "dest -> " << w->dest->id <<  "   ";
+//			cout << "weight -> " << w->getWeight() << endl;
+
+			if(w->dest->dist > v->dist + w->getWeight()) {
+				double oldDist = w->dest->dist;
+
+				w->dest->dist = v->dist + w->getWeight();
+				w->dest->path = v;
+
+				if(oldDist == INF)
+					q.insert(w->dest);
+				else
+					q.decreaseKey(w->dest);
+			}
+		}
+	}
+}
+

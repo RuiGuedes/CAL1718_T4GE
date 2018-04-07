@@ -123,7 +123,7 @@ public:
 
 	///// ***** Algorithms
 	// Dijkstra by distance, single source. Find shortest paths to all other vertices
-	bool dijkstraDist(Vertex *vsource, Vertex *vdest); // or int version
+	void dijkstraDist(Vertex *vsource, Vertex *vdest); // or int version
 
 	void dijkstraDist(Vertex* vsource);
 

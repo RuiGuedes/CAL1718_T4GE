@@ -96,8 +96,8 @@ void getShortestPath() {
 
 		if(algorithm == "DijkstraSourceDist")
 			graph->dijkstraDist(origin,destination);
-		else if(algorithm == "A*")
-			graph->AstarDist(origin,destination);
+		//else if(algorithm == "A*")
+			//graph->AstarDist(origin,destination);
 
 		pathIndex = graph->getPath(origin,destination);
 		pathGraphAnimation(pathIndex);
