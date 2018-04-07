@@ -67,6 +67,7 @@ void getShortestPath() {
 
 	vector<int> unreachableNodes = checkUnreachableNodes();
 	vector<int> pathIndex;
+	vector<int> reset;
 
 	if((unreachableNodes.size() + 1 + graph->getAccidentedVertexSet().size()) >= (unsigned int)graph->getTotalVertices())
 		cout << "There are no reachable nodes at the moment from " << origin->getID() << "." << endl << endl;
@@ -94,14 +95,40 @@ void getShortestPath() {
 				cout << "Invalid node (" << option << ") Try again !" << endl << endl;
 		}
 
-		if(algorithm == "DijkstraSourceDist")
-			graph->dijkstraDist(origin,destination);
+		//		if(algorithm == "DijkstraSourceDist")
+		//			graph->dijkstraDist(origin,destination);
 		//else if(algorithm == "A*")
-			//graph->AstarDist(origin,destination);
+		//graph->AstarDist(origin,destination);
 
 		pathIndex = graph->getPath(origin,destination);
-		pathGraphAnimation(pathIndex);
 
+		for(auto id : pathIndex)
+			cout << id << " - ";
+
+		cout <<endl;
+		reset.push_back(pathIndex.at(0));
+
+		while(pathIndex.size() >= 1) {
+			pathIndex = pathGraphAnimation(pathIndex);
+
+			if(pathIndex.size() == 0)
+				break;
+
+			for(auto id : pathIndex)
+				cout << id << " - ";
+			cout <<endl;
+
+			for (auto node : pathIndex) {
+				graph->setVertexColor(graph->findVertex(node),"blue");
+			}
+
+			system("pause");
+			graph->generateGraphNewStatus();
+
+			graph->dijkstraDist(graph->findVertex(pathIndex.at(0)));
+			pathIndex = graph->getPath(graph->findVertex(pathIndex.at(0)),destination);
+			reset.push_back(pathIndex.at(0));
+		}
 		cout << endl << "Time spent: " << destination->getDist() << " seconds" << endl << endl;
 	}
 
@@ -130,11 +157,16 @@ vector<int> pathGraphAnimation(vector<int> path) {
 	vector<int> pathIndex;
 
 	for(unsigned int i = 0; i < path.size(); i++) {
-		pathIndex.push_back(path.at(i));
+		if(i != 0)
+			pathIndex.push_back(path.at(i));
 		graph->setVertexColor(graph->findVertex(path.at(i)),"green");
-		graph->rearrange();
-		Sleep(500);
 	}
+	graph->rearrange();
+
+	Sleep(2000);
+	graph->setVertexColor(graph->findVertex(path.at(0)),"magenta");
+	graph->rearrange();
+
 	return pathIndex;
 }
 

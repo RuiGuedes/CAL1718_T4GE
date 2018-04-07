@@ -698,8 +698,8 @@ void Vertex::_sgraph(Graph* graph) {
  * conditional accidented, defaulting to false
  */
 Vertex::Vertex(int id, int x, int y, bool accidented):
-							id(id), x(x), y(y), accidented(accidented),
-							graph(nullptr) {}
+											id(id), x(x), y(y), accidented(accidented),
+											graph(nullptr) {}
 
 /*
  * @brief Vertex destructor, destroys all its own edges
@@ -1070,8 +1070,8 @@ void Edge::_sgraph(Graph* graph) {
  */
 Edge::Edge(int id, Vertex* vsource, Vertex* vdest,
 		double weight, Subroad* subroad, bool accidented):
-							id(id), source(vsource), dest(vdest), weight(weight),
-							accidented(accidented), subroad(subroad) {}
+											id(id), source(vsource), dest(vdest), weight(weight),
+											accidented(accidented), subroad(subroad) {}
 
 /*
  * @brief Return's the edge's source vertex
@@ -1212,7 +1212,21 @@ ostream& operator<<(ostream& out, Edge* e) {
 	return out;
 }
 
+void Graph::generateGraphNewStatus() {
 
+	//For every edge generate new capacity
+	vector<Vertex*> everyVextex = getAllVertexSet();
+
+	for (auto vertex : everyVextex) {
+		for(auto edge : vertex->adj) {
+			int newActualCapacity = (rand() % edge->getMaxCapacity());
+			edge->setActualCapacity(newActualCapacity);
+		}
+	}
+
+	//For every vertex
+
+}
 
 void Graph::dijkstraDist(Vertex* vsource) {
 	MutablePriorityQueue<Vertex> q;
@@ -1233,9 +1247,9 @@ void Graph::dijkstraDist(Vertex* vsource) {
 		Vertex* v = q.extractMin();
 		for(auto w : v->adj) {
 
-//			cout << "origem -> " << v->id << "   ";
-//			cout << "dest -> " << w->dest->id <<  "   ";
-//			cout << "weight -> " << w->getWeight() << endl;
+			//			cout << "origem -> " << v->id << "   ";
+			//			cout << "dest -> " << w->dest->id <<  "   ";
+			//			cout << "weight -> " << w->getWeight() << endl;
 
 			if(w->dest->dist > v->dist + w->getWeight()) {
 				double oldDist = w->dest->dist;
@@ -1275,9 +1289,9 @@ void Graph::dijkstraDist(Vertex* vsource, Vertex *vdest) {
 
 		for(auto w : v->adj) {
 
-//			cout << "origem -> " << v->id << "   ";
-//			cout << "dest -> " << w->dest->id <<  "   ";
-//			cout << "weight -> " << w->getWeight() << endl;
+			//			cout << "origem -> " << v->id << "   ";
+			//			cout << "dest -> " << w->dest->id <<  "   ";
+			//			cout << "weight -> " << w->getWeight() << endl;
 
 			if(w->dest->dist > v->dist + w->getWeight()) {
 				double oldDist = w->dest->dist;

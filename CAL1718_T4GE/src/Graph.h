@@ -135,6 +135,9 @@ public:
 	friend ostream& operator<<(ostream &out, Graph* graph);
 	friend class Vertex;
 	friend class Edge;
+
+
+	void generateGraphNewStatus();
 };
 
 
