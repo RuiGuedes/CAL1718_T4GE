@@ -698,8 +698,8 @@ void Vertex::_sgraph(Graph* graph) {
  * conditional accidented, defaulting to false
  */
 Vertex::Vertex(int id, int x, int y, bool accidented):
-											id(id), x(x), y(y), accidented(accidented),
-											graph(nullptr) {}
+															id(id), x(x), y(y), accidented(accidented),
+															graph(nullptr) {}
 
 /*
  * @brief Vertex destructor, destroys all its own edges
@@ -1070,8 +1070,8 @@ void Edge::_sgraph(Graph* graph) {
  */
 Edge::Edge(int id, Vertex* vsource, Vertex* vdest,
 		double weight, Subroad* subroad, bool accidented):
-											id(id), source(vsource), dest(vdest), weight(weight),
-											accidented(accidented), subroad(subroad) {}
+															id(id), source(vsource), dest(vdest), weight(weight),
+															accidented(accidented), subroad(subroad) {}
 
 /*
  * @brief Return's the edge's source vertex
@@ -1214,15 +1214,23 @@ ostream& operator<<(ostream& out, Edge* e) {
 
 void Graph::generateGraphNewStatus() {
 
+	srand (time(NULL));
+
 	//For every edge generate new capacity
 	vector<Vertex*> everyVextex = getAllVertexSet();
 
+	cout << "GET ALL VERTEX CHECK\n\n";
+
 	for (auto vertex : everyVextex) {
 		for(auto edge : vertex->adj) {
-			int newActualCapacity = (rand() % edge->getMaxCapacity());
-			edge->setActualCapacity(newActualCapacity);
+			if(edge != nullptr) {
+				int newActualCapacity = (rand() % edge->getMaxCapacity());
+				edge->setActualCapacity(newActualCapacity);
+			}
 		}
 	}
+
+	cout << "EDGES CHECK\n\n";
 
 	//For every vertex
 
@@ -1247,16 +1255,16 @@ void Graph::dijkstraDist(Vertex* vsource) {
 		Vertex* v = q.extractMin();
 		for(auto w : v->adj) {
 
-			//			cout << "origem -> " << v->id << "   ";
-			//			cout << "dest -> " << w->dest->id <<  "   ";
-			//			cout << "weight -> " << w->getWeight() << endl;
+			cout << "origem -> " << v->id << "   ";
+			cout << "dest -> " << w->dest->id <<  "   ";
+			cout << "weight -> " << w->getWeight() << endl;
 
 			if(w->dest->dist > v->dist + w->getWeight()) {
 				double oldDist = w->dest->dist;
 
 				w->dest->dist = v->dist + w->getWeight();
 				w->dest->path = v;
-
+				cout << w->dest->path << endl;
 				if(oldDist == INF)
 					q.insert(w->dest);
 				else

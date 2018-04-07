@@ -82,7 +82,7 @@ int main(int argc, char* argv[]) {
 
 	ifstream file;
 	//string filename;
-	string filename = "./resource/small";
+	string filename = "./resource/gporto";
 
 	cout << "Select map file" << endl;
 	cout << "Available maps: gporto, newyork, newyork_large, small" << endl << endl;

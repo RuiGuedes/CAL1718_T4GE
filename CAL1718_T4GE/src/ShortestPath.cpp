@@ -12,6 +12,7 @@ void getShortestPath() {
 
 	string option, algorithm;
 	int startingNode { }, destinationNode { };
+	double timeSpent { 0 };
 	Vertex* origin = nullptr;
 	Vertex* destination= nullptr;
 
@@ -95,46 +96,45 @@ void getShortestPath() {
 				cout << "Invalid node (" << option << ") Try again !" << endl << endl;
 		}
 
-		//		if(algorithm == "DijkstraSourceDist")
-		//			graph->dijkstraDist(origin,destination);
+		if(algorithm == "DijkstraSourceDist")
+			graph->dijkstraDist(origin,destination);
 		//else if(algorithm == "A*")
 		//graph->AstarDist(origin,destination);
 
 		pathIndex = graph->getPath(origin,destination);
-
-		for(auto id : pathIndex)
-			cout << id << " - ";
-
-		cout <<endl;
 		reset.push_back(pathIndex.at(0));
 
 		while(pathIndex.size() >= 1) {
 			pathIndex = pathGraphAnimation(pathIndex);
+			cout << "PATH ANIME CHECK\n\n";
 
 			if(pathIndex.size() == 0)
 				break;
+			else
+				timeSpent += graph->findVertex(pathIndex.at(0))->getDist();
 
-			for(auto id : pathIndex)
-				cout << id << " - ";
-			cout <<endl;
+			cout << "TIME SPENT CHECK\n\n";
 
-			for (auto node : pathIndex) {
-				graph->setVertexColor(graph->findVertex(node),"blue");
-			}
-
-			system("pause");
 			graph->generateGraphNewStatus();
 
+			cout << "NEW STATUS CHECK\n\n";
+
 			graph->dijkstraDist(graph->findVertex(pathIndex.at(0)));
+
+			cout << "DJIKSTRA AGAIN CHECK\n\n";
+
 			pathIndex = graph->getPath(graph->findVertex(pathIndex.at(0)),destination);
 			reset.push_back(pathIndex.at(0));
+
+			cout << "NEXT ITERATION CHECK\n\n";
 		}
-		cout << endl << "Time spent: " << destination->getDist() << " seconds" << endl << endl;
+
+		cout << endl << "Time spent: " << timeSpent << " seconds" << endl << endl;
 	}
 
 	system("pause");
 
-	resetGraphState(unreachableNodes,pathIndex);
+	resetGraphState(unreachableNodes,reset);
 }
 
 vector<int> checkUnreachableNodes() {
@@ -159,11 +159,13 @@ vector<int> pathGraphAnimation(vector<int> path) {
 	for(unsigned int i = 0; i < path.size(); i++) {
 		if(i != 0)
 			pathIndex.push_back(path.at(i));
-		graph->setVertexColor(graph->findVertex(path.at(i)),"green");
-	}
-	graph->rearrange();
 
-	Sleep(2000);
+		graph->setVertexColor(graph->findVertex(path.at(i)),"green");
+		graph->rearrange();
+		Sleep(100);
+	}
+
+	Sleep(100);
 	graph->setVertexColor(graph->findVertex(path.at(0)),"magenta");
 	graph->rearrange();
 

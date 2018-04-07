@@ -5,6 +5,7 @@
 #include <vector>
 #include <queue>
 #include <list>
+#include <time.h>
 
 #include "Graphviewer.h"
 #include "MutablePriorityQueue.h"
