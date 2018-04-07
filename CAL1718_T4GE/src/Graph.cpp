@@ -1219,24 +1219,24 @@ void Graph::dijkstraDist(Vertex* vsource) {
 	for (auto v : vertexSet) {
 
 		if (v == vsource) {
-			cout << "FIND\n";
 			v->dist = 0;
 			v->path = NULL;
 			q.insert(v);
 		}
 		else {
-			cout << "DIFF DIST\n";
 			v->dist = INF;
 			v->path = NULL;
 		}
 	}
 
-	cout << "OUT\n";
 	while (!q.empty()) {
 		Vertex* v = q.extractMin();
-		cout << "EXTRACT\n";
 		for(auto w : v->adj) {
-			cout << "IN\n";
+
+//			cout << "origem -> " << v->id << "   ";
+//			cout << "dest -> " << w->dest->id <<  "   ";
+//			cout << "weight -> " << w->getWeight() << endl;
+
 			if(w->dest->dist > v->dist + w->getWeight()) {
 				double oldDist = w->dest->dist;
 

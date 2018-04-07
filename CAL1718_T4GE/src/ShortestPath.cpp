@@ -10,12 +10,36 @@ void resetGraphState(vector<int> unreachableNodes,vector<int> pathIndex);
 
 void getShortestPath() {
 
-	string option;
+	string option, algorithm;
 	int startingNode { }, destinationNode { };
 	Vertex* origin = nullptr;
 	Vertex* destination= nullptr;
 
 	cout << "Get Shortest Path" << endl << endl;
+
+	cout << "Available algorithms:" << endl;
+	cout << "1 - Dijkstra <source>" << endl;
+	cout << "2 - Dijkstra <source,destination>" << endl;
+	cout << "3 - A star" << endl << endl;
+
+	while(1) {
+
+		cout << "Select algorithm: ";
+		cin >> option;
+
+		if(validIDInput(option,3)) {
+			if(stoi(option) == 1)
+				algorithm = "DijkstraSource";
+			else if(stoi(option) == 2)
+				algorithm = "DijkstraSourceDist";
+			else
+				algorithm = "A*";
+			cout << endl;
+			break;
+		}
+		else
+			cout << "Unavailable algorithm (" << option << "). Try again !" << endl << endl;
+	}
 
 	while(1) {
 
@@ -24,7 +48,7 @@ void getShortestPath() {
 
 		if(validIDInput(option,graph->getTotalVertices())) {
 			startingNode = stoi(option);
-			 origin = graph->findVertex(startingNode);
+			origin = graph->findVertex(startingNode);
 
 			if(origin != NULL) {
 				graph->setVertexColor(origin,"green");
@@ -38,15 +62,14 @@ void getShortestPath() {
 			cout << "Invalid node (" << option << "). Try again !" << endl << endl;
 	}
 
-	cout <<"BEFORE\n";
-	graph->dijkstraDist(origin);
+	if(algorithm == "DijkstraSource")
+		graph->dijkstraDist(origin);
 
 	vector<int> unreachableNodes = checkUnreachableNodes();
-	cout <<"AFTER\n";
 	vector<int> pathIndex;
 
-	if((unreachableNodes.size() + graph->getAccidentedVertexSet().size()) > (unsigned int)graph->getTotalVertices())
-		cout << "There are no reachable nodes at the moment. " << endl << endl;
+	if((unreachableNodes.size() + 1 + graph->getAccidentedVertexSet().size()) >= (unsigned int)graph->getTotalVertices())
+		cout << "There are no reachable nodes at the moment from " << origin->getID() << "." << endl << endl;
 	else {
 
 		while(1) {
@@ -71,11 +94,12 @@ void getShortestPath() {
 				cout << "Invalid node (" << option << ") Try again !" << endl << endl;
 		}
 
+		if(algorithm == "DijkstraSourceDist")
+			graph->dijkstraDist(origin,destination);
+		else if(algorithm == "A*")
+			graph->AstarDist(origin,destination);
+
 		pathIndex = graph->getPath(origin,destination);
-
-		for(unsigned int i = 0; i < pathIndex.size(); i++)
-					cout << pathIndex.at(i) << "   ";
-
 		pathGraphAnimation(pathIndex);
 
 		cout << endl << "Time spent: " << destination->getDist() << " seconds" << endl << endl;
