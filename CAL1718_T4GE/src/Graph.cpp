@@ -353,13 +353,13 @@ vector<Vertex*> Graph::getAllVertexSet() const {
 /*
  * @brief Returns the path between two vertices
  */
-vector<int> Graph::getPath(Vertex* origin, Vertex* dest) const {
-	vector<int> res;
-	auto v = this->findVertex(dest->getID());
-	if (v == nullptr || v->dist == INF) // missing or disconnected
+vector<Vertex*> Graph::getPath(Vertex* origin, Vertex* dest) const {
+	vector<Vertex*> res;
+	//auto v = this->findVertex(dest->getID()); // wtf?
+	if (dest == nullptr || dest->dist == INF) // missing or disconnected
 		return res;
-	for ( ; v != nullptr; v = v->path)
-		res.push_back(v->getID());
+	for (; dest != nullptr; dest = dest->path) // nice tho
+		res.push_back(dest);
 	reverse(res.begin(), res.end());
 	return res;
 }
@@ -1098,6 +1098,8 @@ int Edge::getID() const {
 
 /*
  * @brief Return's the edge's weight
+ * The edge's weight is the time it takes to travel
+ * along the edge given the amount of cars in it.
  */
 double Edge::getWeight() const {
 	return subroad->getDistance()/subroad->calculateAverageSpeed();
@@ -1322,9 +1324,7 @@ void Graph::generateGraphNewStatus() {
 //}
 
 
-void Graph::bfs(Vertex *origin/*, chrono::duration<double> *time = nullptr*/) {
-	//auto start = chrono::high_resolution_clock::now();
-
+void Graph::bfs(Vertex *origin) {
 	// Check args
 	if (origin == nullptr) return;
 
@@ -1349,11 +1349,48 @@ void Graph::bfs(Vertex *origin/*, chrono::duration<double> *time = nullptr*/) {
 			}
 		}
 	}
-
-	//auto end = chrono::high_resolution_clock::now();
-	//if (time) *time = end - start; // time.count() gives seconds
 }
 
+
+
+void Graph::gbfsDist(Vertex *vsource, Vertex *vdest, chrono::duration<double> *time) {
+	auto start = chrono::high_resolution_clock::now();
+
+	// Check args
+	if (vsource == nullptr || vdest == nullptr) return;
+	if (vsource->isAccidented() || vdest->isAccidented()) return;
+
+	for (auto v : vertexSet) {
+		v->dist = INF;
+		v->path = nullptr;
+	}
+	vsource->dist = 0;
+	//origin->path = nullptr;
+
+	MutablePriorityQueue<Vertex> q;
+	q.insert(vsource);
+	while (!q.empty()) {
+		auto v = q.extractMin();
+		if (v == vdest) break;
+		for (auto e : v->adj) { // Non-accidented only
+			auto vertex = e->dest;
+			double oldDist = vertex->dist;
+			double newDist = v->dist
+					+ distance(vertex, vdest); // <- Greedy
+			if (newDist < oldDist) {
+				vertex->dist = newDist;
+				vertex->path = v;
+				if (oldDist == INF)
+					q.insert(vertex);
+				else
+					q.decreaseKey(vertex);
+			}
+		}
+	}
+
+	auto end = chrono::high_resolution_clock::now();
+	if (time) *time = end - start; // time.count() gives seconds
+}
 
 
 /**
@@ -1416,30 +1453,30 @@ void Graph::dijkstraDist(Vertex *origin, chrono::duration<double> *time) {
  * Perform A* given origin and destination vertices.
  * If time is given, compute algorithm performance
  */
-void Graph::AstarDist(Vertex *origin, Vertex *destination, chrono::duration<double> *time) {
+void Graph::AstarDist(Vertex *vsource, Vertex *vdest, chrono::duration<double> *time) {
 	auto start = chrono::high_resolution_clock::now();
 
 	// Check args
-	if (origin == nullptr || destination == nullptr) return;
-	if (origin->isAccidented() || destination->isAccidented()) return;
+	if (vsource == nullptr || vdest == nullptr) return;
+	if (vsource->isAccidented() || vdest->isAccidented()) return;
 
 	for (auto v : vertexSet) {
 		v->dist = INF;
 		v->path = nullptr;
 	}
-	origin->dist = 0;
+	vsource->dist = 0;
 	//origin->path = nullptr;
 
 	MutablePriorityQueue<Vertex> q;
-	q.insert(origin);
+	q.insert(vsource);
 	while (!q.empty()) {
 		auto v = q.extractMin();
-		if (v == destination) break;
+		if (v == vdest) break;
 		for (auto e : v->adj) { // Non-accidented only
 			auto vertex = e->dest;
 			double oldDist = vertex->dist;
 			double newDist = v->dist + distance(v, vertex)
-					+ distance(vertex, destination); // <- A*
+					+ distance(vertex, vdest); // <- A*
 			if (newDist < oldDist) {
 				vertex->dist = newDist;
 				vertex->path = v;
@@ -1461,25 +1498,25 @@ void Graph::AstarDist(Vertex *origin, Vertex *destination, chrono::duration<doub
  * Perform Dijkstra given origin and destination vertices.
  * If time is given, compute algorithm performance
  */
-void Graph::dijkstraDist(Vertex *origin, Vertex *destination, chrono::duration<double> *time) {
+void Graph::dijkstraDist(Vertex *vsource, Vertex *vdest, chrono::duration<double> *time) {
 	auto start = chrono::high_resolution_clock::now();
 
 	// Check args
-	if (origin == nullptr || destination == nullptr) return;
-	if (origin->isAccidented() || destination->isAccidented()) return;
+	if (vsource == nullptr || vdest == nullptr) return;
+	if (vsource->isAccidented() || vdest->isAccidented()) return;
 
 	for (auto v : vertexSet) {
 		v->dist = INF;
 		v->path = nullptr;
 	}
-	origin->dist = 0;
+	vsource->dist = 0;
 	//origin->path = nullptr;
 
 	MutablePriorityQueue<Vertex> q;
-	q.insert(origin);
+	q.insert(vsource);
 	while (!q.empty()) {
 		auto v = q.extractMin();
-		if (v == destination) break;
+		if (v == vdest) break;
 		for (auto e : v->adj) { // Non-accidented only
 			auto vertex = e->dest;
 			double oldDist = vertex->dist;
@@ -1498,4 +1535,48 @@ void Graph::dijkstraDist(Vertex *origin, Vertex *destination, chrono::duration<d
 	auto end = chrono::high_resolution_clock::now();
 	if (time) *time = end - start; // time.count() gives seconds
 }
+
+
+
+// Dijkstra by travel time, with destination. Find the quickest path to destination vertex
+void Graph::dijkstraSimulation(Vertex *vsource, Vertex *vdest, chrono::duration<double> *time) {
+	auto start = chrono::high_resolution_clock::now();
+
+	// Check args
+	if (vsource == nullptr || vdest == nullptr) return;
+	if (vsource->isAccidented() || vdest->isAccidented()) return;
+
+	for (auto v : vertexSet) {
+		v->dist = INF;
+		v->path = nullptr;
+	}
+	vsource->dist = 0;
+	//origin->path = nullptr;
+
+	MutablePriorityQueue<Vertex> q;
+	q.insert(vsource);
+	while (!q.empty()) {
+		auto v = q.extractMin();
+		if (v == vdest) break;
+		for (auto e : v->adj) { // Non-accidented only
+			auto vertex = e->dest;
+			double oldDist = vertex->dist;
+			double newDist = v->dist + e->getWeight();
+			if (newDist < oldDist) {
+				vertex->dist = newDist;
+				vertex->path = v;
+				if (oldDist == INF)
+					q.insert(vertex);
+				else
+					q.decreaseKey(vertex);
+			}
+		}
+	}
+
+	auto end = chrono::high_resolution_clock::now();
+	if (time) *time = end - start; // time.count() gives seconds
+}
+
+
+
 

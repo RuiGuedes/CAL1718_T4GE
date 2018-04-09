@@ -38,6 +38,8 @@ extern bool showEdgeLabels;
 extern bool showEdgeWeights;
 extern bool showEdgeFlows;
 
+// Travel time estimator
+
 //////////////////////////
 /////// Class Graph //////
 //////////////////////////
@@ -91,7 +93,8 @@ public:
 	vector<Vertex*> getVertexSet() const;
 	vector<Vertex*> getAccidentedVertexSet() const;
 	vector<Vertex*> getAllVertexSet() const;
-	vector<int> getPath(Vertex* origin, Vertex* dest) const;
+	vector<Vertex*> getPath(Vertex* origin, Vertex* dest) const;
+	vector<Vertex*> getPathRoad(Vertex* origin, Vertex* dest) const;
 	double distance(Vertex *v1, Vertex *v2) const;
 	double length(Edge *e) const;
 	bool connectedTo(Vertex *v1, Vertex *v2, bool bothways = false) const;
@@ -124,7 +127,10 @@ public:
 
 	///// ***** Algorithms
 	// Breadth First Search. Find reachable nodes
-	void bfs(Vertex *origin/*, chrono::duration<double> *time = nullptr*/);
+	void bfs(Vertex *origin);
+
+	// Greedy Best-First Search
+	void gbfsDist(Vertex *origin, Vertex *destination, chrono::duration<double> *time = nullptr);
 
 	// Dijkstra by distance, single source. Find shortest paths to all other vertices
 	Vertex * initSingleSource(const int &origin);
@@ -136,6 +142,12 @@ public:
 
 	// A* by distance. Find shortest path to destination vertex only
 	void AstarDist(Vertex *vsource, Vertex *vdest, chrono::duration<double> *time = nullptr);
+
+	// Greedy Best-First Search by travel time.
+	void gbfsSimulation(Vertex *vsource, Vertex *vdest, chrono::duration<double> *time = nullptr);
+
+	// Dijkstra by travel time, with destination. Find the quickest path to destination vertex
+	void dijkstraSimulation(Vertex *vsource, Vertex *vdest, chrono::duration<double> *time = nullptr);
 	/////
 
 	///// ***** Operations

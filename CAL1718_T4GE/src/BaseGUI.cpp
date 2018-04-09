@@ -1,9 +1,8 @@
 #include "FunctionsPrototypes.h"
-#include "BaseGUI.h"
 
 #include <assert.h>
 
-bool validIDInput(string input, int max = 0) {
+bool validIDInput(string input, int max) {
 	static const regex reg_int("^\\s*(\\d+)[.,;]?\\s*$");
 	smatch match;
 
@@ -44,7 +43,7 @@ int getOption(int MAX) {
 }
 
 Vertex* getOriginVertex(bool maybeAccidented, bool color) {
-	static const regex esc("^\s*esc[\\.,;]?\s*$|^$", regex::icase); // esc or plain enter
+	static const regex esc("^\\s*esc[\\.,;]?\\s*$|^$", regex::icase); // esc or plain enter
 
 	while(1) {
 		string input;
@@ -81,7 +80,7 @@ Vertex* getOriginVertex(bool maybeAccidented, bool color) {
 }
 
 Vertex* getDestinationVertex(bool maybeAccidented, Vertex *source, bool mustBeReachable, bool color) {
-	static const regex esc("^\s*(?:esc|quit|q)[\\.,;]?\s*$", regex::icase); // 'esc' or 'quit' or 'q'
+	static const regex esc("^\\s*(?:esc|quit|q)[\\.,;]?\\s*$", regex::icase); // 'esc' or 'quit' or 'q'
 	assert(!mustBeReachable || source);
 
 	while(1) {
