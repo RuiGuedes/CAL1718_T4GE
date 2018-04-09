@@ -139,6 +139,12 @@ public:
 
 
 	void generateGraphNewStatus();
+
+
+
+	Vertex * initSingleSource(const int &origin);
+	bool relax(Vertex *v, Vertex *w, double weight);
+	void dijkstraShortestPath(Vertex *origin);
 };
 
 

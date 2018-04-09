@@ -705,10 +705,10 @@ Vertex::Vertex(int id, int x, int y, bool accidented):
  * @brief Vertex destructor, destroys all its own edges
  */
 Vertex::~Vertex() {
-	for (auto edge : adj)
-		delete edge;
-	for (auto edge : accidentedAdj)
-		delete edge;
+//	for (auto edge : adj)
+//		delete edge;
+//	for (auto edge : accidentedAdj)
+//		delete edge;
 }
 
 /*
@@ -1236,83 +1236,131 @@ void Graph::generateGraphNewStatus() {
 
 }
 
-void Graph::dijkstraDist(Vertex* vsource) {
-	MutablePriorityQueue<Vertex> q;
+//void Graph::dijkstraDist(Vertex* vsource) {
+//	MutablePriorityQueue<Vertex> q;
+//	for (auto v : vertexSet) {
+//
+//		if (v == vsource) {
+//			v->dist = 0;
+//			v->path = NULL;
+//			q.insert(v);
+//		}
+//		else {
+//			v->dist = INF;
+//			v->path = NULL;
+//		}
+//	}
+//
+//	while (!q.empty()) {
+//		Vertex* v = q.extractMin();
+//		for(auto w : v->adj) {
+//
+//			cout << "origem -> " << v->id << "   ";
+//			cout << "dest -> " << w->dest->id <<  "   ";
+//			cout << "weight -> " << w->getWeight() << endl;
+//
+//			if(w->dest->dist > v->dist + w->getWeight()) {
+//				double oldDist = w->dest->dist;
+//
+//				w->dest->dist = v->dist + w->getWeight();
+//				w->dest->path = v;
+//				cout << w->dest->path << endl;
+//				if(oldDist == INF)
+//					q.insert(w->dest);
+//				else
+//					q.decreaseKey(w->dest);
+//			}
+//		}
+//	}
+//}
+//
+//void Graph::dijkstraDist(Vertex* vsource, Vertex *vdest) {
+//	MutablePriorityQueue<Vertex> q;
+//	for (auto v : vertexSet) {
+//
+//		if (v == vsource) {
+//			v->dist = 0;
+//			v->path = NULL;
+//			q.insert(v);
+//		}
+//		else {
+//			v->dist = INF;
+//			v->path = NULL;
+//		}
+//	}
+//
+//	while (!q.empty()) {
+//		Vertex* v = q.extractMin();
+//
+//		if(v == vdest)
+//			return;
+//
+//		for(auto w : v->adj) {
+//
+//			//			cout << "origem -> " << v->id << "   ";
+//			//			cout << "dest -> " << w->dest->id <<  "   ";
+//			//			cout << "weight -> " << w->getWeight() << endl;
+//
+//			if(w->dest->dist > v->dist + w->getWeight()) {
+//				double oldDist = w->dest->dist;
+//
+//				w->dest->dist = v->dist + w->getWeight();
+//				w->dest->path = v;
+//
+//				if(oldDist == INF)
+//					q.insert(w->dest);
+//				else
+//					q.decreaseKey(w->dest);
+//			}
+//		}
+//	}
+//}
+
+/**
+ * Initializes single-source shortest path data (path, dist).
+ * Receives the content of the source vertex and returns a pointer to the source vertex.
+ * Used by all single-source shortest path algorithms.
+ */
+Vertex * Graph::initSingleSource(const int &origin) {
 	for (auto v : vertexSet) {
-
-		if (v == vsource) {
-			v->dist = 0;
-			v->path = NULL;
-			q.insert(v);
-		}
-		else {
-			v->dist = INF;
-			v->path = NULL;
-		}
+		v->dist = INF;
+		v->path = nullptr;
 	}
-
-	while (!q.empty()) {
-		Vertex* v = q.extractMin();
-		for(auto w : v->adj) {
-
-			cout << "origem -> " << v->id << "   ";
-			cout << "dest -> " << w->dest->id <<  "   ";
-			cout << "weight -> " << w->getWeight() << endl;
-
-			if(w->dest->dist > v->dist + w->getWeight()) {
-				double oldDist = w->dest->dist;
-
-				w->dest->dist = v->dist + w->getWeight();
-				w->dest->path = v;
-				cout << w->dest->path << endl;
-				if(oldDist == INF)
-					q.insert(w->dest);
+	auto s = findVertex(origin);
+	s->dist = 0;
+	return s;
+}
+/**
+ * Analyzes an edge in single-source shortest path algorithm.
+ * Returns true if the target vertex was relaxed (dist, path).
+ * Used by all single-source shortest path algorithms.
+ */
+bool Graph::relax(Vertex *v, Vertex *w, double weight) {
+	if (v->dist + weight < w->dist) {
+		w->dist = v->dist + weight;
+		w->path = v;
+		return true;
+	}
+	else
+		return false;
+}
+/**
+ * Dijkstra algorithm.
+ */
+void Graph::dijkstraShortestPath(Vertex *origin) {
+	auto s = initSingleSource(origin->getID());
+	MutablePriorityQueue<Vertex> q;
+	q.insert(s);
+	while ( ! q.empty() ) {
+		auto v = q.extractMin();
+		for (auto e : v->adj) {
+			auto oldDist = e->dest->dist;
+			if (relax(v, e->dest, e->weight)) {
+				if (oldDist == INF)
+					q.insert(e->dest);
 				else
-					q.decreaseKey(w->dest);
+					q.decreaseKey(e->dest);
 			}
 		}
 	}
 }
-
-void Graph::dijkstraDist(Vertex* vsource, Vertex *vdest) {
-	MutablePriorityQueue<Vertex> q;
-	for (auto v : vertexSet) {
-
-		if (v == vsource) {
-			v->dist = 0;
-			v->path = NULL;
-			q.insert(v);
-		}
-		else {
-			v->dist = INF;
-			v->path = NULL;
-		}
-	}
-
-	while (!q.empty()) {
-		Vertex* v = q.extractMin();
-
-		if(v == vdest)
-			return;
-
-		for(auto w : v->adj) {
-
-			//			cout << "origem -> " << v->id << "   ";
-			//			cout << "dest -> " << w->dest->id <<  "   ";
-			//			cout << "weight -> " << w->getWeight() << endl;
-
-			if(w->dest->dist > v->dist + w->getWeight()) {
-				double oldDist = w->dest->dist;
-
-				w->dest->dist = v->dist + w->getWeight();
-				w->dest->path = v;
-
-				if(oldDist == INF)
-					q.insert(w->dest);
-				else
-					q.decreaseKey(w->dest);
-			}
-		}
-	}
-}
-

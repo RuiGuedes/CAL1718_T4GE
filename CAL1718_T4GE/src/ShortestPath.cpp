@@ -64,7 +64,7 @@ void getShortestPath() {
 	}
 
 	if(algorithm == "DijkstraSource")
-		graph->dijkstraDist(origin);
+		graph->dijkstraShortestPath(origin);
 
 	vector<int> unreachableNodes = checkUnreachableNodes();
 	vector<int> pathIndex;
@@ -96,40 +96,40 @@ void getShortestPath() {
 				cout << "Invalid node (" << option << ") Try again !" << endl << endl;
 		}
 
-		if(algorithm == "DijkstraSourceDist")
-			graph->dijkstraDist(origin,destination);
+//		if(algorithm == "DijkstraSourceDist")
+//			graph->dijkstraDist(origin,destination);
 		//else if(algorithm == "A*")
 		//graph->AstarDist(origin,destination);
 
 		pathIndex = graph->getPath(origin,destination);
 		reset.push_back(pathIndex.at(0));
-
-		while(pathIndex.size() >= 1) {
-			pathIndex = pathGraphAnimation(pathIndex);
-			cout << "PATH ANIME CHECK\n\n";
-
-			if(pathIndex.size() == 0)
-				break;
-			else
-				timeSpent += graph->findVertex(pathIndex.at(0))->getDist();
-
-			cout << "TIME SPENT CHECK\n\n";
-
-			graph->generateGraphNewStatus();
-
-			cout << "NEW STATUS CHECK\n\n";
-
-			graph->dijkstraDist(graph->findVertex(pathIndex.at(0)));
-
-			cout << "DJIKSTRA AGAIN CHECK\n\n";
-
-			pathIndex = graph->getPath(graph->findVertex(pathIndex.at(0)),destination);
-			reset.push_back(pathIndex.at(0));
-
-			cout << "NEXT ITERATION CHECK\n\n";
-		}
-
-		cout << endl << "Time spent: " << timeSpent << " seconds" << endl << endl;
+		pathIndex = pathGraphAnimation(pathIndex);
+//		while(pathIndex.size() >= 1) {
+//			pathIndex = pathGraphAnimation(pathIndex);
+//			cout << "PATH ANIME CHECK\n\n";
+//
+//			if(pathIndex.size() == 0)
+//				break;
+//			else
+//				timeSpent += graph->findVertex(pathIndex.at(0))->getDist();
+//
+//			cout << "TIME SPENT CHECK\n\n";
+//
+//			graph->generateGraphNewStatus();
+//
+//			cout << "NEW STATUS CHECK\n\n";
+//
+//			graph->dijkstraShortestPath(graph->findVertex(pathIndex.at(0)));
+//
+//			cout << "DJIKSTRA AGAIN CHECK\n\n";
+//
+//			pathIndex = graph->getPath(graph->findVertex(pathIndex.at(0)),destination);
+//			reset.push_back(pathIndex.at(0));
+//
+//			cout << "NEXT ITERATION CHECK\n\n";
+//		}
+//
+//		cout << endl << "Time spent: " << timeSpent << " seconds" << endl << endl;
 	}
 
 	system("pause");
