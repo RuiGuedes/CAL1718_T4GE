@@ -108,5 +108,7 @@ int main(int argc, char* argv[]) {
 		testNewMap(filename);
 	}
 
+	graph->~Graph();
+
 	return 0;
 }
