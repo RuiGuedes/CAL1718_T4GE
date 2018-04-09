@@ -36,6 +36,6 @@ bool validIDInput(string input, int max = 0);
 
 int getOption(int MAX);
 
-Vertex* getOriginVertex(bool maybeAccidented = true, bool color = true);
+Vertex* getOriginVertex(bool maybeAccidented = true);
 
-Vertex* getDestinationVertex(bool maybeAccidented = true, Vertex *source = nullptr, bool mustBeReachable = false, bool color = false);
+Vertex* getDestinationVertex(bool maybeAccidented = true, bool mustBeReachable = false);

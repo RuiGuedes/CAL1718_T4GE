@@ -79,7 +79,7 @@ void systemInformation() {
 
 int main(int argc, char* argv[]) {
 	srand(time(0));
-
+try {
 	ifstream file;
 	//string filename;
 	string filename = "./resource/newyork_large";
@@ -110,5 +110,9 @@ int main(int argc, char* argv[]) {
 
 	delete graph;
 
+} catch (exception &e) {
+	cout << "ERROR: " << e.what() << endl;
+	system("pause");
+}
 	return 0;
 }

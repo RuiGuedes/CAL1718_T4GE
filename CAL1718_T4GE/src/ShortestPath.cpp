@@ -21,7 +21,6 @@ void dijkstraSource(Vertex *origin, Vertex *destination) {
 	pathGraphAnimation(path);
 }
 
-
 void dijkstraSourceDest(Vertex *origin, Vertex *destination) {
 	// Perform algorithm
 	chrono::duration<double> time;
@@ -33,7 +32,6 @@ void dijkstraSourceDest(Vertex *origin, Vertex *destination) {
 	pathGraphAnimation(path);
 }
 
-
 void Astar(Vertex *origin, Vertex *destination) {
 	// Perform algorithm
 	chrono::duration<double> time;
@@ -44,7 +42,6 @@ void Astar(Vertex *origin, Vertex *destination) {
 	vector<Vertex*> path = graph->getPath(origin, destination);
 	pathGraphAnimation(path);
 }
-
 
 void dijkstraSimulation(Vertex *origin, Vertex *destination) {
 	while(1) {
@@ -69,7 +66,6 @@ void dijkstraSimulation(Vertex *origin, Vertex *destination) {
 	};
 }
 
-
 void getShortestPath() {
 
 	int option;
@@ -93,6 +89,7 @@ void getShortestPath() {
 	// Choose origin
 	origin = getOriginVertex(false);
 	if (origin == nullptr) return;
+	graph->setVertexColor(origin, VERTEX_SELECTED_COLOR);
 
 	// Find unreachable nodes
 	bool reachable = checkUnreachableNodes(origin);
@@ -103,11 +100,12 @@ void getShortestPath() {
 	else {
 
 		// Select destination
-		destination = getDestinationVertex(false, origin, true, false);
+		destination = getDestinationVertex(false, true);
 		if (destination == nullptr) {
 			//...
 			return;
 		}
+		//graph->setVertexColor(destination, VERTEX_SELECTED_COLOR);
 
 		// Ok: so here we separate each algorithm
 		switch (option) {
@@ -131,7 +129,6 @@ void getShortestPath() {
 	system("pause");
 	resetGraphState();
 }
-
 
 bool checkUnreachableNodes(Vertex* origin) {
 	graph->bfs(origin);
