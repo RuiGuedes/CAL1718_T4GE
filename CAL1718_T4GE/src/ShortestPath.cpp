@@ -7,13 +7,85 @@
 //////////////////////////
 
 vector<int> checkUnreachableNodes();
-vector<int> pathGraphAnimation(vector<int> path);
-void resetGraphState(vector<int> unreachableNodes,vector<int> pathIndex);
+void pathGraphAnimation(vector<Vertex*> path);
+void resetGraphState();
+
+void dijkstraSource(Vertex *origin, Vertex *destination) {
+	// Perform algorithm
+	chrono::duration<double> time;
+	graph->dijkstraDist(origin, &time);
+	cout << "Elapsed time: " << (1000 * time.count()) << "ms." << endl;
+
+	// Get shortest path and animate
+	vector<Vertex*> path = graph->getPath(origin, destination);
+	pathGraphAnimation(path);
+}
+
+
+void dijkstraSourceDest(Vertex *origin, Vertex *destination) {
+	// Perform algorithm
+	chrono::duration<double> time;
+	graph->dijkstraDist(origin, destination, &time);
+	cout << "Elapsed time: " << (1000 * time.count()) << "ms." << endl;
+
+	// Get shortest path and animate
+	vector<Vertex*> path = graph->getPath(origin, destination);
+	pathGraphAnimation(path);
+}
+
+
+void Astar(Vertex *origin, Vertex *destination) {
+	// Perform algorithm
+	chrono::duration<double> time;
+	graph->AstarDist(origin, destination, &time);
+	cout << "Elapsed time: " << (1000 * time.count()) << "ms." << endl;
+
+	// Get shortest path and animate
+	vector<Vertex*> path = graph->getPath(origin, destination);
+	pathGraphAnimation(path);
+}
+
+
+void dijkstraSimulation(Vertex *origin, Vertex *destination) {
+
+	//		while(pathIndex.size() >= 1) {
+	//			pathIndex = pathGraphAnimation(pathIndex);
+	//			cout << "PATH ANIME CHECK\n\n";
+	//
+	//			if(pathIndex.size() == 0)
+	//				break;
+	//			else
+	//				timeSpent += graph->findVertex(pathIndex.at(0))->getDist();
+	//
+	//			cout << "TIME SPENT CHECK\n\n";
+	//
+	//			graph->generateGraphNewStatus();
+	//
+	//			cout << "NEW STATUS CHECK\n\n";
+	//
+	//			graph->dijkstraShortestPath(graph->findVertex(pathIndex.at(0)));
+	//
+	//			cout << "DJIKSTRA AGAIN CHECK\n\n";
+	//
+	//			pathIndex = graph->getPath(graph->findVertex(pathIndex.at(0)),destination);
+	//			reset.push_back(pathIndex.at(0));
+	//
+	//			cout << "NEXT ITERATION CHECK\n\n";
+	//		}
+	//
+	//		cout << endl << "Time spent: " << timeSpent << " seconds" << endl << endl;
+	return;
+}
+
+
+void AstarSimulation(Vertex *origin, Vertex *destination) {
+	return;
+}
+
 
 void getShortestPath() {
 
-	string option, algorithm;
-	int startingNode { }, destinationNode { };
+	int option;
 	chrono::duration<double> timeSpent;
 	Vertex* origin = nullptr;
 	Vertex* destination= nullptr;
@@ -23,140 +95,118 @@ void getShortestPath() {
 	cout << "Available algorithms:" << endl;
 	cout << "1 - Dijkstra <source>" << endl;
 	cout << "2 - Dijkstra <source,destination>" << endl;
-	cout << "3 - A* <source,destination>" << endl << endl;
+	cout << "3 - A* <source,destination>" << endl;
+	cout << "4 - Dijkstra <source,destination> with simulation" << endl;
+	cout << "5 - A* <source,destination> with simulation" << endl;
+	cout << "6 - return" << endl;
 
 	// Choose Algorithm
-	while(1) {
+	int option = getOption(6);
+	if (option == 6) return;
 
-		cout << "Select algorithm: ";
-		cin >> option;
+	// Choose origin
+	origin = getOriginVertex(false);
+	if (origin == nullptr) return;
 
-		if(validIDInput(option,3)) {
-			if(stoi(option) == 1)
-				algorithm = "DijkstraSource";
-			else if(stoi(option) == 2)
-				algorithm = "DijkstraSourceDist";
-			else
-				algorithm = "A*";
-			cout << endl;
-			break;
-		}
-		else
-			cout << "Unavailable algorithm (" << option << "). Try again !" << endl << endl;
-	}
-
-	while(1) {
-
-		cout << "Select starting node: ";
-		cin >> option;
-
-		if(validIDInput(option,graph->getTotalVertices())) {
-			startingNode = stoi(option);
-			origin = graph->findVertex(startingNode);
-
-			if(origin != NULL) {
-				graph->setVertexColor(origin,"green");
-				break;
-			}
-			else {
-				cout << "Accidented node (" << option << "). Try again !" << endl << endl;
-			}
-		}
-		else
-			cout << "Invalid node (" << option << "). Try again !" << endl << endl;
-	}
-
-	if(algorithm == "DijkstraSource")
-		graph->dijkstraDist(origin,&timeSpent);
-
-	vector<int> unreachableNodes = checkUnreachableNodes();
-	vector<int> pathIndex;
-	vector<int> reset;
+	// Show unreachable nodes
+	graph->bfs(origin);
+	vector<Vertex*> unreachableNodes = checkUnreachableNodes();
 
 	if((unreachableNodes.size() + 1 + graph->getAccidentedVertexSet().size()) >= (unsigned int)graph->getTotalVertices())
 		cout << "There are no reachable nodes at the moment from " << origin->getID() << "." << endl << endl;
 	else {
 
-		while(1) {
-
-			cout << "Select destination node: ";
-			cin >> option;
-
-			if(validIDInput(option,graph->getTotalVertices())) {
-				destinationNode = stoi(option);
-				destination = graph->findVertex(destinationNode);
-
-				if(destination == nullptr)
-					cout << "Accidented node (" << option << ") Try again !" << endl << endl;
-				else if(destination->getDist() == INF)
-					cout << "Unreachable node (" << option << ") Try again !" << endl << endl;
-				else if(startingNode == destinationNode)
-					cout << "Same node as the one chosen to be the starting point. Try again !" << endl << endl;
-				else
-					break;
-			}
-			else
-				cout << "Invalid node (" << option << ") Try again !" << endl << endl;
+		// Select destination
+		destination = getDestinationVertex(false, origin, true, false);
+		if (destination == nullptr) {
+			//...
+			return;
 		}
 
-		if(algorithm == "DijkstraSourceDist")
-			graph->dijkstraDist(origin,destination,&timeSpent);
-		else if(algorithm == "A*")
-			graph->AstarDist(origin,destination,&timeSpent);
-
-		pathIndex = graph->getPath(origin,destination);
-		reset.push_back(pathIndex.at(0));
-		pathIndex = pathGraphAnimation(pathIndex);
-
-//		while(pathIndex.size() >= 1) {
-//			pathIndex = pathGraphAnimation(pathIndex);
-//			cout << "PATH ANIME CHECK\n\n";
-//
-//			if(pathIndex.size() == 0)
-//				break;
-//			else
-//				timeSpent += graph->findVertex(pathIndex.at(0))->getDist();
-//
-//			cout << "TIME SPENT CHECK\n\n";
-//
-//			graph->generateGraphNewStatus();
-//
-//			cout << "NEW STATUS CHECK\n\n";
-//
-//			graph->dijkstraShortestPath(graph->findVertex(pathIndex.at(0)));
-//
-//			cout << "DJIKSTRA AGAIN CHECK\n\n";
-//
-//			pathIndex = graph->getPath(graph->findVertex(pathIndex.at(0)),destination);
-//			reset.push_back(pathIndex.at(0));
-//
-//			cout << "NEXT ITERATION CHECK\n\n";
-//		}
-//
-//		cout << endl << "Time spent: " << timeSpent << " seconds" << endl << endl;
+		// Ok: so here we separate each algorithm
+		switch (option) {
+		case 1: // Dijkstra <source>
+			dijkstraSource(origin, destination);
+			break;
+		case 2: // Dijkstra <source,destination>
+			dijkstraSourceDest(origin, destination);
+			break;
+		case 3: // A* <source,destination>
+			Astar(origin, destination);
+			break;
+		case 4: // Dijkstra <source,destination> with simulation
+			dijkstraSimulation(origin, destination);
+			break;
+		case 5: // A* <source,destination> with simulation
+			AstarSimulation(origin, destination);
+			break;
+		}
 	}
 
+	// Reset
 	system("pause");
-
-	resetGraphState(unreachableNodes,reset);
+	resetGraphState();
 }
 
-vector<int> checkUnreachableNodes() {
-	vector<int> unreachableNodes;
+
+vector<Vertex*> checkUnreachableNodes() {
+	vector<Vertex*> unreachableNodes;
 
 	cout << endl << "Checking for unreachable nodes ..." << endl << endl;
 
-	for(int i = 1; i <= graph->getTotalVertices(); i++) {
-		Vertex* v = graph->findVertex(i);
-		if((v != NULL) && (v->getDist() == INF)) {
-			graph->setVertexColor(v,"yellow");
-			unreachableNodes.push_back(i);
+	for(auto v : graph->getVertexSet()) { // Non-accidented vertices
+		if(v->path == nullptr) {
+			graph->setVertexColor(v,VERTEX_UNREACHABLE_COLOR);
+			unreachableNodes.push_back(v);
 		}
 	}
 	graph->rearrange();
 	return unreachableNodes;
 }
 
+void pathGraphAnimation(vector<Vertex*> path) {
+	for(unsigned int i = 0; i < path.size(); i++) {
+		graph->setVertexColor(path.at(i),VERTEX_SELECTED_COLOR);
+		graph->rearrange();
+		Sleep(100);
+	}
+
+	Sleep(100);
+	graph->setVertexColor(path.at(0),"magenta");
+	graph->rearrange();
+}
+
+void resetGraphState() {
+	for (auto v : graph->getAllVertexSet())
+		graph->setVertexDefaultColor(v);
+	graph->rearrange();
+}
+
+
+
+
+
+vector<int> checkUnreachableNodes() {
+	vector<int> unreachableNodes;
+
+	cout << endl << "Checking for unreachable nodes ..." << endl << endl;
+
+	for(auto v : graph->getVertexSet()) {
+		if(v->path == nullptr) {
+			graph->setVertexColor(v,VERTEX_UNREACHABLE_COLOR);
+			unreachableNodes.push_back(v);
+		}
+	}
+	graph->rearrange();
+	return unreachableNodes;
+}
+
+
+
+
+
+
+// Este vector<int> path podia muito bem ser um vector<Vertex*> ...
 vector<int> pathGraphAnimation(vector<int> path) {
 	vector<int> pathIndex;
 
@@ -164,7 +214,7 @@ vector<int> pathGraphAnimation(vector<int> path) {
 		if(i != 0)
 			pathIndex.push_back(path.at(i));
 
-		graph->setVertexColor(graph->findVertex(path.at(i)),"green");
+		graph->setVertexColor(graph->findVertex(path.at(i)),VERTEX_SELECTED_COLOR);
 		graph->rearrange();
 		Sleep(100);
 	}
@@ -175,14 +225,3 @@ vector<int> pathGraphAnimation(vector<int> path) {
 
 	return pathIndex;
 }
-
-void resetGraphState(vector<int> unreachableNodes,vector<int> pathIndex) {
-	for(unsigned int i = 0; i < unreachableNodes.size(); i++)
-		graph->setVertexColor(graph->findVertex(unreachableNodes.at(i)),"blue");
-
-	for(unsigned int i = 0; i < pathIndex.size(); i++)
-		graph->setVertexColor(graph->findVertex(pathIndex.at(i)),"blue");
-
-	graph->rearrange();
-}
-

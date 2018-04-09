@@ -1,6 +1,7 @@
 #include <math.h>
 #include <algorithm>
 #include <chrono>
+#include <deque>
 
 #include "Graph.h"
 
@@ -1320,6 +1321,41 @@ void Graph::generateGraphNewStatus() {
 //	}
 //}
 
+
+void Graph::bfs(Vertex *origin/*, chrono::duration<double> *time = nullptr*/) {
+	//auto start = chrono::high_resolution_clock::now();
+
+	// Check args
+	if (origin == nullptr) return;
+
+	for (auto v : vertexSet) {
+		v->dist = 0;
+		v->path = nullptr;
+	}
+	//origin->dist = 0;
+	//origin->path = nullptr;
+
+	deque<Vertex*> q;
+	q.push_back(origin);
+	while (!q.empty()) {
+		auto v = q.front();
+		q.pop_front();
+		for (auto e : v->adj) { // Non-accidented only
+			auto vertex = e->dest;
+			if (!vertex->path) {
+				vertex->path = v;
+				vertex->dist = v->dist + 1;
+				q.push_back(vertex);
+			}
+		}
+	}
+
+	//auto end = chrono::high_resolution_clock::now();
+	//if (time) *time = end - start; // time.count() gives seconds
+}
+
+
+
 /**
  * Initializes single-source shortest path data (path, dist).
  * Receives the content of the source vertex and returns a pointer to the source vertex.
@@ -1359,7 +1395,7 @@ void Graph::dijkstraDist(Vertex *origin, chrono::duration<double> *time) {
 	q.insert(s);
 	while ( ! q.empty() ) {
 		auto v = q.extractMin();
-		for (auto e : v->adj) {
+		for (auto e : v->adj) { // Non-accidented only
 			auto oldDist = e->dest->dist;
 			if (relax(v, e->dest, e->weight)) {
 				if (oldDist == INF)
@@ -1377,8 +1413,7 @@ void Graph::dijkstraDist(Vertex *origin, chrono::duration<double> *time) {
 
 
 /**
- * Perform A* starting at origin vertex and ending at
- * destination vertex
+ * Perform A* given origin and destination vertices.
  * If time is given, compute algorithm performance
  */
 void Graph::AstarDist(Vertex *origin, Vertex *destination, chrono::duration<double> *time) {
@@ -1400,7 +1435,7 @@ void Graph::AstarDist(Vertex *origin, Vertex *destination, chrono::duration<doub
 	while (!q.empty()) {
 		auto v = q.extractMin();
 		if (v == destination) break;
-		for (auto e : v->adj) {
+		for (auto e : v->adj) { // Non-accidented only
 			auto vertex = e->dest;
 			double oldDist = vertex->dist;
 			double newDist = v->dist + distance(v, vertex)
@@ -1423,8 +1458,7 @@ void Graph::AstarDist(Vertex *origin, Vertex *destination, chrono::duration<doub
 
 
 /**
- * Perform A* starting at origin vertex and ending at
- * destination vertex
+ * Perform Dijkstra given origin and destination vertices.
  * If time is given, compute algorithm performance
  */
 void Graph::dijkstraDist(Vertex *origin, Vertex *destination, chrono::duration<double> *time) {
@@ -1446,7 +1480,7 @@ void Graph::dijkstraDist(Vertex *origin, Vertex *destination, chrono::duration<d
 	while (!q.empty()) {
 		auto v = q.extractMin();
 		if (v == destination) break;
-		for (auto e : v->adj) {
+		for (auto e : v->adj) { // Non-accidented only
 			auto vertex = e->dest;
 			double oldDist = vertex->dist;
 			double newDist = v->dist + distance(v, vertex);

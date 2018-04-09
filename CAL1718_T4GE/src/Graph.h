@@ -123,6 +123,9 @@ public:
 	/////
 
 	///// ***** Algorithms
+	// Breadth First Search. Find reachable nodes
+	void bfs(Vertex *origin/*, chrono::duration<double> *time = nullptr*/);
+
 	// Dijkstra by distance, single source. Find shortest paths to all other vertices
 	Vertex * initSingleSource(const int &origin);
 	bool relax(Vertex *v, Vertex *w, double weight);

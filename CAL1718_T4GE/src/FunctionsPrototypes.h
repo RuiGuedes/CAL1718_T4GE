@@ -27,31 +27,15 @@ void systemInformation();
 /*
  * @brief Checks if input is a string containing
  * a valid Vertex, Edge, or Road id -- a positive integer
- * max optional parameter is inclusive
+ * > The "max" optional parameter is inclusive
  * @param input The user's input sequence
  * @param max Verify that stoi(input) <= max
  * @return true if valid and stoi(input) does not throw, false otherwise
  */
-static bool validIDInput(string input, int max = 0) {
-	static const regex reg_int("^\\s*(\\d+)[.,;]?\\s*$");
-	smatch match;
+bool validIDInput(string input, int max = 0);
 
-	if (regex_match(input, match, reg_int)) {
-		try {
-			int value = stoi(input);
+int getOption(int MAX);
 
-			if (value < 1) // reserved ids
-				return false;
+Vertex* getOriginVertex(bool maybeAccidented = true, bool color = true);
 
-			if (max > 0 && value > max)
-				return false;
-
-			return true;
-		}
-		catch (runtime_error &e) {
-			return false;
-		}
-	} else {
-		return false;
-	}
-}
+Vertex* getDestinationVertex(bool maybeAccidented = true, Vertex *source = nullptr, bool mustBeReachable = false, bool color = false);
