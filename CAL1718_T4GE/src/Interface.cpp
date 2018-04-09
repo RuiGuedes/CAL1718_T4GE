@@ -108,7 +108,7 @@ int main(int argc, char* argv[]) {
 		testNewMap(filename);
 	}
 
-	graph->~Graph();
+	delete graph;
 
 	return 0;
 }

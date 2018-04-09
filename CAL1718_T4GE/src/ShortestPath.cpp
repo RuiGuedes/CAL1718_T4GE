@@ -1,5 +1,7 @@
 #include "FunctionsPrototypes.h"
 
+#include <chrono>
+
 //////////////////////////
 // Functions Prototypes //
 //////////////////////////
@@ -12,7 +14,7 @@ void getShortestPath() {
 
 	string option, algorithm;
 	int startingNode { }, destinationNode { };
-	double timeSpent { 0 };
+	chrono::duration<double> timeSpent;
 	Vertex* origin = nullptr;
 	Vertex* destination= nullptr;
 
@@ -21,8 +23,9 @@ void getShortestPath() {
 	cout << "Available algorithms:" << endl;
 	cout << "1 - Dijkstra <source>" << endl;
 	cout << "2 - Dijkstra <source,destination>" << endl;
-	cout << "3 - A star" << endl << endl;
+	cout << "3 - A* <source,destination>" << endl << endl;
 
+	// Choose Algorithm
 	while(1) {
 
 		cout << "Select algorithm: ";
@@ -64,7 +67,7 @@ void getShortestPath() {
 	}
 
 	if(algorithm == "DijkstraSource")
-		graph->dijkstraShortestPath(origin);
+		graph->dijkstraDist(origin,&timeSpent);
 
 	vector<int> unreachableNodes = checkUnreachableNodes();
 	vector<int> pathIndex;
@@ -96,14 +99,15 @@ void getShortestPath() {
 				cout << "Invalid node (" << option << ") Try again !" << endl << endl;
 		}
 
-//		if(algorithm == "DijkstraSourceDist")
-//			graph->dijkstraDist(origin,destination);
-		//else if(algorithm == "A*")
-		//graph->AstarDist(origin,destination);
+		if(algorithm == "DijkstraSourceDist")
+			graph->dijkstraDist(origin,destination,&timeSpent);
+		else if(algorithm == "A*")
+			graph->AstarDist(origin,destination,&timeSpent);
 
 		pathIndex = graph->getPath(origin,destination);
 		reset.push_back(pathIndex.at(0));
 		pathIndex = pathGraphAnimation(pathIndex);
+
 //		while(pathIndex.size() >= 1) {
 //			pathIndex = pathGraphAnimation(pathIndex);
 //			cout << "PATH ANIME CHECK\n\n";

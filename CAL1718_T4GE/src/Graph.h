@@ -5,7 +5,7 @@
 #include <vector>
 #include <queue>
 #include <list>
-#include <time.h>
+#include <chrono>
 
 #include "Graphviewer.h"
 #include "MutablePriorityQueue.h"
@@ -76,7 +76,7 @@ public:
 	/////
 
 	///// ***** Constructors and destructor
-	Graph(int width, int height, double scale = 1);
+	explicit Graph(int width, int height, double scale = 1);
 	~Graph();
 
 	///// ***** Vertex
@@ -124,12 +124,15 @@ public:
 
 	///// ***** Algorithms
 	// Dijkstra by distance, single source. Find shortest paths to all other vertices
-	void dijkstraDist(Vertex *vsource, Vertex *vdest); // or int version
+	Vertex * initSingleSource(const int &origin);
+	bool relax(Vertex *v, Vertex *w, double weight);
+	void dijkstraDist(Vertex *origin, chrono::duration<double> *time = nullptr);
 
-	void dijkstraDist(Vertex* vsource);
+	// Dijkstra by distance, with destination. Find shortest paths destination vertex
+	void dijkstraDist(Vertex *vsource, Vertex *vdest, chrono::duration<double> *time = nullptr);
 
 	// A* by distance. Find shortest path to destination vertex only
-	bool AstarDist(Vertex *vsource, Vertex *vdest);
+	void AstarDist(Vertex *vsource, Vertex *vdest, chrono::duration<double> *time = nullptr);
 	/////
 
 	///// ***** Operations
@@ -139,12 +142,6 @@ public:
 
 
 	void generateGraphNewStatus();
-
-
-
-	Vertex * initSingleSource(const int &origin);
-	bool relax(Vertex *v, Vertex *w, double weight);
-	void dijkstraShortestPath(Vertex *origin);
 };
 
 
@@ -281,7 +278,7 @@ class Road {
 	int averageSpeed = 0;
 
 public:
-	Road(int rid, string name, bool bothways = false);
+	explicit Road(int rid, string name, bool bothways = false);
 
 	int getID() const;
 	string getName() const;
@@ -311,7 +308,7 @@ class Subroad {
 	int maxCapacity = 0;
 
 public:
-	Subroad(double distance, Road* road);
+	explicit Subroad(double distance, Road* road);
 
 	Road *getRoad() const;
 	double getDistance() const;

@@ -1,5 +1,6 @@
 #include <math.h>
 #include <algorithm>
+#include <chrono>
 
 #include "Graph.h"
 
@@ -1212,6 +1213,9 @@ ostream& operator<<(ostream& out, Edge* e) {
 	return out;
 }
 
+
+
+
 void Graph::generateGraphNewStatus() {
 
 	srand (time(NULL));
@@ -1347,7 +1351,9 @@ bool Graph::relax(Vertex *v, Vertex *w, double weight) {
 /**
  * Dijkstra algorithm.
  */
-void Graph::dijkstraShortestPath(Vertex *origin) {
+void Graph::dijkstraDist(Vertex *origin, chrono::duration<double> *time) {
+	auto start = chrono::high_resolution_clock::now();
+
 	auto s = initSingleSource(origin->getID());
 	MutablePriorityQueue<Vertex> q;
 	q.insert(s);
@@ -1363,4 +1369,99 @@ void Graph::dijkstraShortestPath(Vertex *origin) {
 			}
 		}
 	}
+
+	auto end = chrono::high_resolution_clock::now();
+	if (time) *time = end - start;
 }
+
+
+
+/**
+ * Perform A* starting at origin vertex and ending at
+ * destination vertex
+ * If time is given, compute algorithm performance
+ */
+void Graph::AstarDist(Vertex *origin, Vertex *destination, chrono::duration<double> *time) {
+	auto start = chrono::high_resolution_clock::now();
+
+	// Check args
+	if (origin == nullptr || destination == nullptr) return;
+	if (origin->isAccidented() || destination->isAccidented()) return;
+
+	for (auto v : vertexSet) {
+		v->dist = INF;
+		v->path = nullptr;
+	}
+	origin->dist = 0;
+	//origin->path = nullptr;
+
+	MutablePriorityQueue<Vertex> q;
+	q.insert(origin);
+	while (!q.empty()) {
+		auto v = q.extractMin();
+		if (v == destination) break;
+		for (auto e : v->adj) {
+			auto vertex = e->dest;
+			double oldDist = vertex->dist;
+			double newDist = v->dist + distance(v, vertex)
+					+ distance(vertex, destination); // <- A*
+			if (newDist < oldDist) {
+				vertex->dist = newDist;
+				vertex->path = v;
+				if (oldDist == INF)
+					q.insert(vertex);
+				else
+					q.decreaseKey(vertex);
+			}
+		}
+	}
+
+	auto end = chrono::high_resolution_clock::now();
+	if (time) *time = end - start; // time.count() gives seconds
+}
+
+
+
+/**
+ * Perform A* starting at origin vertex and ending at
+ * destination vertex
+ * If time is given, compute algorithm performance
+ */
+void Graph::dijkstraDist(Vertex *origin, Vertex *destination, chrono::duration<double> *time) {
+	auto start = chrono::high_resolution_clock::now();
+
+	// Check args
+	if (origin == nullptr || destination == nullptr) return;
+	if (origin->isAccidented() || destination->isAccidented()) return;
+
+	for (auto v : vertexSet) {
+		v->dist = INF;
+		v->path = nullptr;
+	}
+	origin->dist = 0;
+	//origin->path = nullptr;
+
+	MutablePriorityQueue<Vertex> q;
+	q.insert(origin);
+	while (!q.empty()) {
+		auto v = q.extractMin();
+		if (v == destination) break;
+		for (auto e : v->adj) {
+			auto vertex = e->dest;
+			double oldDist = vertex->dist;
+			double newDist = v->dist + distance(v, vertex);
+			if (newDist < oldDist) {
+				vertex->dist = newDist;
+				vertex->path = v;
+				if (oldDist == INF)
+					q.insert(vertex);
+				else
+					q.decreaseKey(vertex);
+			}
+		}
+	}
+
+	auto end = chrono::high_resolution_clock::now();
+	if (time) *time = end - start; // time.count() gives seconds
+}
+

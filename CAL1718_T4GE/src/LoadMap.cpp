@@ -539,17 +539,17 @@ int loadSubroads(string filename, MapMetaData &meta, Graph* graph) {
 			}
 		}
 
-		if (currentRoad != nullptr) {
-			double totalDistance = 0;
-			for (auto subroad : subroads)
-				totalDistance += subroad->getDistance();
-
-			currentRoad->setTotalDistance(totalDistance);
-			subroads.clear();
-		}
-
 		++lineID;
 		getline(file, line);
+	}
+
+	if (currentRoad != nullptr) {
+		double totalDistance = 0;
+		for (auto subroad : subroads)
+			totalDistance += subroad->getDistance();
+
+		currentRoad->setTotalDistance(totalDistance);
+		subroads.clear();
 	}
 
 	file.close();

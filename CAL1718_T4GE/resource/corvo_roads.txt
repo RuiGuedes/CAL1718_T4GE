@@ -1,0 +1,131 @@
+170140217;;False
+170140219;;False
+170140220;;False
+173773436;Rua do Rêgo;False
+173773437;;False
+173773439;;False
+173773440;Rua da Matriz;False
+173773441;Rua do Porto da Casa;False
+173773446;;False
+173773447;Maranhão;False
+173773449;;False
+173773453;;False
+173773456;;False
+173773458;;False
+173773459;;False
+173773463;Rua da Matriz;False
+173773464;;False
+173773465;;False
+173773466;;False
+173773467;;False
+173773468;;False
+173773469;;False
+173773470;;False
+173773471;Rua da Fonte;False
+173773473;;False
+173773474;Rua da Fonte;False
+173773475;;False
+201922209;Avenida Nova;False
+201922211;;False
+201922212;;False
+201922213;;False
+201922219;;False
+201922230;Rua do Jogo da Bola;False
+201922231;;False
+273307693;;False
+273307694;;False
+273679549;;False
+273679550;;False
+273679551;;False
+273679552;;False
+273679553;;False
+273679554;;False
+273679555;;False
+296775624;Caminho dos Moinhos;False
+296776849;Rua dos Antigos Combatentes;False
+296776850;Rua Padre Eugénio Rita;False
+296776851;;False
+296776852;Estrada para o Caldeirão;False
+296776853;Largo do Ribeirão;False
+296879137;;False
+296879143;;False
+296879146;;False
+296879148;;False
+296879151;;False
+296879152;;False
+319035722;;False
+319142964;Rua Padre Eugénio Rita;False
+319142965;;False
+319142966;Rua Padre Eugénio Rita;False
+319142967;;False
+319142971;Rua da Matriz;False
+319142972;Rua da Matriz;False
+319142973;;False
+319142974;;False
+319142975;Estrada para o Caldeirão;False
+319142976;;False
+319142977;;False
+319142978;;False
+319142979;;False
+319142980;;False
+355332831;;False
+355332837;;False
+355369088;;False
+355369089;;False
+355369091;;False
+355369092;;False
+355369093;;False
+355369095;;False
+355375587;;False
+355375588;;False
+355375589;;False
+355375590;;False
+355375591;;False
+355375592;;False
+355375593;;False
+355375598;;False
+355377042;;False
+355377043;;False
+355377044;;False
+355377045;;False
+355377046;;False
+355377047;;False
+355377048;;False
+355377049;;False
+355377050;;False
+355377051;;False
+355377052;;False
+355377053;;False
+356092147;;False
+356098506;;False
+356126845;Caminho da Várzea;False
+356126846;;False
+356128891;Largo do Outeiro;False
+356128893;;False
+356128894;;True
+356128896;;True
+356133449;Rua das Pedras;False
+356133450;Rua do Outeiro;False
+356277597;;False
+356287558;;False
+383821130;Caminho da Várzea;False
+383854278;;False
+383854279;;False
+384387626;;False
+507933347;;False
+507933348;;False
+545714637;;False
+545714638;;False
+545714639;;False
+545718449;Rua da Matriz;False
+545718451;;False
+545722589;Estrada para o Caldeirão;False
+545722590;Rua do Rêgo;False
+545722591;;False
+546055978;Estrada para o Caldeirão;False
+546055983;;False
+546370994;Avenida Nova;False
+546370996;;False
+546370997;Rua do Outeiro;False
+546383236;Rua da Matriz;False
+546770041;;False
