@@ -491,12 +491,12 @@ int loadSubroads(string filename, MapMetaData &meta, Graph* graph) {
 				// Load subroad
 				Subroad* subroad = new Subroad(distance, currentRoad);
 				subroads.push_back(subroad);
-				graph->addEdge(subRoadID, v1, v2, distance, subroad);
+				graph->addEdge(subRoadID, v1, v2, subroad);
 				++newSubroads;
 				++subRoadID;
 				if (currentRoad->isBidirectional()) {
 					// Add reverse edge
-					graph->addEdge(subRoadID, v2, v1, distance, subroad);
+					graph->addEdge(subRoadID, v2, v1, subroad);
 					++newSubroads;
 					++subRoadID;
 				}

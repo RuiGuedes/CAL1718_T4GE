@@ -17,13 +17,17 @@ using namespace std;
 
 #define VERTEX_CLEAR_COLOR        BLUE
 #define VERTEX_ACCIDENTED_COLOR   RED
-#define VERTEX_SELECTED_COLOR     GREEN
+#define VERTEX_SELECTED_COLOR     MAGENTA
 #define VERTEX_UNREACHABLE_COLOR  YELLOW
+#define VERTEX_PATH_COLOR         GREEN
+#define VERTEX_NEXT_PATH_COLOR    CYAN
 
 #define EDGE_CLEAR_COLOR          BLACK
 #define EDGE_ACCIDENTED_COLOR     RED
-#define EDGE_SELECTED_COLOR       GREEN
+#define EDGE_SELECTED_COLOR       MAGENTA
 #define EDGE_UNREACHABLE_COLOR    YELLOW
+#define EDGE_PATH_COLOR           GREEN
+#define EDGE_NEXT_PATH_COLOR      CYAN
 
 #define INF std::numeric_limits<double>::max()
 
@@ -111,8 +115,8 @@ public:
 	/////
 
 	///// ***** Edge CRUD
-	bool addEdge(int eid, int sourceId, int destId, double weight, Subroad* road, bool accidented = false);
-	bool addEdge(int eid, Vertex *vsource, Vertex *vdest, double weight, Subroad* road, bool accidented = false);
+	bool addEdge(int eid, int sourceId, int destId, Subroad* road, bool accidented = false);
+	bool addEdge(int eid, Vertex *vsource, Vertex *vdest, Subroad* road, bool accidented = false);
 	bool addEdge(Edge *e);
 
 	Edge *findEdge(int eid) const;
@@ -241,7 +245,6 @@ class Edge {
 	const int id;
 	Vertex *source;
 	Vertex *dest;
-	double weight;
 	bool accidented;
 	Graph* graph = nullptr;
 	Subroad* subroad;
@@ -249,7 +252,7 @@ class Edge {
 public:
 	///// ***** Constructor
 	void _sgraph(Graph* graph);
-	explicit Edge(int id, Vertex* vsource, Vertex *vdest, double weight, Subroad *subroad, bool accidented = false);
+	explicit Edge(int id, Vertex* vsource, Vertex *vdest, Subroad *subroad, bool accidented = false);
 
 	///// ***** Vertex CRUD
 	Vertex *getSource() const;
@@ -268,7 +271,6 @@ public:
 
 	bool fix();
 	bool accident();
-	void setWeight(double weight);
 	bool setActualCapacity(int capacity);
 	/////
 

@@ -548,9 +548,9 @@ void Graph::removeVertex(Vertex* v) {
  * @throws logic_error if Repeated edge id
  */
 bool Graph::addEdge(int eid, int sourceId, int destId,
-		double weight, Subroad *subroad, bool accidented) {
+		Subroad *subroad, bool accidented) {
 	return addEdge(eid, findVertex(sourceId),
-			findVertex(destId), weight, subroad, accidented);
+			findVertex(destId), subroad, accidented);
 }
 
 /*
@@ -562,14 +562,14 @@ bool Graph::addEdge(int eid, int sourceId, int destId,
  * @throws logic_error if Repeated edge id
  */
 bool Graph::addEdge(int eid, Vertex* vsource, Vertex* vdest,
-		double weight, Subroad *subroad, bool accidented) {
+		Subroad *subroad, bool accidented) {
 	if (vsource == nullptr || vdest == nullptr) {
 		throw std::invalid_argument("Vertex not found");
 	}
 	if (findEdge(eid) != nullptr) {
 		throw std::logic_error("Repeated edge id");
 	}
-	Edge* e = new Edge(eid, vsource, vdest, weight, subroad, accidented);
+	Edge* e = new Edge(eid, vsource, vdest, subroad, accidented);
 	// Delegate to vertex
 	if (vsource->addEdge(e)) {
 		return true;
@@ -1127,9 +1127,9 @@ void Edge::_sgraph(Graph* graph) {
  * conditional accidented, defaulting to false
  */
 Edge::Edge(int id, Vertex* vsource, Vertex* vdest,
-		double weight, Subroad* subroad, bool accidented):
-															id(id), source(vsource), dest(vdest), weight(weight),
-															accidented(accidented), subroad(subroad) {}
+		Subroad* subroad, bool accidented):
+	id(id), source(vsource), dest(vdest),
+	accidented(accidented), subroad(subroad) {}
 
 /*
  * @brief Return's the edge's source vertex
@@ -1238,15 +1238,6 @@ bool Edge::accident() {
 	} else {
 		return false;
 	}
-}
-
-/*
- * @brief Sets this vertex's weight. May be negative
- */
-void Edge::setWeight(double weight) {
-	this->weight = weight;
-	if (showEdgeWeights)
-		graph->setEdgeWeight(this, weight);
 }
 
 /*
@@ -1408,6 +1399,12 @@ void Graph::bfs(Vertex *origin) {
 
 
 
+/**
+ * Performs Greedy Best-First Search in the graph,
+ * with given source and destination vertices.
+ * The resulting path obtainable by getPath(vsource, vdest)
+ * is not necessarily the best (shortest) path.
+ */
 void Graph::gbfsDist(Vertex *vsource, Vertex *vdest, microtime *time) {
 	auto start = chrono::high_resolution_clock::now();
 
@@ -1446,55 +1443,44 @@ void Graph::gbfsDist(Vertex *vsource, Vertex *vdest, microtime *time) {
 	}
 
 	auto end = chrono::high_resolution_clock::now();
-	if (time) *time = chrono::duration_cast<chrono::microseconds>(end - start).count(); // time.count() gives seconds
+	if (time) *time = chrono::duration_cast<chrono::microseconds>(end - start).count();
 }
 
 
+
 /**
- * Initializes single-source shortest path data (path, dist).
- * Receives the content of the source vertex and returns a pointer to the source vertex.
- * Used by all single-source shortest path algorithms.
+ * Performs Dijkstra in the graph, with a given
+ * source vertex but no predetermined destination vertex,
+ * so it finds the best path for all reachable vertices.
  */
-Vertex * Graph::initSingleSource(const int &origin) {
+void Graph::dijkstraDist(Vertex *vsource, microtime *time) {
+	auto start = chrono::high_resolution_clock::now();
+
+	// Check args
+	if (vsource == nullptr) return;
+	if (vsource->isAccidented()) return;
+
 	for (auto v : vertexSet) {
 		v->dist = INF;
 		v->path = nullptr;
 	}
-	auto s = findVertex(origin);
-	s->dist = 0;
-	return s;
-}
-/**
- * Analyzes an edge in single-source shortest path algorithm.
- * Returns true if the target vertex was relaxed (dist, path).
- * Used by all single-source shortest path algorithms.
- */
-bool Graph::relax(Vertex *v, Vertex *w, double weight) {
-	if (v->dist + weight < w->dist) {
-		w->dist = v->dist + weight;
-		w->path = v;
-		return true;
-	}
-	else
-		return false;
-}
-/**
- * Dijkstra algorithm.
- */
-void Graph::dijkstraDist(Vertex *origin, microtime *time) {
-	auto start = chrono::high_resolution_clock::now();
+	vsource->dist = 0;
+	//origin->path = nullptr;
 
-	auto s = initSingleSource(origin->getID());
 	MutablePriorityQueue<Vertex> q;
-	q.insert(s);
-	while ( ! q.empty() ) {
+	q.insert(vsource);
+	while (!q.empty()) {
 		auto v = q.extractMin();
+		// if (v == vdest) break; <- Single source
 		for (auto e : v->adj) { // Non-accidented only
 			auto vertex = e->dest;
 			// If vertex is accidented, skip
 			if (vertex->isAccidented()) continue;
-			auto oldDist = vertex->dist;
-			if (relax(v, vertex, e->weight)) {
+			double oldDist = vertex->dist;
+			double newDist = v->dist + distance(v, vertex);
+			if (newDist < oldDist) {
+				vertex->dist = newDist;
+				vertex->path = v;
 				if (oldDist == INF)
 					q.insert(vertex);
 				else
@@ -1504,14 +1490,61 @@ void Graph::dijkstraDist(Vertex *origin, microtime *time) {
 	}
 
 	auto end = chrono::high_resolution_clock::now();
-	if (time) *time = chrono::duration_cast<chrono::microseconds>(end - start).count(); // time.count() gives seconds
+	if (time) *time = chrono::duration_cast<chrono::microseconds>(end - start).count();
 }
 
 
 
 /**
- * Perform A* given origin and destination vertices.
- * If time is given, compute algorithm performance
+ * Performs Dijkstra in the graph, with given
+ * source and destination vertices, stopping once the best
+ * path from vsource to vdest is found.
+ */
+void Graph::dijkstraDist(Vertex *vsource, Vertex *vdest, microtime *time) {
+	auto start = chrono::high_resolution_clock::now();
+
+	// Check args
+	if (vsource == nullptr || vdest == nullptr) return;
+	if (vsource->isAccidented() || vdest->isAccidented()) return;
+
+	for (auto v : vertexSet) {
+		v->dist = INF;
+		v->path = nullptr;
+	}
+	vsource->dist = 0;
+	//origin->path = nullptr;
+
+	MutablePriorityQueue<Vertex> q;
+	q.insert(vsource);
+	while (!q.empty()) {
+		auto v = q.extractMin();
+		if (v == vdest) break;
+		for (auto e : v->adj) { // Non-accidented only
+			auto vertex = e->dest;
+			// If vertex is accidented, skip
+			if (vertex->isAccidented()) continue;
+			double oldDist = vertex->dist;
+			double newDist = v->dist + distance(v, vertex);
+			if (newDist < oldDist) {
+				vertex->dist = newDist;
+				vertex->path = v;
+				if (oldDist == INF)
+					q.insert(vertex);
+				else
+					q.decreaseKey(vertex);
+			}
+		}
+	}
+
+	auto end = chrono::high_resolution_clock::now();
+	if (time) *time = chrono::duration_cast<chrono::microseconds>(end - start).count();
+}
+
+
+
+/**
+ * Performs A* in the graph, given origin and destination vertices,
+ * stopping once the best path from vsource to vdest is found.
  */
 void Graph::AstarDist(Vertex *vsource, Vertex *vdest, microtime *time) {
 	auto start = chrono::high_resolution_clock::now();
@@ -1551,58 +1584,15 @@ void Graph::AstarDist(Vertex *vsource, Vertex *vdest, microtime *time) {
 	}
 
 	auto end = chrono::high_resolution_clock::now();
-	if (time) *time = chrono::duration_cast<chrono::microseconds>(end - start).count(); // time.count() gives seconds
+	if (time) *time = chrono::duration_cast<chrono::microseconds>(end - start).count();
 }
 
 
 
 /**
- * Perform Dijkstra given origin and destination vertices.
- * If time is given, compute algorithm performance
+ * Performs Dijkstra in the graph, computing the fastest path, in terms
+ * of travel time, given source and destination vertices.
  */
-void Graph::dijkstraDist(Vertex *vsource, Vertex *vdest, microtime *time) {
-	auto start = chrono::high_resolution_clock::now();
-
-	// Check args
-	if (vsource == nullptr || vdest == nullptr) return;
-	if (vsource->isAccidented() || vdest->isAccidented()) return;
-
-	for (auto v : vertexSet) {
-		v->dist = INF;
-		v->path = nullptr;
-	}
-	vsource->dist = 0;
-	//origin->path = nullptr;
-
-	MutablePriorityQueue<Vertex> q;
-	q.insert(vsource);
-	while (!q.empty()) {
-		auto v = q.extractMin();
-		if (v == vdest) break;
-		for (auto e : v->adj) { // Non-accidented only
-			auto vertex = e->dest;
-			// If vertex is accidented, skip
-			if (vertex->isAccidented()) continue;
-			double oldDist = vertex->dist;
-			double newDist = v->dist + distance(v, vertex);
-			if (newDist < oldDist) {
-				vertex->dist = newDist;
-				vertex->path = v;
-				if (oldDist == INF)
-					q.insert(vertex);
-				else
-					q.decreaseKey(vertex);
-			}
-		}
-	}
-
-	auto end = chrono::high_resolution_clock::now();
-	if (time) *time = chrono::duration_cast<chrono::microseconds>(end - start).count(); // time.count() gives seconds
-}
-
-
-
-// Dijkstra by travel time, with destination. Find the quickest path to destination vertex
 void Graph::dijkstraSimulation(Vertex *vsource, Vertex *vdest, microtime *time) {
 	auto start = chrono::high_resolution_clock::now();
 
@@ -1640,7 +1630,7 @@ void Graph::dijkstraSimulation(Vertex *vsource, Vertex *vdest, microtime *time) 
 	}
 
 	auto end = chrono::high_resolution_clock::now();
-	if (time) *time = chrono::duration_cast<chrono::microseconds>(end - start).count(); // time.count() gives seconds
+	if (time) *time = chrono::duration_cast<chrono::microseconds>(end - start).count();
 }
 
 
