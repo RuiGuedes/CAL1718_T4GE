@@ -78,10 +78,10 @@ void dijkstraSimulation(Vertex *origin, Vertex *destination) {
 
 		// ... and animate
 		// by Road
-		animateOneRoad(path, current);
+		//animateOneRoad(path, current);
 
 		// by Subroad
-		//animateOneSubroad(path, current);
+		animateOneSubroad(path, current);
 
 		system("pause");
 		if (current == destination) return;
@@ -238,5 +238,6 @@ void animateOneSubroad(vector<Vertex*> path, Vertex* &current) {
 void resetGraphState() {
 	graph->resetVertexColors();
 	graph->resetEdgeColors();
+	graph->rearrange();
 }
 

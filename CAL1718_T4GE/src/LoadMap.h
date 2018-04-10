@@ -12,7 +12,7 @@ static const string roads_suffix = "_roads.txt";
 static const string subroads_suffix = "_subroads.txt";
 static constexpr long double default_density = 0.000250;
 
-struct MapMetaData {
+struct MetaData {
 	long double min_longitude, max_longitude;
 	long double min_latitude, max_latitude;
 	double scale;
@@ -22,19 +22,19 @@ struct MapMetaData {
 	long double density = default_density;
 };
 
-void showBoundaries(MapMetaData &meta, Graph* graph);
+void showBoundaries(MetaData &meta, Graph* graph);
 
 bool checkFilename(string filename);
 
 int loadMap(string filename, Graph* &graph, bool boundaries = false);
 
-int loadMeta(string filename, MapMetaData &meta);
+int loadMeta(string filename, MetaData &meta);
 
-int loadNodes(string filename, MapMetaData &meta, Graph* graph);
+int loadNodes(string filename, MetaData &meta, Graph* graph);
 
-int loadRoads(string filename, MapMetaData &meta, Graph* graph);
+int loadRoads(string filename, MetaData &meta, Graph* graph);
 
-int loadSubroads(string filename, MapMetaData &meta, Graph* graph);
+int loadSubroads(string filename, MetaData &meta, Graph* graph);
 
 int testLoadMeta(string path);
 

@@ -63,33 +63,47 @@ class Graph {
 		bool edgeFlows = false;
 	} show;
 
-	// ***** Auxiliary
+	///// ***** Auxiliary
 	bool withinBounds(int x, int y) const;
 	void moveToVertexSet(Vertex *v);
 	void moveToAccidentedVertexSet(Vertex *v);
 
 public:
 	///// ***** Visual GraphViewer API
+	// Update Screen
 	void update() const;
 	void rearrange() const;
 
-	bool setVertexLabel(Vertex *v, string label) const;
+	// Change Color
 	bool setVertexColor(Vertex *v, color color) const;
-	bool defineVertexColor(color color) const;
 	bool setVertexDefaultColor(Vertex *v) const;
-
-	bool setEdgeLabel(Edge *e, string label) const;
-	bool setEdgeWeight(Edge *e, int weight) const;
-	bool setEdgeFlow(Edge *e, int flow) const;
 	bool setEdgeColor(Edge *e, color color) const;
-	bool defineEdgeColor(color color) const;
 	bool setEdgeDefaultColor(Edge *e) const;
+	void resetVertexColors() const;
+	void resetEdgeColors() const;
 
-	bool setEdgeThickness(Edge *e, int thickness) const;
-	bool setBackground(string path) const;
+	// Advanced API
+	//bool clearVertexLabel(int id);
+	//bool clearEdgeLabel(int id);
+	//bool clearEdgeColor(int id);
+	//bool setEdgeDashed(int id, bool dashed);
+	//bool clearVertexColor(int id);
+	//bool setVertexSize(int id, int size);
+	//bool setVertexIcon(int id, string filepath);
+	//bool clearVertexIcon(int id);
+	//bool setEdgeThickness(int id, int thickness);
+	//bool defineEdgeCurved(bool curved);
+	//bool resetEdgeColor();
+	//bool defineEdgeDashed(bool dashed);
+	//bool resetVertexColor();
+	//bool defineVertexSize(int size);
+	//bool defineVertexIcon(string filepath);
+	//bool resetVertexIcon();
+	//bool setBackground(string path);
+	//bool clearBackground();
+
 
 	// Phantom Display
-	bool addPhantom(int id, int x, int y) const;
 	void showBoundaries() const;
 
 	// General Display
@@ -101,10 +115,9 @@ public:
 	void hideAllEdgeWeights() const;
 	void showAllEdgeFlows() const;
 	void hideAllEdgeFlows() const;
-	void resetVertexColors() const;
-	void resetEdgeColors() const;
+	/////
 
-	// Animation
+	///// ***** Animation
 	void animatePath(vector<Vertex*> path, int interval = 100, color = VERTEX_PATH_COLOR, bool last = false) const;
 	void clearPath(vector<Vertex*> path, int interval = 0, bool last = false) const;
 	/////
@@ -112,8 +125,9 @@ public:
 	///// ***** Constructors and destructor
 	explicit Graph(int width, int height, double scale = 1);
 	~Graph();
+	/////
 
-	///// ***** Vertex
+	///// ***** Vertex CRUD
 	bool addVertex(int id, int x, int y, bool accidented = false);
 	bool addVertex(Vertex *v);
 
@@ -126,12 +140,9 @@ public:
 	vector<Vertex*> getAccidentedVertexSet() const;
 	vector<Vertex*> getAllVertexSet() const;
 	vector<Vertex*> getPath(Vertex* origin, Vertex* dest) const;
-	vector<Vertex*> getPathRoad(Vertex* origin, Vertex* dest) const;
 	double distance(Vertex *v1, Vertex *v2) const;
 	double length(Edge *e) const;
 	bool connectedTo(Vertex *v1, Vertex *v2, bool bothways = false) const;
-	bool edgeIsAccidented(Edge *e) const;
-	bool vertexIsAccidented(Vertex* v) const;
 
 	bool fixVertex(Vertex *v);
 	bool accidentVertex(Vertex *v);
@@ -163,12 +174,10 @@ public:
 	// Breadth First Search. Find reachable nodes
 	void bfs(Vertex *origin);
 
-	// Greedy Best-First Search
+	// Greedy Best-First Search.
 	void gbfsDist(Vertex *origin, Vertex *destination, microtime *time = nullptr);
 
 	// Dijkstra by distance, single source. Find shortest paths to all other vertices
-	Vertex * initSingleSource(const int &origin);
-	bool relax(Vertex *v, Vertex *w, double weight);
 	void dijkstraDist(Vertex *origin, microtime *time = nullptr);
 
 	// Dijkstra by distance, with destination. Find shortest paths destination vertex
@@ -177,15 +186,11 @@ public:
 	// A* by distance. Find shortest path to destination vertex only
 	void AstarDist(Vertex *vsource, Vertex *vdest, microtime *time = nullptr);
 
-	// Greedy Best-First Search by travel time.
-	void gbfsSimulation(Vertex *vsource, Vertex *vdest, microtime *time = nullptr);
-
 	// Dijkstra by travel time, with destination. Find the quickest path to destination vertex
 	void dijkstraSimulation(Vertex *vsource, Vertex *vdest, microtime *time = nullptr);
 	/////
 
 	///// ***** Operations
-	friend ostream& operator<<(ostream &out, Graph* graph);
 	friend class Vertex;
 	friend class Edge;
 };

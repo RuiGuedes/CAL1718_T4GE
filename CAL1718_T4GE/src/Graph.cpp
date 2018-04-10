@@ -5,44 +5,71 @@
 
 #include "Graph.h"
 
-bool graphLoaded = false;
-bool showEdgeLabels = false;
-bool showEdgeWeights = false;
-bool showEdgeFlows = false;
 
 
-void Graph::animatePath(vector<Vertex*> path, int interval, color color, bool last) const {
-	for (unsigned int i = 1; i < path.size(); ++i) {
-		if (i > 1 && interval > 5) Sleep(interval);
-		setVertexColor(path.at(i), color);
-		setEdgeColor(path.at(i - 1)->findEdge(path.at(i)), color);
-		rearrange();
-	}
 
-	if (last) setVertexColor(path.back(), VERTEX_SELECTED_COLOR);
-	rearrange();
+
+/*
+bool Graph::clearVertexLabel(Vertex *v) {
+	return true;
 }
-
-void Graph::clearPath(vector<Vertex*> path, int interval, bool last) const {
-	for (unsigned int i = 1; i < path.size(); ++i) {
-		if (i > 1 && interval > 5) Sleep(interval);
-		setVertexDefaultColor(path.at(i));
-		setEdgeDefaultColor(path.at(i - 1)->findEdge(path.at(i)));
-		rearrange();
-	}
-
-	if (last) setVertexColor(path.back(), VERTEX_SELECTED_COLOR);
-	rearrange();
+bool Graph::clearEdgeLabel(Edge *e) {
+	return true;
 }
+bool Graph::clearEdgeColor(Edge *e) {
+	return true;
+}
+bool Graph::setEdgeDashed(Edge *e, bool dashed) {
+	return true;
+}
+bool Graph::clearVertexColor(Vertex *v) {
+	return true;
+}
+bool Graph::setVertexSize(Vertex *v, int size) {
+	return true;
+}
+bool Graph::setVertexIcon(Vertex *v, string filepath) {
+	return true;
+}
+bool Graph::clearVertexIcon(Vertex *v) {
+	return true;
+}
+bool Graph::setEdgeThickness(Edge *e, int thickness) {
+	return true;
+}
+bool Graph::defineEdgeCurved(bool curved) {
+	return true;
+}
+bool Graph::resetEdgeColor() {
+	return true;
+}
+bool Graph::defineEdgeDashed(bool dashed) {
+	return true;
+}
+bool Graph::resetVertexColor() {
+	return true;
+}
+bool Graph::defineVertexSize(int size) {
+	return true;
+}
+bool Graph::defineVertexIcon(string filepath) {
+	return true;
+}
+bool Graph::resetVertexIcon() {
+	return true;
+}
+bool Graph::setBackground(string path) {
+	return true;
+}
+bool Graph::clearBackground() {
+	return true;
+}
+*/
 
 
 
 
-
-
-
-
-
+///// ***** Auxiliary
 
 /*
  * @brief (Private) Checks if a pair of integers is
@@ -76,6 +103,9 @@ void Graph::moveToAccidentedVertexSet(Vertex *v) {
 }
 
 
+
+///// ***** Visual GraphViewer API
+
 /*
  * GRAPHVIEWER
  * @brief Updates the graph window with the new info
@@ -94,28 +124,11 @@ void Graph::rearrange() const {
 
 /*
  * GRAPHVIEWER
- * @brief Define the text of a particular vertex
- */
-bool Graph::setVertexLabel(Vertex *v, string label) const {
-	if (v == nullptr) return false;
-	return gv->setVertexLabel(v->getID(), label);
-}
-
-/*
- * GRAPHVIEWER
  * @brief Define the color of a particular vertex
  */
 bool Graph::setVertexColor(Vertex *v, string color) const {
 	if (v == nullptr) return false;
 	return gv->setVertexColor(v->getID(), color);
-}
-
-/*
- * GRAPHVIEWER
- * @brief Define the default color for all vertices
- */
-bool Graph::defineVertexColor(string color) const {
-	return gv->defineVertexColor(color);
 }
 
 /*
@@ -135,36 +148,6 @@ bool Graph::setVertexDefaultColor(Vertex *v) const {
 
 /*
  * GRAPHVIEWER
- * @brief Define the label of a particular edge
- * w: PESO, f: FLUXO, LABEL
- */
-bool Graph::setEdgeLabel(Edge *e, string label) const {
-	if (e == nullptr) return false;
-	return gv->setEdgeLabel(e->getID(), label);
-}
-
-/*
- * GRAPHVIEWER
- * @brief Define the weight of a particular edge
- * w: PESO, f: FLUXO, LABEL
- */
-bool Graph::setEdgeWeight(Edge *e, int weight) const {
-	if (e == nullptr) return false;
-	return gv->setEdgeWeight(e->getID(), weight);
-}
-
-/*
- * GRAPHVIEWER
- * @brief Define the flow of a particular edge
- * w: PESO, f: FLUXO, LABEL
- */
-bool Graph::setEdgeFlow(Edge *e, int flow) const {
-	if (e == nullptr) return false;
-	return gv->setEdgeFlow(e->getID(), flow);
-}
-
-/*
- * GRAPHVIEWER
  * @brief Define the color of a particular edge
  */
 bool Graph::setEdgeColor(Edge *e, string color) const {
@@ -174,17 +157,9 @@ bool Graph::setEdgeColor(Edge *e, string color) const {
 
 /*
  * GRAPHVIEWER
- * @brief Define the default color for all edges
- */
-bool Graph::defineEdgeColor(string color) const {
-	return gv->defineEdgeColor(color);
-}
-
-/*
- * GRAPHVIEWER
  * @brief Reset the edge's color to the expected color
  * EDGE_ACCIDENTED_COLOR if the edge is accidented
- * EDGe_CLEAR_COLOR if the edge is clear
+ * EDGE_CLEAR_COLOR if the edge is clear
  */
 bool Graph::setEdgeDefaultColor(Edge *e) const {
 	if (e == nullptr) return false;
@@ -195,23 +170,44 @@ bool Graph::setEdgeDefaultColor(Edge *e) const {
 	}
 }
 
-/*
+/**
  * GRAPHVIEWER
- * @brief Define the thickness of a particular edge
- * @param thickness The edge's thickness (default is 1)
+ * @brief Reset all vertices back to their default color
+ * VERTEX_ACCIDENTED_COLOR if the vertex is accidented
+ * VERTEX_CLEAR_COLOR if the vertex is clear
  */
-bool Graph::setEdgeThickness(Edge *e, int thickness) const {
-	if (e == nullptr) return false;
-	return gv->setEdgeThickness(e->getID(), thickness);
+void Graph::resetVertexColors() const {
+	for (auto v : vertexSet) {
+		setVertexDefaultColor(v);
+	}
+	for (auto v : accidentedVertexSet) {
+		setVertexDefaultColor(v);
+	}
 }
 
-/*
+/**
  * GRAPHVIEWER
- * @brief Define the graph's background
- * @param path Path to the image file
+ * @brief Reset all edges back to their default color
+ * EDGE_ACCIDENTED_COLOR if the edge is accidented
+ * EDGE_CLEAR_COLOR if the edge is clear
  */
-bool Graph::setBackground(string path) const {
-	return gv->setBackground(path);
+void Graph::resetEdgeColors() const {
+	for (auto v : vertexSet) {
+		for (auto e : v->adj) {
+			setEdgeDefaultColor(e);
+		}
+		for (auto e : v->accidentedAdj) {
+			setEdgeDefaultColor(e);
+		}
+	}
+	for (auto v : accidentedVertexSet) {
+		for (auto e : v->adj) {
+			setEdgeDefaultColor(e);
+		}
+		for (auto e : v->accidentedAdj) {
+			setEdgeDefaultColor(e);
+		}
+	}
 }
 
 /**
@@ -260,9 +256,14 @@ void Graph::showBoundaries() const {
 		gv->setVertexLabel(ID, "\t");
 		gv->setVertexColor(ID, BLACK);
 	}
+
+	// TODO: Add phantom edges between phantom points
 }
 
-
+/**
+ * GRAPHVIEWER
+ * Reshows all vertex labels
+ */
 void Graph::showAllVertexLabels() const {
 	show.vertexLabels = true;
 	for (auto v : vertexSet) {
@@ -273,6 +274,10 @@ void Graph::showAllVertexLabels() const {
 	}
 }
 
+/**
+ * GRAPHVIEWER
+ * Hides all vertex labels
+ */
 void Graph::hideAllVertexLabels() const {
 	show.vertexLabels = false;
 	for (auto v : vertexSet) {
@@ -283,6 +288,10 @@ void Graph::hideAllVertexLabels() const {
 	}
 }
 
+/**
+ * GRAPHVIEWER
+ * Reshows all edge labels
+ */
 void Graph::showAllEdgeLabels() const {
 	show.edgeLabels = true;
 	for (auto v : vertexSet) {
@@ -297,6 +306,10 @@ void Graph::showAllEdgeLabels() const {
 	}
 }
 
+/**
+ * GRAPHVIEWER
+ * Hides all edge labels
+ */
 void Graph::hideAllEdgeLabels() const {
 	show.edgeLabels = false;
 	for (auto v : vertexSet) {
@@ -311,52 +324,69 @@ void Graph::hideAllEdgeLabels() const {
 	}
 }
 
+/**
+ * GRAPHVIEWER
+ * Reshows all edge weights
+ */
 void Graph::showAllEdgeWeights() const {
-	show.edgeWeights = true;
+	show.edgeWeights = true; // TODO showAllEdgeWeights
 }
 
+/**
+ * GRAPHVIEWER
+ * Hides all edge weights
+ */
 void Graph::hideAllEdgeWeights() const {
-	show.edgeWeights = false;
+	show.edgeWeights = false; // TODO hideAllEdgeWeights
 }
 
+/**
+ * GRAPHVIEWER
+ * Reshows all edge flows
+ */
 void Graph::showAllEdgeFlows() const {
-	show.edgeFlows = true;
+	show.edgeFlows = true; // TODO showAllEdgeFlows
 }
 
+/**
+ * GRAPHVIEWER
+ * Hides all edge flows
+ */
 void Graph::hideAllEdgeFlows() const {
-	show.edgeFlows = false;
+	show.edgeFlows = false; // TODO hideAllEdgeWeights
 }
 
-void Graph::resetVertexColors() const {
-	for (auto v : vertexSet) {
-		setVertexDefaultColor(v);
+
+
+///// ***** Animation
+
+void Graph::animatePath(vector<Vertex*> path, int interval, color color, bool last) const {
+	if (path.empty()) return;
+
+	for (unsigned int i = 1; i < path.size(); ++i) {
+		if (i > 1 && interval > 5) Sleep(interval);
+		setVertexColor(path.at(i), color);
+		setEdgeColor(path.at(i - 1)->findEdge(path.at(i)), color);
+		rearrange();
 	}
-	for (auto v : accidentedVertexSet) {
-		setVertexDefaultColor(v);
-	}
+
+	if (last) setVertexColor(path.back(), VERTEX_SELECTED_COLOR);
 	rearrange();
 }
 
-void Graph::resetEdgeColors() const {
-	for (auto v : vertexSet) {
-		for (auto e : v->adj) {
-			setEdgeDefaultColor(e);
-		}
-		for (auto e : v->accidentedAdj) {
-			setEdgeDefaultColor(e);
-		}
+void Graph::clearPath(vector<Vertex*> path, int interval, bool last) const {
+	if (path.empty()) return;
+
+	for (unsigned int i = 1; i < path.size(); ++i) {
+		if (i > 1 && interval > 5) Sleep(interval);
+		setVertexDefaultColor(path.at(i));
+		setEdgeDefaultColor(path.at(i - 1)->findEdge(path.at(i)));
+		rearrange();
 	}
-	for (auto v : accidentedVertexSet) {
-		for (auto e : v->adj) {
-			setEdgeDefaultColor(e);
-		}
-		for (auto e : v->accidentedAdj) {
-			setEdgeDefaultColor(e);
-		}
-	}
+
+	if (last) setVertexColor(path.back(), VERTEX_SELECTED_COLOR);
 	rearrange();
 }
-
 
 
 
@@ -367,8 +397,8 @@ void Graph::resetEdgeColors() const {
 Graph::Graph(int width, int height, double scale): width(width), height(height), scale(scale) {
 	gv = new GraphViewer(width, height, false);
 	gv->createWindow(GRAPH_VIEWER_WIDTH, GRAPH_VIEWER_HEIGHT);
-	defineVertexColor(VERTEX_CLEAR_COLOR);
-	defineEdgeColor(EDGE_CLEAR_COLOR);
+	gv->defineVertexColor(VERTEX_CLEAR_COLOR);
+	gv->defineEdgeColor(EDGE_CLEAR_COLOR);
 }
 
 /*
@@ -384,15 +414,6 @@ Graph::~Graph() {
 		delete vertex;
 	}
 	delete gv;
-}
-
-/**
- * @brief Adds a phantom graph visible in the
- * GraphViewer window but not present in the
- * actual Graph abstraction. Just for visual.
- */
-bool Graph::addPhantom(int id, int x, int y) const {
-	return gv->addNode(id, x, y);
 }
 
 /*
@@ -419,10 +440,11 @@ bool Graph::addVertex(int id, int x, int y, bool accidented) {
 		}
 		gv->addNode(id, x, y);
 		// * Set Vertex Label
-		setVertexLabel(v, to_string(id));
+		if (show.vertexLabels)
+			gv->setVertexLabel(id, to_string(id));
 		// * Set Vertex Color
 		if (v->isAccidented())
-			setVertexColor(v, VERTEX_ACCIDENTED_COLOR);
+			gv->setVertexColor(id, VERTEX_ACCIDENTED_COLOR);
 		// No graph->update()
 		return true;
 	}
@@ -452,10 +474,11 @@ bool Graph::addVertex(Vertex* v) {
 		}
 		gv->addNode(id, v->getX(), v->getY());
 		// * Set Vertex Label
-		setVertexLabel(v, to_string(id));
+		if (show.vertexLabels)
+			gv->setVertexLabel(id, to_string(id));
 		// * Set Vertex Color
 		if (v->isAccidented())
-			setVertexColor(v, VERTEX_ACCIDENTED_COLOR);
+			gv->setVertexColor(id, VERTEX_ACCIDENTED_COLOR);
 		// No graph->update()
 		return true;
 	}
@@ -595,28 +618,6 @@ bool Graph::connectedTo(Vertex* v1, Vertex* v2, bool bothways) const {
 		throw std::invalid_argument("Vertex not found");
 	}
 	return v1->connectsTo(v2) || (bothways && v2->connectsTo(v1));
-}
-
-/*
- * @brief Checks if an edge e is currently accidented
- * @throws invalid_argument if Edge is nullptr
- */
-bool Graph::edgeIsAccidented(Edge *e) const {
-	if (e == nullptr) {
-		throw std::invalid_argument("Edge not found");
-	}
-	return e->isAccidented();
-}
-
-/*
- * @brief Checks if vertex v is accidented
- * @throws invalid_argument if Vertex is nullptr
- */
-bool Graph::vertexIsAccidented(Vertex* v) const {
-	if (v == nullptr) {
-		throw std::invalid_argument("Vertex not found");
-	}
-	return v->isAccidented();
 }
 
 /*
@@ -839,20 +840,6 @@ void Graph::removeEdge(Edge* e) {
 }
 
 
-/*
- * @brief Calls << for all of the graph's vertices,
- * printing them
- */
-ostream& operator<<(ostream& out, Graph* graph) {
-	for (auto vertex : graph->vertexSet)
-		out << vertex;
-	for (auto vertex : graph->accidentedVertexSet)
-		out << vertex;
-	return out;
-}
-
-
-
 
 
 
@@ -1041,14 +1028,14 @@ bool Vertex::addEdge(Edge* e) {
 	e->_sgraph(graph);
 	graph->gv->addEdge(id, e->getSource()->getID(), e->getDest()->getID(), EdgeType::DIRECTED);
 	// * Set Edge Label
-	if (showEdgeLabels)
-		graph->setEdgeLabel(e, to_string(id));
+	if (graph->show.edgeLabels)
+		graph->gv->setEdgeLabel(id, to_string(id));
 	// * Set Edge Color
 	if (e->isAccidented())
-		graph->setEdgeColor(e, EDGE_ACCIDENTED_COLOR);
+		graph->gv->setEdgeColor(id, EDGE_ACCIDENTED_COLOR);
 	// * Set Edge Weight
-	if (showEdgeWeights)
-		graph->setEdgeWeight(e, e->getWeight());
+	if (graph->show.edgeWeights)
+		graph->gv->setEdgeWeight(id, e->getWeight());
 	// No graph->update()
 	return true;
 }

@@ -21,7 +21,7 @@ static map<int, Road*> roadMap;
  * @param longitude The node's longitude.
  * @return The node's assigned X coordinate on the GraphViewer map.
  */
-static int getX(long double longitude, MapMetaData &meta) {
+static int getX(long double longitude, MetaData &meta) {
 	// X grows from left to right
 	return floor(meta.width * ((longitude - meta.min_longitude) / (meta.max_longitude - meta.min_longitude)));
 }
@@ -31,7 +31,7 @@ static int getX(long double longitude, MapMetaData &meta) {
  * @param latitude The node's longitude.
  * @return The node's assigned Y coordinate on the GraphViewer map.
  */
-static int getY(long double latitude, MapMetaData &meta) {
+static int getY(long double latitude, MetaData &meta) {
 	// Y grows from top to bottom
 	return floor(meta.height * ((meta.max_latitude - latitude) / (meta.max_latitude - meta.min_latitude)));
 }
@@ -52,7 +52,7 @@ static long double toRadians(long double degrees) {
  * nodes's geographic position.
  * @param meta The MapMetaData struct.
  */
-static void estimateMeta(MapMetaData &meta) {
+static void estimateMeta(MetaData &meta) {
 	static constexpr long double latitude_const = 110.574;		// 1 degree Latitude ~ 110.574 km
 	static constexpr long double longitude_const = 111.320;		// 1 degree Longitude ~ 111.320 * cos(latitude) km
 
@@ -172,7 +172,7 @@ int loadMap(string filename, Graph* &graph, bool boundaries) {
 	}
 
 	// Load meta data
-	MapMetaData meta;
+	MetaData meta;
 	if (loadMeta(filename + meta_suffix, meta) != 0) {
 		return -1;
 	}
@@ -199,7 +199,6 @@ int loadMap(string filename, Graph* &graph, bool boundaries) {
 	roadMap.clear();
 
 	graph->update();
-	graphLoaded = true;
 	return 0;
 }
 
@@ -209,7 +208,7 @@ int loadMap(string filename, Graph* &graph, bool boundaries) {
 // -> ECMAScript (icase)
 //    [0] : Text Line
 //    [1] : Attribute value
-int loadMeta(string filename, MapMetaData &meta) {
+int loadMeta(string filename, MetaData &meta) {
 	static const regex reg_min_lon("min_longitude ?= ?(-?\\d+\\.?\\d*)[.;,]", regex::icase);
 	static const regex reg_max_lon("max_longitude ?= ?(-?\\d+\\.?\\d*)[.;,]", regex::icase);
 	static const regex reg_min_lat("min_latitude ?= ?(-?\\d+\\.?\\d*)[.;,]", regex::icase);
@@ -220,9 +219,6 @@ int loadMeta(string filename, MapMetaData &meta) {
 	static const regex reg_width("width ?= ?(\\d+)[.;,]", regex::icase);
 	static const regex reg_height("height ?= ?(\\d+)[.;,]", regex::icase);
 	static const regex reg_boundaries("boundaries ?= ?([01])[.;,]", regex::icase);
-	static const regex reg_show_edge_labels("show_edge_labels? ?= ?([01])[.;,]", regex::icase);
-	static const regex reg_show_edge_weights("show_edge_weights? ?= ?([01])[.;,]", regex::icase);
-	static const regex reg_show_edge_flows("show_edge_flows? ?= ?([01])[.;,]", regex::icase);
 
 	ifstream file(filename);
 	if (!file.is_open())
@@ -286,18 +282,6 @@ int loadMeta(string filename, MapMetaData &meta) {
 		// Optional: BOUNDARIES
 		if (regex_search(text, match, reg_boundaries))
 			meta.boundaries = static_cast<bool>(stoi(match[1]));
-
-		// Optional: SHOW_EDGE_LABELS
-		if (regex_search(text, match, reg_show_edge_labels))
-			showEdgeLabels = static_cast<bool>(stoi(match[1]));
-
-		// Optional: SHOW_EDGE_WEIGHTS
-		if (regex_search(text, match, reg_show_edge_weights))
-			showEdgeWeights = static_cast<bool>(stoi(match[1]));
-
-		// Optional: SHOW_EDGE_FLOWS
-		if (regex_search(text, match, reg_show_edge_flows))
-			showEdgeFlows = static_cast<bool>(stoi(match[1]));
 	} catch (runtime_error &e) {
 		cerr << e.what() << endl;
 		cerr << "Found numeric field not representable in " << filename << endl;
@@ -318,7 +302,7 @@ int loadMeta(string filename, MapMetaData &meta) {
 //    [3] : Longitude in degrees (long double)
 //    [4]*: Longitude in radians (long double)
 //    [5]*: Latitude in radians (long double)
-int loadNodes(string filename, MapMetaData &meta, Graph* graph) {
+int loadNodes(string filename, MetaData &meta, Graph* graph) {
 	static const regex reg("^(\\d+);(-?\\d+.?\\d*);(-?\\d+.?\\d*);(?:-?\\d+.?\\d*);(?:-?\\d+.?\\d*);?$");
 
 	ifstream file(filename);
@@ -375,7 +359,7 @@ int loadNodes(string filename, MapMetaData &meta, Graph* graph) {
 //    [1] : Road id (long long)
 //    [2] : Road name (string)
 //    [3] : Two way (bool)
-int loadRoads(string filename, MapMetaData &meta, Graph* graph) {
+int loadRoads(string filename, MetaData &meta, Graph* graph) {
 	static const regex reg("^(\\d+);(.*?);(False|True);?$");
 	static const string FalseStr = "False", TrueStr = "True";
 
@@ -435,7 +419,7 @@ int loadRoads(string filename, MapMetaData &meta, Graph* graph) {
 //    [1] : Road id
 //    [2] : Node 1 id
 //    [3] : Node 2 id
-int loadSubroads(string filename, MapMetaData &meta, Graph* graph) {
+int loadSubroads(string filename, MetaData &meta, Graph* graph) {
 	static const regex reg("^(\\d+);(\\d+);(\\d+);?$");
 
 	ifstream file(filename);
@@ -538,7 +522,7 @@ int testLoadMeta(string path) {
 		}
 
 		// Load meta data
-		MapMetaData meta;
+		MetaData meta;
 		if (loadMeta(path + meta_suffix, meta) != 0) {
 			return -1;
 		}
@@ -551,9 +535,6 @@ int testLoadMeta(string path) {
 		cout << "Edges: " << meta.edges << endl;
 		cout << "Density: " << meta.density << endl;
 		cout << "Boundaries: " << meta.boundaries << endl;
-		cout << "Show Edge Labels: " << showEdgeLabels << endl;
-		cout << "Show Edge Weights: " << showEdgeLabels << endl;
-		cout << "Show Edge Flows: " << showEdgeLabels << endl << endl;
 
 		cout << "Computed Scale: " << meta.scale << endl;
 		cout << "Estimated X: " << meta.width << endl;
@@ -578,7 +559,7 @@ int testLoadNodes(string path) {
 		}
 
 		// Load meta data
-		MapMetaData meta;
+		MetaData meta;
 		if (loadMeta(path + meta_suffix, meta) != 0) {
 			return -1;
 		}
@@ -621,7 +602,7 @@ int testLoadRoads(string path) {
 		}
 
 		// Load meta data
-		MapMetaData meta;
+		MetaData meta;
 		if (loadMeta(path + meta_suffix, meta) != 0) {
 			return -1;
 		}
@@ -666,7 +647,7 @@ int testLoadSubroads(string path) {
 		}
 
 		// Load meta data
-		MapMetaData meta;
+		MetaData meta;
 		if (loadMeta(path + meta_suffix, meta) != 0) {
 			return -1;
 		}
