@@ -7,6 +7,7 @@
 //////////////////////////
 
 bool checkUnreachableNodes(Vertex *origin);
+void pathGraphClear(vector<Vertex*> path);
 void pathGraphAnimation(vector<Vertex*> path);
 void pathGraphAnimationOneRoad(vector<Vertex*> path, Vertex* &current, string &name);
 void pathGraphAnimationOneSubroad(vector<Vertex*> path, Vertex* &current);
@@ -89,7 +90,13 @@ void dijkstraSimulation(Vertex *origin, Vertex *destination) {
 
 		system("pause");
 
-		if (current == destination) return;
+		// Clear previous NEXT PATH colors
+		if (current != destination) {
+			path = graph->getPath(current, destination);
+			pathGraphClear(path);
+		} else {
+			return;
+		}
 
 		// Else move cars
 		graph->generateGraphNewStatus();
@@ -187,6 +194,15 @@ bool checkUnreachableNodes(Vertex* origin) {
 
 	graph->rearrange();
 	return reachable;
+}
+
+void pathGraphClear(vector<Vertex*> path) {
+	for (unsigned int i = 1; i < path.size(); ++i) {
+		graph->setVertexDefaultColor(path.at(i));
+		graph->setEdgeDefaultColor(path.at(i - 1)->findEdge(path.at(i)));
+	}
+	graph->setVertexColor(path.back(), VERTEX_SELECTED_COLOR);
+	graph->rearrange();
 }
 
 void pathGraphAnimation(vector<Vertex*> path) {
