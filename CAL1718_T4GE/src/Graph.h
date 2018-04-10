@@ -38,7 +38,7 @@ extern bool showEdgeLabels;
 extern bool showEdgeWeights;
 extern bool showEdgeFlows;
 
-// Travel time estimator
+using microtime = chrono::duration<int64_t,micro>::rep;
 
 //////////////////////////
 /////// Class Graph //////
@@ -130,24 +130,24 @@ public:
 	void bfs(Vertex *origin);
 
 	// Greedy Best-First Search
-	void gbfsDist(Vertex *origin, Vertex *destination, chrono::duration<double> *time = nullptr);
+	void gbfsDist(Vertex *origin, Vertex *destination, microtime *time = nullptr);
 
 	// Dijkstra by distance, single source. Find shortest paths to all other vertices
 	Vertex * initSingleSource(const int &origin);
 	bool relax(Vertex *v, Vertex *w, double weight);
-	void dijkstraDist(Vertex *origin, chrono::duration<double> *time = nullptr);
+	void dijkstraDist(Vertex *origin, microtime *time = nullptr);
 
 	// Dijkstra by distance, with destination. Find shortest paths destination vertex
-	void dijkstraDist(Vertex *vsource, Vertex *vdest, chrono::duration<double> *time = nullptr);
+	void dijkstraDist(Vertex *vsource, Vertex *vdest, microtime *time = nullptr);
 
 	// A* by distance. Find shortest path to destination vertex only
-	void AstarDist(Vertex *vsource, Vertex *vdest, chrono::duration<double> *time = nullptr);
+	void AstarDist(Vertex *vsource, Vertex *vdest, microtime *time = nullptr);
 
 	// Greedy Best-First Search by travel time.
-	void gbfsSimulation(Vertex *vsource, Vertex *vdest, chrono::duration<double> *time = nullptr);
+	void gbfsSimulation(Vertex *vsource, Vertex *vdest, microtime *time = nullptr);
 
 	// Dijkstra by travel time, with destination. Find the quickest path to destination vertex
-	void dijkstraSimulation(Vertex *vsource, Vertex *vdest, chrono::duration<double> *time = nullptr);
+	void dijkstraSimulation(Vertex *vsource, Vertex *vdest, microtime *time = nullptr);
 	/////
 
 	///// ***** Operations

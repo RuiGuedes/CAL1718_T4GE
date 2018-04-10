@@ -1220,9 +1220,6 @@ ostream& operator<<(ostream& out, Edge* e) {
 
 
 void Graph::generateGraphNewStatus() {
-
-	srand (time(NULL));
-
 	//For every edge generate new capacity
 	vector<Vertex*> everyVextex = getAllVertexSet();
 
@@ -1342,6 +1339,8 @@ void Graph::bfs(Vertex *origin) {
 		q.pop_front();
 		for (auto e : v->adj) { // Non-accidented only
 			auto vertex = e->dest;
+			// If vertex is accidented, skip
+			if (vertex->isAccidented()) continue;
 			if (!vertex->path) {
 				vertex->path = v;
 				vertex->dist = v->dist + 1;
@@ -1353,7 +1352,7 @@ void Graph::bfs(Vertex *origin) {
 
 
 
-void Graph::gbfsDist(Vertex *vsource, Vertex *vdest, chrono::duration<double> *time) {
+void Graph::gbfsDist(Vertex *vsource, Vertex *vdest, microtime *time) {
 	auto start = chrono::high_resolution_clock::now();
 
 	// Check args
@@ -1374,6 +1373,8 @@ void Graph::gbfsDist(Vertex *vsource, Vertex *vdest, chrono::duration<double> *t
 		if (v == vdest) break;
 		for (auto e : v->adj) { // Non-accidented only
 			auto vertex = e->dest;
+			// If vertex is accidented, skip
+			if (vertex->isAccidented()) continue;
 			double oldDist = vertex->dist;
 			double newDist = v->dist
 					+ distance(vertex, vdest); // <- Greedy
@@ -1389,7 +1390,7 @@ void Graph::gbfsDist(Vertex *vsource, Vertex *vdest, chrono::duration<double> *t
 	}
 
 	auto end = chrono::high_resolution_clock::now();
-	if (time) *time = end - start; // time.count() gives seconds
+	if (time) *time = chrono::duration_cast<chrono::microseconds>(end - start).count(); // time.count() gives seconds
 }
 
 
@@ -1424,7 +1425,7 @@ bool Graph::relax(Vertex *v, Vertex *w, double weight) {
 /**
  * Dijkstra algorithm.
  */
-void Graph::dijkstraDist(Vertex *origin, chrono::duration<double> *time) {
+void Graph::dijkstraDist(Vertex *origin, microtime *time) {
 	auto start = chrono::high_resolution_clock::now();
 
 	auto s = initSingleSource(origin->getID());
@@ -1433,18 +1434,21 @@ void Graph::dijkstraDist(Vertex *origin, chrono::duration<double> *time) {
 	while ( ! q.empty() ) {
 		auto v = q.extractMin();
 		for (auto e : v->adj) { // Non-accidented only
-			auto oldDist = e->dest->dist;
-			if (relax(v, e->dest, e->weight)) {
+			auto vertex = e->dest;
+			// If vertex is accidented, skip
+			if (vertex->isAccidented()) continue;
+			auto oldDist = vertex->dist;
+			if (relax(v, vertex, e->weight)) {
 				if (oldDist == INF)
-					q.insert(e->dest);
+					q.insert(vertex);
 				else
-					q.decreaseKey(e->dest);
+					q.decreaseKey(vertex);
 			}
 		}
 	}
 
 	auto end = chrono::high_resolution_clock::now();
-	if (time) *time = end - start;
+	if (time) *time = chrono::duration_cast<chrono::microseconds>(end - start).count(); // time.count() gives seconds
 }
 
 
@@ -1453,7 +1457,7 @@ void Graph::dijkstraDist(Vertex *origin, chrono::duration<double> *time) {
  * Perform A* given origin and destination vertices.
  * If time is given, compute algorithm performance
  */
-void Graph::AstarDist(Vertex *vsource, Vertex *vdest, chrono::duration<double> *time) {
+void Graph::AstarDist(Vertex *vsource, Vertex *vdest, microtime *time) {
 	auto start = chrono::high_resolution_clock::now();
 
 	// Check args
@@ -1474,6 +1478,8 @@ void Graph::AstarDist(Vertex *vsource, Vertex *vdest, chrono::duration<double> *
 		if (v == vdest) break;
 		for (auto e : v->adj) { // Non-accidented only
 			auto vertex = e->dest;
+			// If vertex is accidented, skip
+			if (vertex->isAccidented()) continue;
 			double oldDist = vertex->dist;
 			double newDist = v->dist + distance(v, vertex)
 					+ distance(vertex, vdest); // <- A*
@@ -1489,7 +1495,7 @@ void Graph::AstarDist(Vertex *vsource, Vertex *vdest, chrono::duration<double> *
 	}
 
 	auto end = chrono::high_resolution_clock::now();
-	if (time) *time = end - start; // time.count() gives seconds
+	if (time) *time = chrono::duration_cast<chrono::microseconds>(end - start).count(); // time.count() gives seconds
 }
 
 
@@ -1498,7 +1504,7 @@ void Graph::AstarDist(Vertex *vsource, Vertex *vdest, chrono::duration<double> *
  * Perform Dijkstra given origin and destination vertices.
  * If time is given, compute algorithm performance
  */
-void Graph::dijkstraDist(Vertex *vsource, Vertex *vdest, chrono::duration<double> *time) {
+void Graph::dijkstraDist(Vertex *vsource, Vertex *vdest, microtime *time) {
 	auto start = chrono::high_resolution_clock::now();
 
 	// Check args
@@ -1519,6 +1525,8 @@ void Graph::dijkstraDist(Vertex *vsource, Vertex *vdest, chrono::duration<double
 		if (v == vdest) break;
 		for (auto e : v->adj) { // Non-accidented only
 			auto vertex = e->dest;
+			// If vertex is accidented, skip
+			if (vertex->isAccidented()) continue;
 			double oldDist = vertex->dist;
 			double newDist = v->dist + distance(v, vertex);
 			if (newDist < oldDist) {
@@ -1533,13 +1541,13 @@ void Graph::dijkstraDist(Vertex *vsource, Vertex *vdest, chrono::duration<double
 	}
 
 	auto end = chrono::high_resolution_clock::now();
-	if (time) *time = end - start; // time.count() gives seconds
+	if (time) *time = chrono::duration_cast<chrono::microseconds>(end - start).count(); // time.count() gives seconds
 }
 
 
 
 // Dijkstra by travel time, with destination. Find the quickest path to destination vertex
-void Graph::dijkstraSimulation(Vertex *vsource, Vertex *vdest, chrono::duration<double> *time) {
+void Graph::dijkstraSimulation(Vertex *vsource, Vertex *vdest, microtime *time) {
 	auto start = chrono::high_resolution_clock::now();
 
 	// Check args
@@ -1560,6 +1568,8 @@ void Graph::dijkstraSimulation(Vertex *vsource, Vertex *vdest, chrono::duration<
 		if (v == vdest) break;
 		for (auto e : v->adj) { // Non-accidented only
 			auto vertex = e->dest;
+			// If vertex is accidented, skip
+			if (vertex->isAccidented()) continue;
 			double oldDist = vertex->dist;
 			double newDist = v->dist + e->getWeight();
 			if (newDist < oldDist) {
@@ -1574,7 +1584,7 @@ void Graph::dijkstraSimulation(Vertex *vsource, Vertex *vdest, chrono::duration<
 	}
 
 	auto end = chrono::high_resolution_clock::now();
-	if (time) *time = end - start; // time.count() gives seconds
+	if (time) *time = chrono::duration_cast<chrono::microseconds>(end - start).count(); // time.count() gives seconds
 }
 
 
