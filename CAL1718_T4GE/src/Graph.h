@@ -75,6 +75,7 @@ public:
 
 	bool setEdgeThickness(Edge *e, int thickness) const;
 	bool setBackground(string path) const;
+	void showBoundaries() const;
 	/////
 
 	///// ***** Constructors and destructor
@@ -82,6 +83,7 @@ public:
 	~Graph();
 
 	///// ***** Vertex
+	bool addPhantom(int id, int x, int y) const;
 	bool addVertex(int id, int x, int y, bool accidented = false);
 	bool addVertex(Vertex *v);
 
@@ -125,6 +127,8 @@ public:
 	void removeEdge(Edge *e);
 	/////
 
+	void generateGraphNewStatus();
+
 	///// ***** Algorithms
 	// Breadth First Search. Find reachable nodes
 	void bfs(Vertex *origin);
@@ -154,9 +158,6 @@ public:
 	friend ostream& operator<<(ostream &out, Graph* graph);
 	friend class Vertex;
 	friend class Edge;
-
-
-	void generateGraphNewStatus();
 };
 
 

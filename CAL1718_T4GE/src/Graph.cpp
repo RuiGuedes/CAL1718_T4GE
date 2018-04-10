@@ -181,6 +181,53 @@ bool Graph::setBackground(string path) const {
 	return gv->setBackground(path);
 }
 
+/**
+ * GRAPHVIEWER
+ * Adds phantom vertices not present in the
+ * vertex set around the GraphViewer, delimiting
+ * its boundaries.
+ */
+void Graph::showBoundaries() const {
+	int ID = -1337;
+
+	// Corners
+	gv->addNode(--ID, 0, 0);
+	gv->setVertexLabel(ID, "\t");
+	gv->setVertexColor(ID, BLACK);
+	gv->addNode(--ID, width, 0);
+	gv->setVertexLabel(ID, "\t");
+	gv->setVertexColor(ID, BLACK);
+	gv->addNode(--ID, 0, height);
+	gv->setVertexLabel(ID, "\t");
+	gv->setVertexColor(ID, BLACK);
+	gv->addNode(--ID, width, height);
+	gv->setVertexLabel(ID, "\t");
+	gv->setVertexColor(ID, BLACK);
+
+	int increment;
+
+	// Top and bottom
+	increment = width / ((width + 1000) / 200);
+	for (int i = increment; i < width - (increment / 3); i += increment) {
+		gv->addNode(--ID, i, 0);
+		gv->setVertexLabel(ID, "\t");
+		gv->setVertexColor(ID, BLACK);
+		gv->addNode(--ID, i, height);
+		gv->setVertexLabel(ID, "\t");
+		gv->setVertexColor(ID, BLACK);
+	}
+
+	// Left and right
+	increment = height / ((height + 1000) / 200);
+	for (int j = increment; j < height - (increment / 3); j += increment) {
+		gv->addNode(--ID, 0, j);
+		gv->setVertexLabel(ID, "\t");
+		gv->setVertexColor(ID, BLACK);
+		gv->addNode(--ID, width, j);
+		gv->setVertexLabel(ID, "\t");
+		gv->setVertexColor(ID, BLACK);
+	}
+}
 
 /*
  * @brief Graph constructor, taking
@@ -206,6 +253,15 @@ Graph::~Graph() {
 		delete vertex;
 	}
 	delete gv;
+}
+
+/**
+ * @brief Adds a phantom graph visible in the
+ * GraphViewer window but not present in the
+ * actual Graph abstraction. Just for visual.
+ */
+bool Graph::addPhantom(int id, int x, int y) const {
+	return gv->addNode(id, x, y);
 }
 
 /*

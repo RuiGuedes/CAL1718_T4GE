@@ -9,11 +9,14 @@ EDGES=11261;
 
 DENSITY=0.0001;
 
-BOUNDARIES=0;
+BOUNDARIES=1;
 
 SHOW_EDGE_LABELS=0;
 SHOW_EDGE_WEIGHTS=0;
 SHOW_EDGE_FLOWS=0;
 
-delta latitude  = 0.05800
-delta longitude = 0.08200
+---------------------------
+
+Info:
+delta latitude  is 0.05800
+delta longitude is 0.08200

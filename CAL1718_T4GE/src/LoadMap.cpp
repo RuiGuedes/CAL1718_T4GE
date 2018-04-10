@@ -106,37 +106,6 @@ static void estimateMeta(MapMetaData &meta) {
 }
 
 /*
- * For use by load_map and test functions
- * Adds dummy boundary vertices around the map (around 20 per side)
- * @param ...
- */
-void showBoundaries(MapMetaData &meta, Graph* graph) {
-	int ID = -1000;
-
-	// Corners
-	graph->addVertex(ID--, 0, 0);
-	graph->addVertex(ID--, meta.width, 0);
-	graph->addVertex(ID--, 0, meta.height);
-	graph->addVertex(ID--, meta.width, meta.height);
-
-	int increment;
-
-	// Top and bottom
-	increment = meta.width / ((meta.width + 1000) / 200);
-	for (int i = increment; i < meta.width; i += increment) {
-		graph->addVertex(ID--, i, 0);
-		graph->addVertex(ID--, i, meta.height);
-	}
-
-	// Left and right
-	increment = meta.height / ((meta.height + 1000) / 200);
-	for (int j = increment; j < meta.height; j += increment) {
-		graph->addVertex(ID--, 0, j);
-		graph->addVertex(ID--, meta.width, j);
-	}
-}
-
-/*
  * For use by loadMap
  * Checks if all files are present and openable
  * Extremely rigid -- exits if some file is not found
@@ -222,7 +191,7 @@ int loadMap(string filename, Graph* &graph, bool boundaries) {
 		return -1;
 	}
 
-	if (meta.boundaries) showBoundaries(meta, graph);
+	if (meta.boundaries) graph->showBoundaries();
 
 	// Release auxiliary memory
 	nodeIdMap.clear();
@@ -622,7 +591,7 @@ int testLoadNodes(string path) {
 			return -1;
 		}
 
-		if (meta.boundaries) showBoundaries(meta, graph);
+		if (meta.boundaries) graph->showBoundaries();
 
 		graph->update();
 
@@ -668,7 +637,7 @@ int testLoadRoads(string path) {
 			return -1;
 		}
 
-		if (meta.boundaries) showBoundaries(meta, graph);
+		if (meta.boundaries) graph->showBoundaries();
 
 		graph->update();
 
@@ -716,7 +685,7 @@ int testLoadSubroads(string path) {
 			return -1;
 		}
 
-		if (meta.boundaries) showBoundaries(meta, graph);
+		if (meta.boundaries) graph->showBoundaries();
 
 		graph->update();
 

@@ -76,13 +76,14 @@ void dijkstraSimulation(Vertex *origin, Vertex *destination) {
 		graph->dijkstraSimulation(current, destination, &time);
 		cout << "Elapsed time: " << time << "microseconds." << endl;
 
-		// Get shortest path and animate (TODO)
+		// Get shortest path
 		vector<Vertex*> path = graph->getPath(current, destination);
 
-		// Move forward an entire road (very weird)
+		// Animate
+		// Just a Road
 		//pathGraphAnimationOneRoad(path, current);
 
-		// Or move forward just one subroad (long)
+		// Just a Subroad
 		current = path.at(1);
 		graph->setVertexColor(current, VERTEX_SELECTED_COLOR);
 		graph->rearrange();
