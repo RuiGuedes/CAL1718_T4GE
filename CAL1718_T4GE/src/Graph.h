@@ -7,7 +7,7 @@
 #include <list>
 #include <chrono>
 
-#include "Graphviewer.h"
+#include "graphviewer.h"
 #include "MutablePriorityQueue.h"
 
 using namespace std;
@@ -43,6 +43,7 @@ extern bool showEdgeWeights;
 extern bool showEdgeFlows;
 
 using microtime = chrono::duration<int64_t,micro>::rep;
+using color = string;
 
 //////////////////////////
 /////// Class Graph //////
@@ -55,31 +56,57 @@ class Graph {
 	GraphViewer *gv;
 	double scale;
 
+	mutable struct Mode {
+		bool vertexLabels = true;
+		bool edgeLabels = false;
+		bool edgeWeights = false;
+		bool edgeFlows = false;
+	} show;
+
 	// ***** Auxiliary
 	bool withinBounds(int x, int y) const;
 	void moveToVertexSet(Vertex *v);
 	void moveToAccidentedVertexSet(Vertex *v);
 
 public:
-	///// ***** Visual API
+	///// ***** Visual GraphViewer API
 	void update() const;
 	void rearrange() const;
 
 	bool setVertexLabel(Vertex *v, string label) const;
-	bool setVertexColor(Vertex *v, string color) const;
-	bool defineVertexColor(string color) const;
+	bool setVertexColor(Vertex *v, color color) const;
+	bool defineVertexColor(color color) const;
 	bool setVertexDefaultColor(Vertex *v) const;
 
 	bool setEdgeLabel(Edge *e, string label) const;
 	bool setEdgeWeight(Edge *e, int weight) const;
 	bool setEdgeFlow(Edge *e, int flow) const;
-	bool setEdgeColor(Edge *e, string color) const;
-	bool defineEdgeColor(string color) const;
+	bool setEdgeColor(Edge *e, color color) const;
+	bool defineEdgeColor(color color) const;
 	bool setEdgeDefaultColor(Edge *e) const;
 
 	bool setEdgeThickness(Edge *e, int thickness) const;
 	bool setBackground(string path) const;
+
+	// Phantom Display
+	bool addPhantom(int id, int x, int y) const;
 	void showBoundaries() const;
+
+	// General Display
+	void showAllVertexLabels() const;
+	void hideAllVertexLabels() const;
+	void showAllEdgeLabels() const;
+	void hideAllEdgeLabels() const;
+	void showAllEdgeWeights() const;
+	void hideAllEdgeWeights() const;
+	void showAllEdgeFlows() const;
+	void hideAllEdgeFlows() const;
+	void resetVertexColors() const;
+	void resetEdgeColors() const;
+
+	// Animation
+	void animatePath(vector<Vertex*> path, int interval = 100, color = VERTEX_PATH_COLOR, bool last = false) const;
+	void clearPath(vector<Vertex*> path, int interval = 0, bool last = false) const;
 	/////
 
 	///// ***** Constructors and destructor
@@ -87,7 +114,6 @@ public:
 	~Graph();
 
 	///// ***** Vertex
-	bool addPhantom(int id, int x, int y) const;
 	bool addVertex(int id, int x, int y, bool accidented = false);
 	bool addVertex(Vertex *v);
 

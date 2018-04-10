@@ -11,6 +11,39 @@ bool showEdgeWeights = false;
 bool showEdgeFlows = false;
 
 
+void Graph::animatePath(vector<Vertex*> path, int interval, color color, bool last) const {
+	for (unsigned int i = 1; i < path.size(); ++i) {
+		if (i > 1 && interval > 5) Sleep(interval);
+		setVertexColor(path.at(i), color);
+		setEdgeColor(path.at(i - 1)->findEdge(path.at(i)), color);
+		rearrange();
+	}
+
+	if (last) setVertexColor(path.back(), VERTEX_SELECTED_COLOR);
+	rearrange();
+}
+
+void Graph::clearPath(vector<Vertex*> path, int interval, bool last) const {
+	for (unsigned int i = 1; i < path.size(); ++i) {
+		if (i > 1 && interval > 5) Sleep(interval);
+		setVertexDefaultColor(path.at(i));
+		setEdgeDefaultColor(path.at(i - 1)->findEdge(path.at(i)));
+		rearrange();
+	}
+
+	if (last) setVertexColor(path.back(), VERTEX_SELECTED_COLOR);
+	rearrange();
+}
+
+
+
+
+
+
+
+
+
+
 /*
  * @brief (Private) Checks if a pair of integers is
  * within the bounds of the graph area
@@ -228,6 +261,104 @@ void Graph::showBoundaries() const {
 		gv->setVertexColor(ID, BLACK);
 	}
 }
+
+
+void Graph::showAllVertexLabels() const {
+	show.vertexLabels = true;
+	for (auto v : vertexSet) {
+		gv->setVertexLabel(v->getID(), to_string(v->getID()));
+	}
+	for (auto v : accidentedVertexSet) {
+		gv->setVertexLabel(v->getID(), to_string(v->getID()));
+	}
+}
+
+void Graph::hideAllVertexLabels() const {
+	show.vertexLabels = false;
+	for (auto v : vertexSet) {
+		gv->clearVertexLabel(v->getID());
+	}
+	for (auto v : accidentedVertexSet) {
+		gv->clearVertexLabel(v->getID());
+	}
+}
+
+void Graph::showAllEdgeLabels() const {
+	show.edgeLabels = true;
+	for (auto v : vertexSet) {
+		for (auto e : v->adj) {
+			gv->setEdgeLabel(e->getID(), to_string(e->getID()));
+		}
+	}
+	for (auto v : accidentedVertexSet) {
+		for (auto e : v->adj) {
+			gv->setEdgeLabel(e->getID(), to_string(e->getID()));
+		}
+	}
+}
+
+void Graph::hideAllEdgeLabels() const {
+	show.edgeLabels = false;
+	for (auto v : vertexSet) {
+		for (auto e : v->adj) {
+			gv->clearEdgeLabel(e->getID());
+		}
+	}
+	for (auto v : accidentedVertexSet) {
+		for (auto e : v->adj) {
+			gv->clearEdgeLabel(e->getID());
+		}
+	}
+}
+
+void Graph::showAllEdgeWeights() const {
+	show.edgeWeights = true;
+}
+
+void Graph::hideAllEdgeWeights() const {
+	show.edgeWeights = false;
+}
+
+void Graph::showAllEdgeFlows() const {
+	show.edgeFlows = true;
+}
+
+void Graph::hideAllEdgeFlows() const {
+	show.edgeFlows = false;
+}
+
+void Graph::resetVertexColors() const {
+	for (auto v : vertexSet) {
+		setVertexDefaultColor(v);
+	}
+	for (auto v : accidentedVertexSet) {
+		setVertexDefaultColor(v);
+	}
+	rearrange();
+}
+
+void Graph::resetEdgeColors() const {
+	for (auto v : vertexSet) {
+		for (auto e : v->adj) {
+			setEdgeDefaultColor(e);
+		}
+		for (auto e : v->accidentedAdj) {
+			setEdgeDefaultColor(e);
+		}
+	}
+	for (auto v : accidentedVertexSet) {
+		for (auto e : v->adj) {
+			setEdgeDefaultColor(e);
+		}
+		for (auto e : v->accidentedAdj) {
+			setEdgeDefaultColor(e);
+		}
+	}
+	rearrange();
+}
+
+
+
 
 /*
  * @brief Graph constructor, taking
