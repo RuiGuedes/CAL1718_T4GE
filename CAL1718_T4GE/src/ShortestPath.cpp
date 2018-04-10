@@ -9,7 +9,7 @@
 bool checkUnreachableNodes(Vertex *origin);
 void pathGraphClear(vector<Vertex*> path);
 void pathGraphAnimation(vector<Vertex*> path);
-void pathGraphAnimationOneRoad(vector<Vertex*> path, Vertex* &current, string &name);
+void pathGraphAnimationOneRoad(vector<Vertex*> path, Vertex* &current);
 void pathGraphAnimationOneSubroad(vector<Vertex*> path, Vertex* &current);
 void resetGraphState();
 
@@ -83,10 +83,10 @@ void dijkstraSimulation(Vertex *origin, Vertex *destination) {
 
 		// Animate
 		// Just a Road
-		//pathGraphAnimationOneRoad(path, current, name);
+		pathGraphAnimationOneRoad(path, current);
 
 		// Just a Subroad
-		pathGraphAnimationOneSubroad(path, current);
+		//pathGraphAnimationOneSubroad(path, current);
 
 		system("pause");
 
@@ -200,32 +200,39 @@ void pathGraphClear(vector<Vertex*> path) {
 	for (unsigned int i = 1; i < path.size(); ++i) {
 		graph->setVertexDefaultColor(path.at(i));
 		graph->setEdgeDefaultColor(path.at(i - 1)->findEdge(path.at(i)));
+		Sleep(100);
 	}
-	graph->setVertexColor(path.back(), VERTEX_SELECTED_COLOR);
+	graph->setVertexColor(path.back(), VERTEX_PATH_COLOR);
 	graph->rearrange();
 }
 
 void pathGraphAnimation(vector<Vertex*> path) {
-	for(unsigned int i = 0; i < path.size(); i++) {
-		graph->setVertexColor(path.at(i),VERTEX_SELECTED_COLOR);
+	graph->setVertexColor(path.front(), VERTEX_SELECTED_COLOR);
+
+	for(unsigned int i = 1; i < path.size(); i++) {
+		graph->setVertexColor(path.at(i), VERTEX_PATH_COLOR);
+		graph->setEdgeColor(path.at(i - 1)->findEdge(path.at(i)), EDGE_PATH_COLOR);
 		graph->rearrange();
 		Sleep(100);
 	}
 
-	graph->setVertexColor(path.at(0),"magenta");
+	graph->setVertexColor(path.back(), VERTEX_SELECTED_COLOR);
 	graph->rearrange();
 }
 
 // A small hack to draw one road at a time. We need to return the last vertex read
-void pathGraphAnimationOneRoad(vector<Vertex*> path, Vertex* &current, string &name) {
+void pathGraphAnimationOneRoad(vector<Vertex*> path, Vertex* &current) {
 	// path.size() > 1, current == path.at(0)
-	// Set previous current back to PATH color
+	// Set current vertex to PATH color, as we will move past it
 	graph->setVertexColor(current, VERTEX_PATH_COLOR);
 
 	// This is the road we should stay on
 	Road* firstRoad = path.at(0)->findEdge(path.at(1))->getRoad();
 
-	// Find the vertex in which we switch roads
+	// Find the vertex in which we switch Roads
+	// If the entire path is contained in one Road, threshold = path.size() - 1
+	// and the new current is the last (destination) vertex.
+	current = path.back();
 	unsigned int threshold = path.size() - 1;
 	for (unsigned int i = 1; i < path.size(); ++i) {
 		Road* road = path.at(i - 1)->findEdge(path.at(i))->getRoad();
@@ -237,22 +244,27 @@ void pathGraphAnimationOneRoad(vector<Vertex*> path, Vertex* &current, string &n
 	}
 
 	// Assign the colors to PATH vertices
-	for (unsigned int i = 1; i < threshold; ++i) {
+	for (unsigned int i = 1; i <= threshold; ++i) {
 		graph->setVertexColor(path.at(i), VERTEX_PATH_COLOR);
 		graph->setEdgeColor(path.at(i - 1)->findEdge(path.at(i)), EDGE_PATH_COLOR);
 		graph->rearrange();
 		Sleep(100);
 	}
 
+	// Assign the SELECTED color to the new current vertex
+	graph->setVertexColor(current, VERTEX_SELECTED_COLOR);
+
 	// Assign the colors to NEXT PATH vertices
 	for (unsigned int i = threshold + 1; i < path.size(); ++i) {
 		graph->setVertexColor(path.at(i), VERTEX_NEXT_PATH_COLOR);
 		graph->setEdgeColor(path.at(i - 1)->findEdge(path.at(i)), EDGE_NEXT_PATH_COLOR);
+		Sleep(100);
 	}
+
 	graph->setVertexColor(path.back(), VERTEX_SELECTED_COLOR);
 	graph->rearrange();
 
-	//cout << "Traveled road " << firstRoad->getName() << "." << endl;
+	cout << "Traveled road " << firstRoad->getName() << "." << endl;
 }
 
 void pathGraphAnimationOneSubroad(vector<Vertex*> path, Vertex* &current) {
@@ -272,13 +284,18 @@ void pathGraphAnimationOneSubroad(vector<Vertex*> path, Vertex* &current) {
 		graph->setVertexColor(path.at(i), VERTEX_NEXT_PATH_COLOR);
 		graph->setEdgeColor(path.at(i - 1)->findEdge(path.at(i)), EDGE_NEXT_PATH_COLOR);
 	}
+
 	graph->setVertexColor(path.back(), VERTEX_SELECTED_COLOR);
 	graph->rearrange();
 }
 
 void resetGraphState() {
-	for (auto v : graph->getAllVertexSet())
+	for (auto v : graph->getAllVertexSet()) {
 		graph->setVertexDefaultColor(v);
+		for (auto e : v->adj) {
+			graph->setEdgeDefaultColor(e);
+		}
+	}
 	graph->rearrange();
 }
 

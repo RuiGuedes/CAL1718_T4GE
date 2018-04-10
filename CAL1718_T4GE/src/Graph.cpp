@@ -412,10 +412,15 @@ vector<Vertex*> Graph::getAllVertexSet() const {
 vector<Vertex*> Graph::getPath(Vertex* origin, Vertex* dest) const {
 	vector<Vertex*> res;
 	//auto v = this->findVertex(dest->getID()); // wtf?
-	if (dest == nullptr || dest->dist == INF) // missing or disconnected
+	if (origin == nullptr || dest == nullptr || dest->dist == INF || origin == dest)
 		return res;
-	for (; dest != nullptr; dest = dest->path) // nice tho
+	for (; dest != nullptr && dest != origin; dest = dest->path)
 		res.push_back(dest);
+	if (dest == origin) res.push_back(origin);
+	if (res.back() != origin) {
+		res.clear();
+		return res;
+	}
 	reverse(res.begin(), res.end());
 	return res;
 }
