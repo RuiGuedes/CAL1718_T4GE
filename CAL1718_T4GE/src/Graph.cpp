@@ -359,21 +359,27 @@ void Graph::hideAllEdgeLabels() const {
  * time - cars / max cars
  */
 void Graph::showEdgeSimulationLabels() const {
+	static const auto lambda = [](Edge* e) -> string {
+		return to_string(e->getWeight()) + " : ("
+			 + to_string(e->getActualCapacity()) + "/"
+			 + to_string(e->getMaxCapacity()) + ")";
+	};
+
 	show.edgeLabels = true;
 	for (auto v : vertexSet) {
 		for (auto e : v->adj) {
-			gv->setEdgeLabel(e->getID(), to_string(e->getID()));
+			gv->setEdgeLabel(e->getID(), lambda(e));
 		}
 		for (auto e : v->accidentedAdj) {
-			gv->setEdgeLabel(e->getID(), to_string(e->getID()));
+			gv->setEdgeLabel(e->getID(), lambda(e));
 		}
 	}
 	for (auto v : accidentedVertexSet) {
 		for (auto e : v->adj) {
-			gv->setEdgeLabel(e->getID(), to_string(e->getID()));
+			gv->setEdgeLabel(e->getID(), lambda(e));
 		}
 		for (auto e : v->accidentedAdj) {
-			gv->setEdgeLabel(e->getID(), to_string(e->getID()));
+			gv->setEdgeLabel(e->getID(), lambda(e));
 		}
 	}
 }
@@ -575,7 +581,7 @@ vector<Vertex*> Graph::getAccidentedVertexSet() const {
  */
 vector<Vertex*> Graph::getAllVertexSet() const {
 	vector<Vertex*> set = vertexSet;
-	copy(accidentedVertexSet.cbegin(), accidentedVertexSet.cend(), back_inserter(set));
+	set.insert(set.end(), accidentedVertexSet.begin(), accidentedVertexSet.end());
 	return set;
 }
 
@@ -1367,8 +1373,8 @@ void Graph::generateGraphNewStatus() {
 	vector<Vertex*> everyVextex = getAllVertexSet();
 
 	for (auto vertex : everyVextex) {
-		for(auto edge : vertex->adj) {
-			if(edge != nullptr) {
+		for (auto edge : vertex->adj) {
+			if (edge != nullptr) {
 				int newActualCapacity = (rand() % edge->getMaxCapacity());
 				edge->setActualCapacity(newActualCapacity);
 			}

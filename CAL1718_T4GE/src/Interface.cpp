@@ -324,7 +324,7 @@ void mainMenu() {
 		cout << "3 - Edit road information" << endl;
 		cout << "4 - Get shortest path" << endl;
 		cout << "5 - System information" << endl;
-		cout << "6 - Exit" << endl;
+		cout << "6 < Exit" << endl;
 
 		option = selectOption(6);
 		if (option == 6) return;

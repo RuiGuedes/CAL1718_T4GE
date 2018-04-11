@@ -22,6 +22,7 @@ using namespace std;
 #define NEXT_PATH_COLOR        CYAN
 
 #define VERTEX_SIZE            20
+#define SMALL_VERTEX_SIZE      10
 
 #define MAX_WAIT               10000 // 10 seconds
 

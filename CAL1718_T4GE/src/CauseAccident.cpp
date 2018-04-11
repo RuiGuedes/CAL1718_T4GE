@@ -17,7 +17,7 @@ void causeAccident() {
 
 	cout << "1 - Intersection accident" << endl;
 	cout << "2 - Road accident" << endl;
-	cout << "3 - Return" << endl;
+	cout << "3 < return" << endl;
 
 	option = selectOption(3);
 	if (option == 3) return;

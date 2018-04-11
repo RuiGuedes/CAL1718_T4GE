@@ -135,8 +135,47 @@ void Astar(Vertex *origin, Vertex *destination) {
 	graph->animatePath(path, 200, PATH_COLOR, true);
 }
 
-void dijkstraSimulation(Vertex *origin, Vertex *destination) {
+void subroadSimulation(Vertex *origin, Vertex *destination) {
 	Vertex* current = origin;
+
+	graph->showEdgeSimulationLabels();
+	graph->rearrange();
+
+	while (true) {
+		// Perform algorithm
+		microtime time;
+		graph->dijkstraSimulation(current, destination, &time);
+		cout << "Elapsed time: " << time << " microseconds." << endl;
+
+		// Get shortest path ...
+		vector<Vertex*> path = graph->getPath(current, destination);
+
+		// ... and animate
+		// by Subroad
+		animateOneSubroad(path, current);
+
+		system("pause");
+		if (current == destination) break;
+
+		// Clear path prediction colors
+		path = graph->getPath(current, destination);
+		graph->clearPath(path, 0, true);
+
+		// Else move cars
+		graph->generateGraphNewStatus();
+		graph->showEdgeSimulationLabels();
+	};
+
+	graph->hideAllEdgeLabels();
+	graph->rearrange();
+}
+
+void roadSimulation(Vertex *origin, Vertex *destination) {
+	Vertex* current = origin;
+
+	graph->showEdgeSimulationLabels();
+	graph->rearrange();
+
 	while (true) {
 		// Perform algorithm
 		microtime time;
@@ -148,13 +187,10 @@ void dijkstraSimulation(Vertex *origin, Vertex *destination) {
 
 		// ... and animate
 		// by Road
-		//animateOneRoad(path, current);
-
-		// by Subroad
-		animateOneSubroad(path, current);
+		animateOneRoad(path, current);
 
 		system("pause");
-		if (current == destination) return;
+		if (current == destination) break;
 
 		// Clear path prediction colors
 		path = graph->getPath(current, destination);
@@ -162,7 +198,11 @@ void dijkstraSimulation(Vertex *origin, Vertex *destination) {
 
 		// Else move cars
 		graph->generateGraphNewStatus();
+		graph->showEdgeSimulationLabels();
 	};
+
+	graph->hideAllEdgeLabels();
+	graph->rearrange();
 }
 
 void benchmark(Vertex *origin, Vertex *destination, int N) {
@@ -274,13 +314,14 @@ void shortestPathUI() {
 	cout << "2 - Dijkstra <source>" << endl;
 	cout << "3 - Dijkstra <source,destination>" << endl;
 	cout << "4 - A* <source,destination>" << endl;
-	cout << "5 - Dijkstra with simulation <source,destination>" << endl;
-	cout << "6 - Benchmark 1 through 4" << endl;
-	cout << "7 - return" << endl;
+	cout << "5 - Simulation (edge by edge)" << endl;
+	cout << "6 - Simulation (road by road)" << endl;
+	cout << "7 - Benchmark (1 through 4)" << endl;
+	cout << "8 < return" << endl;
 
 	// Choose Algorithm
-	option = selectOption(7);
-	if (option == 7) return;
+	option = selectOption(8);
+	if (option == 8) return;
 
 	// Choose origin
 	origin = selectOriginVertex(false);
@@ -313,10 +354,13 @@ void shortestPathUI() {
 	case 4: // A* <source,destination>
 		Astar(origin, destination);
 		break;
-	case 5: // Dijkstra <source,destination> with simulation
-		dijkstraSimulation(origin, destination);
+	case 5: // Simulation (edge by edge)
+		subroadSimulation(origin, destination);
 		break;
-	case 6:
+	case 6: // Simulation (road by road)
+		subroadSimulation(origin, destination);
+		break;
+	case 7: // Benchmark 1 through 4
 		int iterations = selectIterations();
 		if (iterations == 0) return;
 		benchmark(origin, destination, iterations);
