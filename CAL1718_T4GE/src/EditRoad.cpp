@@ -79,7 +79,7 @@ void addCars(Edge* edge) {
 		cin >> option;
 
 		if(validNumberInput(option, maxCap - actualCap)) {
-			edge->setActualCapacity(actualCap + stoi(option)); // this should relabel the edge
+			edge->setActualCapacity(actualCap + stoi(option));
 			break;
 		}
 		else
@@ -102,7 +102,7 @@ void removeCars(Edge* edge) {
 		cin >> option;
 
 		if(validNumberInput(option,actualCap)) {
-			edge->setActualCapacity(actualCap - stoi(option)); // this should relabel the edge
+			edge->setActualCapacity(actualCap - stoi(option));
 			break;
 		}
 		else

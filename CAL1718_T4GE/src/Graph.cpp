@@ -6,70 +6,6 @@
 #include <math.h>
 
 
-
-
-
-
-/*
-bool Graph::clearVertexLabel(Vertex *v) {
-	return true;
-}
-bool Graph::clearEdgeLabel(Edge *e) {
-	return true;
-}
-bool Graph::clearEdgeColor(Edge *e) {
-	return true;
-}
-bool Graph::setEdgeDashed(Edge *e, bool dashed) {
-	return true;
-}
-bool Graph::clearVertexColor(Vertex *v) {
-	return true;
-}
-bool Graph::setVertexSize(Vertex *v, int size) {
-	return true;
-}
-bool Graph::setVertexIcon(Vertex *v, string filepath) {
-	return true;
-}
-bool Graph::clearVertexIcon(Vertex *v) {
-	return true;
-}
-bool Graph::setEdgeThickness(Edge *e, int thickness) {
-	return true;
-}
-bool Graph::defineEdgeCurved(bool curved) {
-	return true;
-}
-bool Graph::resetEdgeColor() {
-	return true;
-}
-bool Graph::defineEdgeDashed(bool dashed) {
-	return true;
-}
-bool Graph::resetVertexColor() {
-	return true;
-}
-bool Graph::defineVertexSize(int size) {
-	return true;
-}
-bool Graph::defineVertexIcon(string filepath) {
-	return true;
-}
-bool Graph::resetVertexIcon() {
-	return true;
-}
-bool Graph::setBackground(string path) {
-	return true;
-}
-bool Graph::clearBackground() {
-	return true;
-}
-*/
-
-
-
-
 ///// ***** Auxiliary
 
 /*
@@ -869,11 +805,6 @@ void Graph::removeEdge(Edge* e) {
 
 
 
-
-
-
-
-
 /*
  * @brief (Private) Moves edge e from accidentedAdj to adj.
  * e is in accidentedAdj.
@@ -1381,19 +1312,6 @@ void Graph::generateGraphNewStatus() {
 		}
 	}
 
-	/*
-	//For every vertex set new status
-	for(auto vertex : everyVextex) {
-		int newStatus = (rand() % 11);
-		if((newStatus < 10))
-			continue;
-
-		if(vertex->isAccidented())
-			vertex->fix();
-		else
-			vertex->accident();
-	}
-	*/
 }
 
 

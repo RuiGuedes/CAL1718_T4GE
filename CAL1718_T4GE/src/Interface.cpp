@@ -4,15 +4,6 @@
 // 'esc' or 'q' or 'quit'
 static const regex esc("^\\s*(?:esc|quit|q)[\\.,;]?\\s*$", regex::icase);
 
-//static string align(string str, size_t width) {
-//	if (str.size() >= width) {
-//		return str;
-//	} else {
-//		return str + string(width, ' ');
-//	}
-//}
-
-
 /*
  * @brief Checks if input is a string containing
  * a valid Vertex, Edge, or Road id -- a positive integer
