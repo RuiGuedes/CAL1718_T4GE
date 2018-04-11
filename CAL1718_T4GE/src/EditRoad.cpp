@@ -27,14 +27,15 @@ void editRoadInfo() {
 
 
 void editRoadInformationInterface(Edge* edge) {
+	system("cls");
+
 	int option;
 
 	while (1) {
 		cout << "Edit road information " << endl << endl;
 
 		cout << "1 - Add cars" << endl;
-		cout << "2 - Remove cars" << endl;
-		cout << "3 < return" << endl;
+		cout << "2 - Remove cars" << endl << endl;
 
 		option = selectOption(3);
 		if (option == 3) return;

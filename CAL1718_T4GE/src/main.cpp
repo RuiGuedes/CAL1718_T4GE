@@ -6,22 +6,22 @@
 
 #define FILENAME_PREFIX "./resource/"
 
-string files = "Select map file\n"
-"Available by default:\n"
-" NODES   ~SUBROADS   NAME\n"
-"    52        64      fep\n"             // Minor check
-"   100       125      newyork\n"         // Minor check
-"   270       300      madrid\n"          // Minor check
-"  1756      1914      vilareal\n"        // Minor check
-"  6123      6278      graciosa\n"        // Minor check
-"  9917     11261      bignewyork\n"      // Good
+string files = "Select map file\n\n"
+"Map files available:\n"
+"NAME         SUBROADS     NODES\n"
+"fep          64           52\n"	// Minor check
+"newyork      125          100\n"	// Minor check
+"madrid       300          270\n"	// Minor check
+"vilareal     1914         1756\n"	// Minor check
+"graciosa     6278         6123\n"	// Minor check
+"bignewyork   11261        9917\n"	// Good
 "\n"
-"   500       500      faro\n"            // Decent
-"    1K        1K      coimbra\n"         // Good
-"    2K        2K      porto\n"           // Good
-"    4K        4K      sydney\n"          // Good
-"    8K       10K      tokyo\n"           // Good
-"   16K       18K      paris\n";          // Good
+"faro         500          500\n"		// Decent
+"coimbra      1K           1K\n"		// Good
+"porto        2K           2K\n"		// Good
+"sydney       4K           4K\n"		// Good
+"tokyo        10K          8K\n"		// Good
+"paris        18K          16K\n";		// Good
 
 Graph* graph;
 
@@ -61,12 +61,13 @@ int main(int argc, char* argv[]) {
 		getFilename(filename);
 	}
 
-	cout << endl << "Loading map information ..." << endl << endl;
+	cout << endl << "Loading map information ..";
 
 	if (loadMap(filename, graph) != 0) {
 		system("pause");
 		return 1;
 	}
+	cout << ".";
 	mainMenu();
 
 	delete graph;

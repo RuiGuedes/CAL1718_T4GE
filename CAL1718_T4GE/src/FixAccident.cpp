@@ -16,8 +16,7 @@ void fixAccident() {
 	cout << "Fix accident" << endl << endl;
 
 	cout << "1 - Intersection accident" << endl;
-	cout << "2 - Road accident" << endl;
-	cout << "3 < return" << endl;
+	cout << "2 - Road accident" << endl << endl;
 
 	option = selectOption(3);
 	if (option == 3) return;
@@ -34,7 +33,6 @@ void fixAccident() {
 		break;
 	}
 
-	system("pause"); // dont like this
 	system("cls");
 	return fixAccident();
 }

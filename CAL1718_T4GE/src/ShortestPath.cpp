@@ -83,7 +83,7 @@ void gbfs(Vertex *origin, Vertex *destination) {
 	// Perform algorithm
 	microtime time;
 	graph->gbfsDist(origin, destination, &time);
-	cout << "Elapsed time: " << time << " microseconds." << endl;
+	cout << endl << "Elapsed time: " << time << " microseconds." << endl << endl;
 
 	// Get shortest path and animate
 	vector<Vertex*> path = graph->getPath(origin, destination);
@@ -94,10 +94,11 @@ void gbfs(Vertex *origin, Vertex *destination) {
 	vector<Vertex*> astarpath = graph->getPath(origin, destination);
 
 	if (equal(path.begin(), path.end(), astarpath.begin(), astarpath.end())) {
-		cout << "The path found is the best path." << endl;
+		cout << "The path found is the best path. ";
 	} else {
-		cout << "The path found is NOT the best path. We show the best path next." << endl;
+		cout << "The path found is NOT the best path. We show the best path next." << endl << endl;
 		system("pause");
+		cout << endl;
 		graph->animatePath(astarpath, 0, NEXT_PATH_COLOR, true);
 	}
 }
@@ -106,7 +107,7 @@ void dijkstraSource(Vertex *origin, Vertex *destination) {
 	// Perform algorithm
 	microtime time;
 	graph->dijkstraDist(origin, &time);
-	cout << "Elapsed time: " << time << " microseconds." << endl;
+	cout << endl << "Elapsed time: " << time << " microseconds." << endl << endl;
 
 	// Get shortest path and animate
 	vector<Vertex*> path = graph->getPath(origin, destination);
@@ -117,7 +118,7 @@ void dijkstraSourceDest(Vertex *origin, Vertex *destination) {
 	// Perform algorithm
 	microtime time;
 	graph->dijkstraDist(origin, destination, &time);
-	cout << "Elapsed time: " << time << " microseconds." << endl;
+	cout << endl << "Elapsed time: " << time << " microseconds." << endl << endl;
 
 	// Get shortest path and animate
 	vector<Vertex*> path = graph->getPath(origin, destination);
@@ -128,7 +129,7 @@ void Astar(Vertex *origin, Vertex *destination) {
 	// Perform algorithm
 	microtime time;
 	graph->AstarDist(origin, destination, &time);
-	cout << "Elapsed time: " << time << " microseconds." << endl;
+	cout << endl << "Elapsed time: " << time << " microseconds." << endl << endl;
 
 	// Get shortest path and animate
 	vector<Vertex*> path = graph->getPath(origin, destination);
@@ -145,7 +146,7 @@ void subroadSimulation(Vertex *origin, Vertex *destination) {
 		// Perform algorithm
 		microtime time;
 		graph->dijkstraSimulation(current, destination, &time);
-		cout << "Elapsed time: " << time << " microseconds." << endl;
+		cout << endl << "Elapsed time: " << time << " microseconds." << endl << endl;
 
 		// Get shortest path ...
 		vector<Vertex*> path = graph->getPath(current, destination);
@@ -155,6 +156,7 @@ void subroadSimulation(Vertex *origin, Vertex *destination) {
 		animateOneSubroad(path, current);
 
 		system("pause");
+		cout << endl;
 		if (current == destination) break;
 
 		// Clear path prediction colors
@@ -180,7 +182,7 @@ void roadSimulation(Vertex *origin, Vertex *destination) {
 		// Perform algorithm
 		microtime time;
 		graph->dijkstraSimulation(current, destination, &time);
-		cout << "Elapsed time: " << time << " microseconds." << endl;
+		cout << endl << "Elapsed time: " << time << " microseconds." << endl << endl;
 
 		// Get shortest path ...
 		vector<Vertex*> path = graph->getPath(current, destination);
@@ -190,6 +192,7 @@ void roadSimulation(Vertex *origin, Vertex *destination) {
 		animateOneRoad(path, current);
 
 		system("pause");
+		cout << endl;
 		if (current == destination) break;
 
 		// Clear path prediction colors
@@ -215,7 +218,7 @@ void benchmark(Vertex *origin, Vertex *destination, int N) {
 	// Time of all N iterations
 	microtime internal, external;
 
-	cout << "=== Benchmark " << N << " Iterations ===" << endl;
+	cout << "===== Benchmark " << N << " Iterations =====" << endl;
 
 	// Silent warmup
 	{
@@ -294,7 +297,7 @@ void benchmark(Vertex *origin, Vertex *destination, int N) {
 	}
 	cout << "--- (4) A* ---" << endl;
 	cout << "Internal Average Time: " << internal << " microseconds." << endl;
-	cout << "External Average Time: " << external << " microseconds." << endl;
+	cout << "External Average Time: " << external << " microseconds." << endl << endl;
 }
 
 
@@ -303,6 +306,9 @@ void benchmark(Vertex *origin, Vertex *destination, int N) {
 /////////////////////
 
 void shortestPathUI() {
+
+	system("cls");
+
 	int option;
 	Vertex* origin = nullptr;
 	Vertex* destination = nullptr;
@@ -314,10 +320,9 @@ void shortestPathUI() {
 	cout << "2 - Dijkstra <source>" << endl;
 	cout << "3 - Dijkstra <source,destination>" << endl;
 	cout << "4 - A* <source,destination>" << endl;
-	cout << "5 - Simulation (edge by edge)" << endl;
-	cout << "6 - Simulation (road by road)" << endl;
-	cout << "7 - Benchmark (1 through 4)" << endl;
-	cout << "8 < return" << endl;
+	cout << "5 - Simulation [edge - edge]" << endl;
+	cout << "6 - Simulation [road - road]" << endl;
+	cout << "7 - Benchmark  [1 through 4]" << endl << endl;
 
 	// Choose Algorithm
 	option = selectOption(8);
@@ -362,14 +367,15 @@ void shortestPathUI() {
 		break;
 	case 7: // Benchmark 1 through 4
 		int iterations = selectIterations();
+		cout << endl << endl;
 		if (iterations == 0) return;
 		benchmark(origin, destination, iterations);
-	// ...
 	}
 
 	// Reset and go up
-	cout << "Done. ";
+	cout << "Done." << endl << endl;
 	system("pause");
 	resetGraphState();
+	return shortestPathUI();
 }
 

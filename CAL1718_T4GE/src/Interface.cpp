@@ -4,13 +4,13 @@
 // 'esc' or 'q' or 'quit'
 static const regex esc("^\\s*(?:esc|quit|q)[\\.,;]?\\s*$", regex::icase);
 
-static string align(string str, size_t width) {
-	if (str.size() >= width) {
-		return str;
-	} else {
-		return str + string(width, ' ');
-	}
-}
+//static string align(string str, size_t width) {
+//	if (str.size() >= width) {
+//		return str;
+//	} else {
+//		return str + string(width, ' ');
+//	}
+//}
 
 
 /*
@@ -51,7 +51,7 @@ bool validNumberInput(string input, int max) {
 int selectIterations() {
 	while (1) {
 		string input;
-		cout << "Number of iterations (esc to quit): ";
+		cout << endl << "Number of iterations (esc to quit): ";
 		cin >> input;
 
 		if (validNumberInput(input)) {
@@ -153,7 +153,7 @@ Vertex* selectOriginVertex(bool maybeAccidented) {
 
 	while (1) {
 		string input;
-		cout << "Select origin node (q to quit): ";
+		cout << endl << "Select origin node (q to quit): ";
 		cin >> input;
 
 		if (validNumberInput(input)) {
@@ -324,7 +324,7 @@ void mainMenu() {
 		cout << "3 - Edit road information" << endl;
 		cout << "4 - Get shortest path" << endl;
 		cout << "5 - System information" << endl;
-		cout << "6 < Exit" << endl;
+		cout << "6 - Exit" << endl << endl;
 
 		option = selectOption(6);
 		if (option == 6) return;
@@ -362,12 +362,12 @@ void systemInformation() {
 	cout << "System information" << endl << endl;
 
 	cout << "Node and edge colors meaning:" << endl;
-	cout << align(VERTEX_CLEAR_COLOR, 12)      << "-> Available nodes" << endl;
-	cout << align(ACCIDENTED_COLOR, 12)        << "-> Accidented nodes" << endl;
-	cout << align(PATH_COLOR, 12)              << "-> Chosen path" << endl;
-	cout << align(NEXT_PATH_COLOR, 12)         << "-> Predicted path" << endl;
-	cout << align(SELECTED_COLOR, 12)          << "-> Selected node" << endl;
-	cout << align(UNREACHABLE_COLOR, 12)       << "-> Unreachable nodes" << endl;
+	cout << " " << VERTEX_CLEAR_COLOR << "    -> Available nodes" << endl;
+	cout << " " << ACCIDENTED_COLOR   << "     -> Accidented nodes" << endl;
+	cout << " " << PATH_COLOR         << "   -> Chosen path" << endl;
+	cout << " " << NEXT_PATH_COLOR    << "    -> Predicted path" << endl;
+	cout << " " << SELECTED_COLOR     << " -> Selected node" << endl;
+	cout << " " << UNREACHABLE_COLOR  << "  -> Unreachable nodes" << endl << endl;
 
 	system("pause");
 }
