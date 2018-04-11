@@ -1380,6 +1380,20 @@ void Graph::generateGraphNewStatus() {
 			}
 		}
 	}
+
+	/*
+	//For every vertex set new status
+	for(auto vertex : everyVextex) {
+		int newStatus = (rand() % 11);
+		if((newStatus < 10))
+			continue;
+
+		if(vertex->isAccidented())
+			vertex->fix();
+		else
+			vertex->accident();
+	}
+	*/
 }
 
 
