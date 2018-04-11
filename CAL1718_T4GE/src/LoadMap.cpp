@@ -1,12 +1,12 @@
+#include "LoadMap.h"
+
 #include <fstream>
-#include <limits>
+#include <iostream>
 #include <exception>
 #include <stdexcept>
+#include <stdlib.h>
 #include <regex>
 #include <math.h>
-#include <stdlib.h>
-
-#include "LoadMap.h"
 
 static map<long long, int> nodeIdMap;
 static map<long long, int> roadIdMap;
@@ -16,8 +16,24 @@ static map<int, Road*> roadMap;
 // Auxiliary Functions //
 /////////////////////////
 
+/**
+ * For use by loadMeta
+ */
+static bool toBool(string match) {
+	static const regex regex_true("true", regex::icase);
+	static const regex regex_false("false", regex::icase);
+
+	if (regex_match(match, regex_true)) {
+		return true;
+	}
+	if (regex_match(match, regex_false)) {
+		return false;
+	}
+	return static_cast<bool>(stoi(match));
+}
+
 /*
- * For use by load_nodes
+ * For use by loadNodes
  * @param longitude The node's longitude.
  * @return The node's assigned X coordinate on the GraphViewer map.
  */
@@ -27,7 +43,7 @@ static int getX(long double longitude, MetaData &meta) {
 }
 
 /*
- * For use by load_nodes
+ * For use by loadNodes
  * @param latitude The node's longitude.
  * @return The node's assigned Y coordinate on the GraphViewer map.
  */
@@ -180,6 +196,12 @@ int loadMap(string filename, Graph* &graph, bool boundaries) {
 	// Initialize the graph
 	graph = new Graph(meta.width, meta.height, meta.scale);
 
+	if (meta.boundaries) graph->showBoundaries();
+
+	if (meta.background) graph->setBackground(meta.background_filename);
+
+	if (meta.straightedges) graph->straightEdges();
+
 	// Load Nodes, Roads and Subroads
 	if (loadNodes(filename + nodes_suffix, meta, graph) != 0) {
 		return -1;
@@ -190,8 +212,6 @@ int loadMap(string filename, Graph* &graph, bool boundaries) {
 	if (loadSubroads(filename + subroads_suffix, meta, graph) != 0) {
 		return -1;
 	}
-
-	if (meta.boundaries) graph->showBoundaries();
 
 	// Release auxiliary memory
 	nodeIdMap.clear();
@@ -209,16 +229,22 @@ int loadMap(string filename, Graph* &graph, bool boundaries) {
 //    [0] : Text Line
 //    [1] : Attribute value
 int loadMeta(string filename, MetaData &meta) {
-	static const regex reg_min_lon("min_longitude ?= ?(-?\\d+\\.?\\d*)[.;,]", regex::icase);
-	static const regex reg_max_lon("max_longitude ?= ?(-?\\d+\\.?\\d*)[.;,]", regex::icase);
-	static const regex reg_min_lat("min_latitude ?= ?(-?\\d+\\.?\\d*)[.;,]", regex::icase);
-	static const regex reg_max_lat("max_latitude ?= ?(-?\\d+\\.?\\d*)[.;,]", regex::icase);
-	static const regex reg_nodes("nodes ?= ?(\\d+)[.;,]", regex::icase);
-	static const regex reg_edges("edges ?= ?(\\d+)[.;,]", regex::icase);
-	static const regex reg_density("density ?= ?(-?\\d+\\.?\\d*)[.;,]", regex::icase);
-	static const regex reg_width("width ?= ?(\\d+)[.;,]", regex::icase);
-	static const regex reg_height("height ?= ?(\\d+)[.;,]", regex::icase);
-	static const regex reg_boundaries("boundaries ?= ?([01])[.;,]", regex::icase);
+	static const regex reg_min_lon("min_longitude ?= ?(-?\\d+\\.?\\d*)[;,]", regex::icase);
+	static const regex reg_max_lon("max_longitude ?= ?(-?\\d+\\.?\\d*)[;,]", regex::icase);
+	static const regex reg_min_lat("min_latitude ?= ?(-?\\d+\\.?\\d*)[;,]", regex::icase);
+	static const regex reg_max_lat("max_latitude ?= ?(-?\\d+\\.?\\d*)[;,]", regex::icase);
+	static const regex reg_nodes("nodes ?= ?(\\d+)[;,]", regex::icase);
+	static const regex reg_edges("edges ?= ?(\\d+)[;,]", regex::icase);
+
+	static const regex reg_density("density ?= ?(-?\\d+\\.?\\d*)[;,]", regex::icase);
+	static const regex reg_width("width ?= ?(\\d+)[;,]", regex::icase);
+	static const regex reg_height("height ?= ?(\\d+)[;,]", regex::icase);
+
+	static const regex reg_boundaries("boundaries ?= ?([01]|(?:True|False))[;,]", regex::icase);
+	static const regex reg_oneway("oneway ?= ?([01]|(?:True|False))[;,]", regex::icase);
+	static const regex reg_bothways("bothways ?= ?([01]|(?:True|False))[;,]", regex::icase);
+	static const regex reg_straightedges("straight_edges ?= ?([01]|(?:True|False))[;,]", regex::icase);
+	static const regex reg_background("background ?= ?(.*?)[;,]", regex::icase);
 
 	ifstream file(filename);
 	if (!file.is_open())
@@ -281,10 +307,29 @@ int loadMeta(string filename, MetaData &meta) {
 
 		// Optional: BOUNDARIES
 		if (regex_search(text, match, reg_boundaries))
-			meta.boundaries = static_cast<bool>(stoi(match[1]));
-	} catch (runtime_error &e) {
+			meta.boundaries = toBool(match[1]);
+
+		// Optional: ONEWAY
+		if (regex_search(text, match, reg_oneway))
+			meta.oneway = toBool(match[1]);
+
+		// Optional: BOTHWAYS
+		if (regex_search(text, match, reg_bothways))
+			meta.bothways = toBool(match[1]);
+
+		// Optional: STRAIGHT_EDGES
+		if (regex_search(text, match, reg_straightedges))
+			meta.straightedges = toBool(match[1]);
+
+		// Optional: BACKGROUND
+		if (regex_search(text, match, reg_background)) {
+			meta.background = true;
+			meta.background_filename = match[1];
+		}
+	} catch (exception &e) {
 		cerr << e.what() << endl;
-		cerr << "Found numeric field not representable in " << filename << endl;
+		cerr << "Error on file " << filename << endl;
+		cerr << "Found numeric field not representable." << endl;
 		return -2;
 	}
 
@@ -316,27 +361,37 @@ int loadNodes(string filename, MetaData &meta, Graph* graph) {
 
 	while (!file.eof() && !file.fail()) {
 		smatch match;
+		long long id;
+		double long latitude, longitude;
 
 		if (regex_match(line, match, reg)) {
 			try {
 				// Get Node ID
-				long long id = stoll(match[1]);
+				id = stoll(match[1]);
 				nodeIdMap[id] = lineID;
 
 				// Get Node Latitude
-				double long latitude = stold(match[2]);
+				latitude = stold(match[2]);
 				int y = getY(latitude, meta);
 
 				// Get Node Longitude
-				double long longitude = stold(match[3]);
+				longitude = stold(match[3]);
 				int x = getX(longitude, meta);
 
 				// Add Node
 				graph->addVertex(lineID, x, y);
 				++newNodes;
-			} catch (runtime_error &e) {
+			} catch (out_of_range &e) {
 				cerr << e.what() << endl;
-				cerr << "Found numeric field not representable in " << filename << endl;
+				cerr << "Error on file " << filename << endl;
+				cerr << "Line: " << lineID << endl;
+				cerr << "Vertex Latitude = " << latitude << endl;
+				cerr << "Vertex Longitude = " << longitude << endl;
+				return -2;
+			} catch (exception &e) {
+				cerr << e.what() << endl;
+				cerr << "Error on file " << filename << endl;
+				cerr << "Found numeric field not representable." << endl;
 				cerr << "Line: " << lineID << endl;
 				return -2;
 			}
@@ -344,6 +399,12 @@ int loadNodes(string filename, MetaData &meta, Graph* graph) {
 
 		++lineID;
 		getline(file, line);
+	}
+
+	if (newNodes != meta.nodes) {
+		cout << "Warning: Loaded only " << newNodes << " out of " << meta.nodes << " nodes." << endl;
+		cout << "Press OK to continue..." << endl;
+		system("pause");
 	}
 
 	file.close();
@@ -361,7 +422,6 @@ int loadNodes(string filename, MetaData &meta, Graph* graph) {
 //    [3] : Two way (bool)
 int loadRoads(string filename, MetaData &meta, Graph* graph) {
 	static const regex reg("^(\\d+);(.*?);(False|True);?$");
-	static const string FalseStr = "False", TrueStr = "True";
 
 	ifstream file(filename);
 	if (!file.is_open())
@@ -386,18 +446,21 @@ int loadRoads(string filename, MetaData &meta, Graph* graph) {
 
 				// Get Road Direction
 				bool bothways;
-				if (match[3] == TrueStr)
+				if (meta.bothways)
 					bothways = true;
-				else
+				else if (meta.oneway)
 					bothways = false;
+				else
+					bothways = toBool(match[3]);
 
 				// Register Road
 				Road* road = new Road(lineID, name, bothways);
 				roadMap[lineID] = road;
 				++newRoads;
-			} catch (runtime_error &e) {
+			} catch (exception &e) {
 				cerr << e.what() << endl;
-				cerr << "Found numeric field not representable in " << filename << endl;
+				cerr << "Error on file " << filename << endl;
+				cerr << "Found numeric field not representable." << endl;
 				cerr << "Line: " << lineID << endl;
 				return -2;
 			}
@@ -481,12 +544,12 @@ int loadSubroads(string filename, MetaData &meta, Graph* graph) {
 				if (currentRoad->isBidirectional()) {
 					// Add reverse edge
 					graph->addEdge(subRoadID, v2, v1, subroad);
-					++newSubroads;
 					++subRoadID;
 				}
-			} catch (runtime_error &e) {
+			} catch (exception &e) {
 				cerr << e.what() << endl;
-				cerr << "Found numeric field not representable in " << filename << endl;
+				cerr << "Error on file " << filename << endl;
+				cerr << "Found numeric field not representable." << endl;
 				cerr << "Line: " << lineID << endl;
 				return -2;
 			}
@@ -503,6 +566,12 @@ int loadSubroads(string filename, MetaData &meta, Graph* graph) {
 
 		currentRoad->setTotalDistance(totalDistance);
 		subroads.clear();
+	}
+
+	if (newSubroads != meta.edges) {
+		cout << "Warning: Loaded only " << newSubroads << " out of " << meta.edges << " subroads." << endl;
+		cout << "Press OK to continue..." << endl;
+		system("pause");
 	}
 
 	file.close();
@@ -579,7 +648,10 @@ int testLoadNodes(string path) {
 		// *** Test
 		auto vertexSet = graph->getAllVertexSet();
 		for (auto v : vertexSet) {
-			cout << v << endl;
+			cout << "ID=" << v->getID() << "; ";
+			cout << "(" << v->getX() << "," << v->getY() << "); ";
+			cout << (v->isAccidented() ? "Accidented;" : "Clear;");
+			cout << endl;
 		}
 
 		system("pause");
@@ -624,7 +696,11 @@ int testLoadRoads(string path) {
 
 		// *** Test
 		for (auto const& pair : roadMap) {
-			cout << pair.second << endl;
+			Road* r = pair.second;
+			cout << "ID=" << r->getID() << "; ";
+			cout << "NAME=" << r->getName() << "; ";
+			cout << "TWOWAY=" << (r->isBidirectional() ? "true;" : "false;");
+			cout << endl;
 		}
 
 		system("pause");
@@ -673,8 +749,14 @@ int testLoadSubroads(string path) {
 		// *** Test
 		auto vertexSet = graph->getAllVertexSet();
 		for (auto v : vertexSet) {
-			for (auto edge : v->getAdj()) {
-				cout << edge << endl;
+			for (auto e : v->getAdj()) {
+				cout << "ID=" << e->getID() << "; ";
+				cout << "ROAD=" << e->getRoad()->getName() << "; ";
+				cout << "SPEED=" << e->calculateAverageSpeed() << "; ";
+				cout << "DIST=" << e->getDistance() << " m; ";
+				cout << "ACTUAL_CAP=" << e->getActualCapacity() << "; ";
+				cout << "MAX_CAP=" << e->getMaxCapacity();
+				cout << endl;;
 			}
 		}
 

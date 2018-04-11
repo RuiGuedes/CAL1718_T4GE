@@ -1,9 +1,10 @@
-#include <math.h>
-#include <algorithm>
-#include <chrono>
-#include <deque>
-
 #include "Graph.h"
+
+#include <iostream>
+#include <deque>
+#include <algorithm>
+#include <math.h>
+
 
 
 
@@ -373,6 +374,16 @@ void Graph::showEdgeSimulationLabels() const {
 			gv->setEdgeLabel(e->getID(), to_string(e->getID()));
 		}
 	}
+}
+
+
+
+bool Graph::setBackground(string path) const {
+	return gv->setBackground(path);
+}
+
+bool Graph::straightEdges() const {
+	return gv->defineEdgeCurved(false);
 }
 
 
@@ -1221,16 +1232,6 @@ bool Vertex::operator<(Vertex vertex) const {
 	return this->dist < vertex.dist;
 }
 
-/*
- * @brief Prints vertex's basic info (one liner)
- */
-ostream& operator<<(ostream& out, Vertex* v) {
-	out << "ID=" << v->getID() << "; ";
-	out << "(" << v->getX() << "," << v->getY() << "); ";
-	out << (v->isAccidented() ? "Accidented;" : "Clear;");
-	return out;
-}
-
 
 
 
@@ -1375,19 +1376,6 @@ bool Edge::setActualCapacity(int capacity) {
 	return subroad->setActualCapacity(capacity);
 }
 
-
-/*
- * @brief Prints the edge's basic info (one liner)
- */
-ostream& operator<<(ostream& out, Edge* e) {
-	out << "ID=" << e->getID() << "; ";
-	out << "ROAD=" << e->getRoad()->getName() << "; ";
-	out << "SPEED=" << e->calculateAverageSpeed() << "; ";
-	out << "DIST=" << e->getDistance() << " m; ";
-	out << "ACTUAL_CAP=" << e->getActualCapacity() << "; ";
-	out << "MAX_CAP=" << e->getMaxCapacity();
-	return out;
-}
 
 
 

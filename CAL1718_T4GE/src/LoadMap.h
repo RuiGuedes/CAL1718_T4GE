@@ -1,7 +1,5 @@
 #pragma once
 
-#include <string>
-
 #include "Graph.h"
 
 using namespace std;
@@ -10,7 +8,7 @@ static const string meta_suffix = "_meta.txt";
 static const string nodes_suffix = "_nodes.txt";
 static const string roads_suffix = "_roads.txt";
 static const string subroads_suffix = "_subroads.txt";
-static constexpr long double default_density = 0.000250;
+static constexpr long double default_density = 0.000100;
 
 struct MetaData {
 	long double min_longitude, max_longitude;
@@ -19,6 +17,10 @@ struct MetaData {
 	int nodes, edges;
 	int width = 0, height = 0;
 	bool boundaries = false;
+	bool background = false;
+	bool oneway = false, bothways = false;
+	bool straightedges = false;
+	string background_filename = "";
 	long double density = default_density;
 };
 

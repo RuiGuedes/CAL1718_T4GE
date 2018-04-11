@@ -1,14 +1,11 @@
 #pragma once
 
-#include <iostream>
-#include <string>
-#include <vector>
-#include <queue>
-#include <list>
-#include <chrono>
-
 #include "graphviewer.h"
 #include "MutablePriorityQueue.h"
+
+#include <limits>
+#include <chrono>
+
 
 using namespace std;
 
@@ -24,7 +21,7 @@ using namespace std;
 #define PATH_COLOR             GREEN
 #define NEXT_PATH_COLOR        CYAN
 
-#define VERTEX_SIZE            15
+#define VERTEX_SIZE            20
 
 
 #define INF std::numeric_limits<double>::max()
@@ -67,34 +64,13 @@ public:
 	void update() const;
 	void rearrange() const;
 
-	// Change Color
+	// Editing Color
 	bool setVertexColor(Vertex *v, color color) const;
 	bool setVertexDefaultColor(Vertex *v) const;
 	bool setEdgeColor(Edge *e, color color) const;
 	bool setEdgeDefaultColor(Edge *e) const;
 	void resetVertexColors() const;
 	void resetEdgeColors() const;
-
-	// Advanced API
-	//bool clearVertexLabel(int id);
-	//bool clearEdgeLabel(int id);
-	//bool clearEdgeColor(int id);
-	//bool setEdgeDashed(int id, bool dashed);
-	//bool clearVertexColor(int id);
-	//bool setVertexSize(int id, int size);
-	//bool setVertexIcon(int id, string filepath);
-	//bool clearVertexIcon(int id);
-	//bool setEdgeThickness(int id, int thickness);
-	//bool defineEdgeCurved(bool curved);
-	//bool resetEdgeColor();
-	//bool defineEdgeDashed(bool dashed);
-	//bool resetVertexColor();
-	//bool defineVertexSize(int size);
-	//bool defineVertexIcon(string filepath);
-	//bool resetVertexIcon();
-	//bool setBackground(string path);
-	//bool clearBackground();
-
 
 	// Phantom Display
 	void showBoundaries() const;
@@ -105,6 +81,10 @@ public:
 	void showAllEdgeLabels() const;
 	void hideAllEdgeLabels() const;
 	void showEdgeSimulationLabels() const;
+
+	// Advanced API
+	bool setBackground(string path) const;
+	bool straightEdges() const;
 	/////
 
 	///// ***** Animation
@@ -251,7 +231,6 @@ public:
 
 	///// ***** Operations
 	bool operator<(Vertex v) const;
-	friend ostream& operator<<(ostream &out, Vertex* v);
 	friend class Graph;
 	friend class Edge;
 };
@@ -298,7 +277,6 @@ public:
 	/////
 
 	// ***** Operations
-	friend ostream& operator<<(ostream &out, Edge* e);
 	friend class Graph;
 	friend class Vertex;
 };
@@ -329,7 +307,6 @@ public:
 
 	bool setTotalDistance(double distance);
 
-	friend ostream& operator<<(ostream& out, Road* r);
 	friend class Subroad;
 };
 
