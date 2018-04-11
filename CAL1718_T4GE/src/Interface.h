@@ -20,7 +20,9 @@ void systemInformation();
 
 bool validNumberInput(string input, int max = 0);
 
-int getOption(int max);
+int selectIterations();
+
+int selectOption(int max);
 
 Vertex* selectVertex(bool maybeAccidented = true);
 

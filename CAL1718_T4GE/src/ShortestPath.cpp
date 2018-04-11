@@ -165,6 +165,97 @@ void dijkstraSimulation(Vertex *origin, Vertex *destination) {
 	};
 }
 
+void benchmark(Vertex *origin, Vertex *destination, int N) {
+	// Perform A* to find the best path and show it,
+	// and only then proceed with benchmarking
+	graph->AstarDist(origin, destination);
+	vector<Vertex*> path = graph->getPath(origin, destination);
+	graph->animatePath(path, 0, PATH_COLOR, true);
+
+	// Time of all N iterations
+	microtime internal, external;
+
+	cout << "=== Benchmark " << N << " Iterations ===" << endl;
+
+	// Silent warmup
+	{
+		for (int i = 0; i < min(20, N / 10); ++i) {
+			microtime time;
+			graph->gbfsDist(origin, destination, &time);
+			graph->dijkstraDist(origin, &time);
+			graph->dijkstraDist(origin, destination, &time);
+			graph->AstarDist(origin, destination, &time);
+		}
+	}
+
+	// Benchmark Greedy Best-First Search
+	{
+		microtime sum = 0;
+		auto start = chrono::high_resolution_clock::now();
+		for (int i = 0; i < N; ++i) {
+			microtime time;
+			graph->gbfsDist(origin, destination, &time);
+			sum += time;
+		}
+		auto end = chrono::high_resolution_clock::now();
+		internal = sum / N;
+		external = (end - start).count() / N;
+	}
+	cout << "--- (1) Greedy Best First Search ---" << endl;
+	cout << "Internal Average Time: " << internal << " microseconds." << endl;
+	cout << "External Average Time: " << external << " microseconds." << endl;
+
+	// Benchmark Late Exit Dijkstra
+	{
+		microtime sum = 0;
+		auto start = chrono::high_resolution_clock::now();
+		for (int i = 0; i < N; ++i) {
+			microtime time;
+			graph->dijkstraDist(origin, &time);
+			sum += time;
+		}
+		auto end = chrono::high_resolution_clock::now();
+		internal = sum / N;
+		external = (end - start).count() / N;
+	}
+	cout << "--- (2) Late Exit Dijkstra ---" << endl;
+	cout << "Internal Average Time: " << internal << " microseconds." << endl;
+	cout << "External Average Time: " << external << " microseconds." << endl;
+
+	// Benchmark Early Exit Dijkstra
+	{
+		microtime sum = 0;
+		auto start = chrono::high_resolution_clock::now();
+		for (int i = 0; i < N; ++i) {
+			microtime time;
+			graph->dijkstraDist(origin, destination, &time);
+			sum += time;
+		}
+		auto end = chrono::high_resolution_clock::now();
+		internal = sum / N;
+		external = (end - start).count() / N;
+	}
+	cout << "--- (3) Early Exit Dijkstra ---" << endl;
+	cout << "Internal Average Time: " << internal << " microseconds." << endl;
+	cout << "External Average Time: " << external << " microseconds." << endl;
+
+	// Benchmark A*
+	{
+		microtime sum = 0;
+		auto start = chrono::high_resolution_clock::now();
+		for (int i = 0; i < N; ++i) {
+			microtime time;
+			graph->AstarDist(origin, destination, &time);
+			sum += time;
+		}
+		auto end = chrono::high_resolution_clock::now();
+		internal = sum / N;
+		external = (end - start).count() / N;
+	}
+	cout << "--- (4) A* ---" << endl;
+	cout << "Internal Average Time: " << internal << " microseconds." << endl;
+	cout << "External Average Time: " << external << " microseconds." << endl;
+}
 
 
 /////////////////////
@@ -184,11 +275,12 @@ void shortestPathUI() {
 	cout << "3 - Dijkstra <source,destination>" << endl;
 	cout << "4 - A* <source,destination>" << endl;
 	cout << "5 - Dijkstra with simulation <source,destination>" << endl;
-	cout << "6 - return" << endl;
+	cout << "6 - Benchmark 1 through 4" << endl;
+	cout << "7 - return" << endl;
 
 	// Choose Algorithm
-	option = getOption(6);
-	if (option == 6) return;
+	option = selectOption(7);
+	if (option == 7) return;
 
 	// Choose origin
 	origin = selectOriginVertex(false);
@@ -224,6 +316,10 @@ void shortestPathUI() {
 	case 5: // Dijkstra <source,destination> with simulation
 		dijkstraSimulation(origin, destination);
 		break;
+	case 6:
+		int iterations = selectIterations();
+		if (iterations == 0) return;
+		benchmark(origin, destination, iterations);
 	// ...
 	}
 

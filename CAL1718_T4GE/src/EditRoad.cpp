@@ -36,7 +36,7 @@ void editRoadInformationInterface(Edge* edge) {
 		cout << "2 - Remove cars" << endl;
 		cout << "3 - Return" << endl;
 
-		option = getOption(3);
+		option = selectOption(3);
 		if (option == 3) return;
 
 		system("cls");

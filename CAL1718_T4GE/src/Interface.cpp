@@ -48,14 +48,37 @@ bool validNumberInput(string input, int max) {
 
 
 // Choose an option from the range 1..MAX.
-int getOption(int max) {
+int selectIterations() {
 	while (1) {
 		string input;
-		cout << "Select option: ";
+		cout << "Number of iterations (esc to quit): ";
+		cin >> input;
+
+		if (validNumberInput(input)) {
+			return stoi(input);
+		}
+		else if (regex_match(input, esc)) {
+			return 0;
+		} else {
+			cout << "Invalid input (" << input << "). Try again !" << endl << endl;
+		}
+	}
+}
+
+
+
+// Choose an option from the range 1..MAX.
+int selectOption(int max) {
+	while (1) {
+		string input;
+		cout << "Select option (q to quit): ";
 		cin >> input;
 
 		if (validNumberInput(input, max)) {
 			return stoi(input);
+		}
+		else if (regex_match(input, esc)) {
+			return max;
 		}
 		else {
 			cout << "Unavailable option (" << input << "). Try again !" << endl << endl;
@@ -78,7 +101,7 @@ Vertex* selectVertex(bool maybeAccidented) {
 
 	while (1) {
 		string input;
-		cout << "Select node (write esc to cancel): ";
+		cout << "Select node (esc to quit): ";
 		cin >> input;
 
 		if (validNumberInput(input)) {
@@ -130,7 +153,7 @@ Vertex* selectOriginVertex(bool maybeAccidented) {
 
 	while (1) {
 		string input;
-		cout << "Select origin node (write esc to cancel): ";
+		cout << "Select origin node (q to quit): ";
 		cin >> input;
 
 		if (validNumberInput(input)) {
@@ -190,7 +213,7 @@ Vertex* selectDestinationVertex(Vertex* origin, bool maybeAccidented, bool mustB
 
 	while (1) {
 		string input;
-		cout << "Select destination node (write esc to cancel): ";
+		cout << "Select destination node (q to quit): ";
 		cin >> input;
 
 		if (validNumberInput(input)) {
@@ -247,7 +270,7 @@ Edge* selectEdge(bool maybeAccidented) {
 
 	while (1) {
 		string input;
-		cout << "Select edge (write esc to cancel): ";
+		cout << "Select edge (q to quit): ";
 		cin >> input;
 
 		if (validNumberInput(input)) {
@@ -303,7 +326,7 @@ void mainMenu() {
 		cout << "5 - System information" << endl;
 		cout << "6 - Exit" << endl;
 
-		option = getOption(6);
+		option = selectOption(6);
 		if (option == 6) return;
 
 		system("cls");
