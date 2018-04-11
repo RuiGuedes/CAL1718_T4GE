@@ -210,7 +210,6 @@ void Graph::showBoundaries() const {
 		gv->setVertexColor(ID, BLACK);
 	}
 
-	// TODO: Add phantom edges between phantom points
 }
 
 /**
@@ -845,10 +844,6 @@ Vertex::Vertex(int id, int x, int y, bool accidented):
  * @brief Vertex destructor, destroys all its own edges
  */
 Vertex::~Vertex() {
-//	for (auto edge : adj)
-//		delete edge;
-//	for (auto edge : accidentedAdj)
-//		delete edge;
 }
 
 /*
