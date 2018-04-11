@@ -1,15 +1,85 @@
-#include "FunctionsPrototypes.h"
-
 #include <chrono>
+#include "Interface.h"
 
-//////////////////////////
-// Functions Prototypes //
-//////////////////////////
+/////////////////////////
+// Auxiliary Functions //
+/////////////////////////
 
-bool checkUnreachableNodes(Vertex *origin);
-void animateOneRoad(vector<Vertex*> path, Vertex* &current);
-void animateOneSubroad(vector<Vertex*> path, Vertex* &current);
-void resetGraphState();
+void colorUnreachableNodes(Vertex* origin) {
+	graph->bfs(origin);
+	vector<Vertex*> unreachableNodes;
+
+	cout << endl << "Checking for unreachable nodes ..." << endl << endl;
+
+	for (auto v : graph->getVertexSet()) { // Non-accidented vertices
+		if (v->getPath() == nullptr) {
+			graph->setVertexColor(v, UNREACHABLE_COLOR);
+			unreachableNodes.push_back(v);
+		}
+	}
+
+	graph->setVertexColor(origin, SELECTED_COLOR);
+	graph->rearrange();
+	graph->clear();
+}
+
+void animateOneRoad(vector<Vertex*> path, Vertex* &current) {
+	graph->setVertexColor(current, PATH_COLOR);
+
+	// This is the road we should stay on
+	Road* firstRoad = path.at(0)->findEdge(path.at(1))->getRoad();
+
+	// Display the road we travel
+	cout << "Traveling road " << firstRoad->getName() << "." << endl;
+
+	// Find the vertex in which we switch Roads
+	// If the entire path is contained in one Road, i.e. this is the
+	// last road and the for cycle ends naturally, then
+	// the new current is the last (destination) vertex.
+	current = path.back();
+	for (size_t i = 1; i < path.size(); ++i) {
+		Road* road = path.at(i - 1)->findEdge(path.at(i))->getRoad();
+		if (road != firstRoad) {
+			current = path.at(i - 1);
+			break;
+		}
+	}
+
+	// Animate these with PATH color
+	vector<Vertex*> first = graph->getPath(path.front(), current);
+	// Quick-animate these with NEXT PATH color
+	vector<Vertex*> second = graph->getPath(current, path.back());
+
+	graph->animatePath(first, 200, PATH_COLOR, true);
+	graph->animatePath(second, 15, NEXT_PATH_COLOR, true);
+}
+
+void animateOneSubroad(vector<Vertex*> path, Vertex* &current) {
+	graph->setVertexColor(current, PATH_COLOR);
+
+	// The new current is the next vertex in the path
+	current = path.at(1);
+
+	// Animate these with PATH color
+	vector<Vertex*> first = graph->getPath(path.front(), path.at(1));
+	// Quick-animate these with NEXT PATH color
+	vector<Vertex*> second = graph->getPath(path.at(1), path.back());
+
+	graph->animatePath(first, 200, PATH_COLOR, true);
+	graph->animatePath(second, 15, NEXT_PATH_COLOR, true);
+}
+
+void resetGraphState() {
+	graph->resetVertexColors();
+	graph->resetEdgeColors();
+	graph->rearrange();
+}
+
+
+
+///////////////////////////////////
+// GUI for Individual Algorithms //
+///////////////////////////////////
 
 void gbfs(Vertex *origin, Vertex *destination) {
 	// Perform algorithm
@@ -19,7 +89,7 @@ void gbfs(Vertex *origin, Vertex *destination) {
 
 	// Get shortest path and animate
 	vector<Vertex*> path = graph->getPath(origin, destination);
-	graph->animatePath(path, 100, VERTEX_PATH_COLOR, true);
+	graph->animatePath(path, 200, PATH_COLOR, true);
 
 	// Perform A* to verify it is the correct path
 	graph->AstarDist(origin, destination);
@@ -40,7 +110,7 @@ void dijkstraSource(Vertex *origin, Vertex *destination) {
 
 	// Get shortest path and animate
 	vector<Vertex*> path = graph->getPath(origin, destination);
-	graph->animatePath(path, 100, VERTEX_PATH_COLOR, true);
+	graph->animatePath(path, 200, PATH_COLOR, true);
 }
 
 void dijkstraSourceDest(Vertex *origin, Vertex *destination) {
@@ -51,7 +121,7 @@ void dijkstraSourceDest(Vertex *origin, Vertex *destination) {
 
 	// Get shortest path and animate
 	vector<Vertex*> path = graph->getPath(origin, destination);
-	graph->animatePath(path, 100, VERTEX_PATH_COLOR, true);
+	graph->animatePath(path, 200, PATH_COLOR, true);
 }
 
 void Astar(Vertex *origin, Vertex *destination) {
@@ -62,7 +132,7 @@ void Astar(Vertex *origin, Vertex *destination) {
 
 	// Get shortest path and animate
 	vector<Vertex*> path = graph->getPath(origin, destination);
-	graph->animatePath(path, 100, VERTEX_PATH_COLOR, true);
+	graph->animatePath(path, 200, PATH_COLOR, true);
 }
 
 void dijkstraSimulation(Vertex *origin, Vertex *destination) {
@@ -95,8 +165,13 @@ void dijkstraSimulation(Vertex *origin, Vertex *destination) {
 	};
 }
 
-void getShortestPath() {
 
+
+/////////////////////
+// Algorithms Menu //
+/////////////////////
+
+void shortestPathUI() {
 	int option;
 	Vertex* origin = nullptr;
 	Vertex* destination = nullptr;
@@ -116,128 +191,45 @@ void getShortestPath() {
 	if (option == 6) return;
 
 	// Choose origin
-	origin = getOriginVertex(false);
+	origin = selectOriginVertex(false);
 	if (origin == nullptr) return;
-	graph->setVertexColor(origin, VERTEX_SELECTED_COLOR);
 
-	// Find unreachable nodes
-	bool reachable = checkUnreachableNodes(origin);
+	// Color unreachable nodes
+	colorUnreachableNodes(origin);
+	graph->setVertexColor(origin, SELECTED_COLOR);
 
-	if(!reachable) {
-		cout << "There are no reachable nodes at the moment from " << origin->getID() << "." << endl << endl;
+	// Select destination
+	destination = selectDestinationVertex(origin, false, true);
+	if (destination == nullptr) {
+		resetGraphState();
+		return;
 	}
-	else {
 
-		// Select destination
-		destination = getDestinationVertex(false, true);
-		if (destination == nullptr) {
-			resetGraphState();
-			return;
-		}
+	graph->setVertexColor(destination, SELECTED_COLOR);
 
-		graph->setVertexColor(destination, "magenta");
-
-		// Ok: so here we separate each algorithm
-		switch (option) {
-		case 1: // Greedy Best-First Search <source,destination>
-			gbfs(origin, destination);
-			break;
-		case 2: // Dijkstra <source>
-			dijkstraSource(origin, destination);
-			break;
-		case 3: // Dijkstra <source,destination>
-			dijkstraSourceDest(origin, destination);
-			break;
-		case 4: // A* <source,destination>
-			Astar(origin, destination);
-			break;
-		case 5: // Dijkstra <source,destination> with simulation
-			dijkstraSimulation(origin, destination);
-			break;
-		}
+	// Ok: so here we separate each algorithm
+	switch (option) {
+	case 1: // Greedy Best-First Search <source,destination>
+		gbfs(origin, destination);
+		break;
+	case 2: // Dijkstra <source>
+		dijkstraSource(origin, destination);
+		break;
+	case 3: // Dijkstra <source,destination>
+		dijkstraSourceDest(origin, destination);
+		break;
+	case 4: // A* <source,destination>
+		Astar(origin, destination);
+		break;
+	case 5: // Dijkstra <source,destination> with simulation
+		dijkstraSimulation(origin, destination);
+		break;
+	// ...
 	}
 
 	// Reset and go up
 	cout << "Done. ";
 	system("pause");
 	resetGraphState();
-}
-
-bool checkUnreachableNodes(Vertex* origin) {
-	graph->bfs(origin);
-	vector<Vertex*> unreachableNodes;
-	bool reachable = false;
-
-	cout << endl << "Checking for unreachable nodes ..." << endl << endl;
-
-	for(auto v : graph->getVertexSet()) { // Non-accidented vertices
-		if(v->getPath() == nullptr) {
-			graph->setVertexColor(v,VERTEX_UNREACHABLE_COLOR);
-			unreachableNodes.push_back(v);
-		} else {
-			reachable = true;
-		}
-	}
-
-	// Color unreachable nodes
-	for (auto v : unreachableNodes) {
-		graph->setVertexColor(v, VERTEX_UNREACHABLE_COLOR);
-	}
-
-	graph->rearrange();
-	return reachable;
-}
-
-void animateOneRoad(vector<Vertex*> path, Vertex* &current) {
-	graph->setVertexColor(current, VERTEX_PATH_COLOR);
-
-	// This is the road we should stay on
-	Road* firstRoad = path.at(0)->findEdge(path.at(1))->getRoad();
-
-	// Display the road we travel
-	cout << "Traveling road " << firstRoad->getName() << "." << endl;
-
-	// Find the vertex in which we switch Roads
-	// If the entire path is contained in one Road, i.e. this is the
-	// last road and the for cycle ends naturally, then
-	// threshold = path.size() - 1
-	// and the new current is the last (destination) vertex.
-	current = path.back();
-	for (size_t i = 1; i < path.size(); ++i) {
-		Road* road = path.at(i - 1)->findEdge(path.at(i))->getRoad();
-		if (road != firstRoad) {
-			current = path.at(i - 1);
-			break;
-		}
-	}
-
-	// Animate these with PATH color
-	vector<Vertex*> first = graph->getPath(path.front(), current);
-	// Quick-animate these with NEXT PATH color
-	vector<Vertex*> second = graph->getPath(current, path.back());
-
-	graph->animatePath(first, 100, VERTEX_PATH_COLOR, true);
-	graph->animatePath(second, 10, VERTEX_NEXT_PATH_COLOR, true);
-}
-
-void animateOneSubroad(vector<Vertex*> path, Vertex* &current) {
-	graph->setVertexColor(current, VERTEX_PATH_COLOR);
-
-	// The new current is the next vertex in the path
-	current = path.at(1);
-
-	// Animate these with PATH color
-	vector<Vertex*> first = graph->getPath(path.front(), path.at(1));
-	// Quick-animate these with NEXT PATH color
-	vector<Vertex*> second = graph->getPath(path.at(1), path.back());
-
-	graph->animatePath(first, 100, VERTEX_PATH_COLOR, true);
-	graph->animatePath(second, 10, VERTEX_NEXT_PATH_COLOR, true);
-}
-
-void resetGraphState() {
-	graph->resetVertexColors();
-	graph->resetEdgeColors();
-	graph->rearrange();
 }
 

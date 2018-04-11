@@ -12,22 +12,20 @@
 
 using namespace std;
 
-#define GRAPH_VIEWER_WIDTH        ((int)600)
-#define GRAPH_VIEWER_HEIGHT       ((int)600)
+#define GRAPH_VIEWER_WIDTH     ((int)600)
+#define GRAPH_VIEWER_HEIGHT    ((int)600)
 
-#define VERTEX_CLEAR_COLOR        BLUE
-#define VERTEX_ACCIDENTED_COLOR   RED
-#define VERTEX_SELECTED_COLOR     MAGENTA
-#define VERTEX_UNREACHABLE_COLOR  YELLOW
-#define VERTEX_PATH_COLOR         GREEN
-#define VERTEX_NEXT_PATH_COLOR    CYAN
+#define VERTEX_CLEAR_COLOR     BLUE
+#define EDGE_CLEAR_COLOR       BLACK
 
-#define EDGE_CLEAR_COLOR          BLACK
-#define EDGE_ACCIDENTED_COLOR     RED
-#define EDGE_SELECTED_COLOR       MAGENTA
-#define EDGE_UNREACHABLE_COLOR    YELLOW
-#define EDGE_PATH_COLOR           GREEN
-#define EDGE_NEXT_PATH_COLOR      CYAN
+#define ACCIDENTED_COLOR       RED
+#define SELECTED_COLOR         MAGENTA
+#define UNREACHABLE_COLOR      YELLOW
+#define PATH_COLOR             GREEN
+#define NEXT_PATH_COLOR        CYAN
+
+#define VERTEX_SIZE            15
+
 
 #define INF std::numeric_limits<double>::max()
 
@@ -37,10 +35,7 @@ class Vertex;
 class Road;
 class Subroad;
 
-extern bool graphLoaded;
-extern bool showEdgeLabels;
-extern bool showEdgeWeights;
-extern bool showEdgeFlows;
+extern Graph* graph;
 
 using microtime = chrono::duration<int64_t,micro>::rep;
 using color = string;
@@ -57,10 +52,8 @@ class Graph {
 	double scale;
 
 	mutable struct Mode {
-		bool vertexLabels = true;
+		bool vertexLabels = false;
 		bool edgeLabels = false;
-		bool edgeWeights = false;
-		bool edgeFlows = false;
 	} show;
 
 	///// ***** Auxiliary
@@ -111,14 +104,11 @@ public:
 	void hideAllVertexLabels() const;
 	void showAllEdgeLabels() const;
 	void hideAllEdgeLabels() const;
-	void showAllEdgeWeights() const;
-	void hideAllEdgeWeights() const;
-	void showAllEdgeFlows() const;
-	void hideAllEdgeFlows() const;
+	void showEdgeSimulationLabels() const;
 	/////
 
 	///// ***** Animation
-	void animatePath(vector<Vertex*> path, int interval = 100, color = VERTEX_PATH_COLOR, bool last = false) const;
+	void animatePath(vector<Vertex*> path, int interval = 100, color = PATH_COLOR, bool last = false) const;
 	void clearPath(vector<Vertex*> path, int interval = 0, bool last = false) const;
 	/////
 
@@ -171,6 +161,8 @@ public:
 	void generateGraphNewStatus();
 
 	///// ***** Algorithms
+	void clear() const;
+
 	// Breadth First Search. Find reachable nodes
 	void bfs(Vertex *origin);
 
@@ -345,9 +337,9 @@ public:
 
 
 
-/////////////////////////
-///// Class Subroad /////
-/////////////////////////
+//////////////////////////
+////// Class Subroad /////
+//////////////////////////
 
 class Subroad {
 	const double distance;

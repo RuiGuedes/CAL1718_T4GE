@@ -102,6 +102,20 @@ void Graph::moveToAccidentedVertexSet(Vertex *v) {
 	update();
 }
 
+/**
+ * @brief Clear previous invocation of a pathing
+ * algorithm.
+ */
+void Graph::clear() const {
+	for (auto v : vertexSet) {
+		v->dist = INF;
+		v->path = nullptr;
+	}
+	for (auto v : accidentedVertexSet) {
+		v->dist = INF;
+		v->path = nullptr;
+	}
+}
 
 
 ///// ***** Visual GraphViewer API
@@ -140,7 +154,7 @@ bool Graph::setVertexColor(Vertex *v, string color) const {
 bool Graph::setVertexDefaultColor(Vertex *v) const {
 	if (v == nullptr) return false;
 	if (v->isAccidented()) {
-		return setVertexColor(v, VERTEX_ACCIDENTED_COLOR);
+		return setVertexColor(v, ACCIDENTED_COLOR);
 	} else {
 		return setVertexColor(v, VERTEX_CLEAR_COLOR);
 	}
@@ -164,7 +178,7 @@ bool Graph::setEdgeColor(Edge *e, string color) const {
 bool Graph::setEdgeDefaultColor(Edge *e) const {
 	if (e == nullptr) return false;
 	if (e->isAccidented()) {
-		return setEdgeColor(e, EDGE_ACCIDENTED_COLOR);
+		return setEdgeColor(e, ACCIDENTED_COLOR);
 	} else {
 		return setEdgeColor(e, EDGE_CLEAR_COLOR);
 	}
@@ -298,9 +312,15 @@ void Graph::showAllEdgeLabels() const {
 		for (auto e : v->adj) {
 			gv->setEdgeLabel(e->getID(), to_string(e->getID()));
 		}
+		for (auto e : v->accidentedAdj) {
+			gv->setEdgeLabel(e->getID(), to_string(e->getID()));
+		}
 	}
 	for (auto v : accidentedVertexSet) {
 		for (auto e : v->adj) {
+			gv->setEdgeLabel(e->getID(), to_string(e->getID()));
+		}
+		for (auto e : v->accidentedAdj) {
 			gv->setEdgeLabel(e->getID(), to_string(e->getID()));
 		}
 	}
@@ -316,9 +336,15 @@ void Graph::hideAllEdgeLabels() const {
 		for (auto e : v->adj) {
 			gv->clearEdgeLabel(e->getID());
 		}
+		for (auto e : v->accidentedAdj) {
+			gv->clearEdgeLabel(e->getID());
+		}
 	}
 	for (auto v : accidentedVertexSet) {
 		for (auto e : v->adj) {
+			gv->clearEdgeLabel(e->getID());
+		}
+		for (auto e : v->accidentedAdj) {
 			gv->clearEdgeLabel(e->getID());
 		}
 	}
@@ -326,34 +352,27 @@ void Graph::hideAllEdgeLabels() const {
 
 /**
  * GRAPHVIEWER
- * Reshows all edge weights
+ * Shows all edge labels in the format
+ * time - cars / max cars
  */
-void Graph::showAllEdgeWeights() const {
-	show.edgeWeights = true; // TODO showAllEdgeWeights
-}
-
-/**
- * GRAPHVIEWER
- * Hides all edge weights
- */
-void Graph::hideAllEdgeWeights() const {
-	show.edgeWeights = false; // TODO hideAllEdgeWeights
-}
-
-/**
- * GRAPHVIEWER
- * Reshows all edge flows
- */
-void Graph::showAllEdgeFlows() const {
-	show.edgeFlows = true; // TODO showAllEdgeFlows
-}
-
-/**
- * GRAPHVIEWER
- * Hides all edge flows
- */
-void Graph::hideAllEdgeFlows() const {
-	show.edgeFlows = false; // TODO hideAllEdgeWeights
+void Graph::showEdgeSimulationLabels() const {
+	show.edgeLabels = true;
+	for (auto v : vertexSet) {
+		for (auto e : v->adj) {
+			gv->setEdgeLabel(e->getID(), to_string(e->getID()));
+		}
+		for (auto e : v->accidentedAdj) {
+			gv->setEdgeLabel(e->getID(), to_string(e->getID()));
+		}
+	}
+	for (auto v : accidentedVertexSet) {
+		for (auto e : v->adj) {
+			gv->setEdgeLabel(e->getID(), to_string(e->getID()));
+		}
+		for (auto e : v->accidentedAdj) {
+			gv->setEdgeLabel(e->getID(), to_string(e->getID()));
+		}
+	}
 }
 
 
@@ -370,7 +389,7 @@ void Graph::animatePath(vector<Vertex*> path, int interval, color color, bool la
 		rearrange();
 	}
 
-	if (last) setVertexColor(path.back(), VERTEX_SELECTED_COLOR);
+	if (last) setVertexColor(path.back(), SELECTED_COLOR);
 	rearrange();
 }
 
@@ -384,7 +403,7 @@ void Graph::clearPath(vector<Vertex*> path, int interval, bool last) const {
 		rearrange();
 	}
 
-	if (last) setVertexColor(path.back(), VERTEX_SELECTED_COLOR);
+	if (last) setVertexColor(path.back(), SELECTED_COLOR);
 	rearrange();
 }
 
@@ -431,22 +450,7 @@ bool Graph::addVertex(int id, int x, int y, bool accidented) {
 	} else if (!withinBounds(x, y)) {
 		throw std::out_of_range("Vertex out of graph bounds");
 	} else {
-		Vertex *v = new Vertex(id, x, y, accidented);
-		v->_sgraph(this);
-		if (accidented) {
-			accidentedVertexSet.push_back(v);
-		} else {
-			vertexSet.push_back(v);
-		}
-		gv->addNode(id, x, y);
-		// * Set Vertex Label
-		if (show.vertexLabels)
-			gv->setVertexLabel(id, to_string(id));
-		// * Set Vertex Color
-		if (v->isAccidented())
-			gv->setVertexColor(id, VERTEX_ACCIDENTED_COLOR);
-		// No graph->update()
-		return true;
+		return addVertex(new Vertex(id, x, y, accidented));
 	}
 }
 
@@ -469,16 +473,18 @@ bool Graph::addVertex(Vertex* v) {
 		v->_sgraph(this);
 		if (v->isAccidented()) {
 			accidentedVertexSet.push_back(v);
+			gv->setVertexColor(id, ACCIDENTED_COLOR);
 		} else {
 			vertexSet.push_back(v);
 		}
 		gv->addNode(id, v->getX(), v->getY());
+
 		// * Set Vertex Label
 		if (show.vertexLabels)
 			gv->setVertexLabel(id, to_string(id));
-		// * Set Vertex Color
-		if (v->isAccidented())
-			gv->setVertexColor(id, VERTEX_ACCIDENTED_COLOR);
+
+		gv->setVertexSize(id, VERTEX_SIZE);
+
 		// No graph->update()
 		return true;
 	}
@@ -1032,10 +1038,7 @@ bool Vertex::addEdge(Edge* e) {
 		graph->gv->setEdgeLabel(id, to_string(id));
 	// * Set Edge Color
 	if (e->isAccidented())
-		graph->gv->setEdgeColor(id, EDGE_ACCIDENTED_COLOR);
-	// * Set Edge Weight
-	if (graph->show.edgeWeights)
-		graph->gv->setEdgeWeight(id, e->getWeight());
+		graph->gv->setEdgeColor(id, ACCIDENTED_COLOR);
 	// No graph->update()
 	return true;
 }
@@ -1122,7 +1125,7 @@ bool Vertex::accident() {
 	if (!accidented) {
 		accidented = true;
 		// * Set Vertex Color
-		graph->setVertexColor(this, VERTEX_ACCIDENTED_COLOR);
+		graph->setVertexColor(this, ACCIDENTED_COLOR);
 		// * Accident edges ?
 		for (Edge *e : adj) {
 			e->accident();
@@ -1354,7 +1357,7 @@ bool Edge::accident() {
 	if (!accidented) {
 		accidented = true;
 		// * Set Edge Color
-		graph->setEdgeColor(this, EDGE_ACCIDENTED_COLOR);
+		graph->setEdgeColor(this, ACCIDENTED_COLOR);
 		// Move to accidentedAdj
 		source->moveToAccidentedAdj(this);
 		return true;
@@ -1389,11 +1392,10 @@ ostream& operator<<(ostream& out, Edge* e) {
 
 
 
+
 void Graph::generateGraphNewStatus() {
 	//For every edge generate new capacity
 	vector<Vertex*> everyVextex = getAllVertexSet();
-
-	cout << "GET ALL VERTEX CHECK\n\n";
 
 	for (auto vertex : everyVextex) {
 		for(auto edge : vertex->adj) {
@@ -1403,104 +1405,11 @@ void Graph::generateGraphNewStatus() {
 			}
 		}
 	}
-
-	cout << "EDGES CHECK\n\n";
-
-	//For every vertex
-
 }
-
-//void Graph::dijkstraDist(Vertex* vsource) {
-//	MutablePriorityQueue<Vertex> q;
-//	for (auto v : vertexSet) {
-//
-//		if (v == vsource) {
-//			v->dist = 0;
-//			v->path = NULL;
-//			q.insert(v);
-//		}
-//		else {
-//			v->dist = INF;
-//			v->path = NULL;
-//		}
-//	}
-//
-//	while (!q.empty()) {
-//		Vertex* v = q.extractMin();
-//		for(auto w : v->adj) {
-//
-//			cout << "origem -> " << v->id << "   ";
-//			cout << "dest -> " << w->dest->id <<  "   ";
-//			cout << "weight -> " << w->getWeight() << endl;
-//
-//			if(w->dest->dist > v->dist + w->getWeight()) {
-//				double oldDist = w->dest->dist;
-//
-//				w->dest->dist = v->dist + w->getWeight();
-//				w->dest->path = v;
-//				cout << w->dest->path << endl;
-//				if(oldDist == INF)
-//					q.insert(w->dest);
-//				else
-//					q.decreaseKey(w->dest);
-//			}
-//		}
-//	}
-//}
-//
-//void Graph::dijkstraDist(Vertex* vsource, Vertex *vdest) {
-//	MutablePriorityQueue<Vertex> q;
-//	for (auto v : vertexSet) {
-//
-//		if (v == vsource) {
-//			v->dist = 0;
-//			v->path = NULL;
-//			q.insert(v);
-//		}
-//		else {
-//			v->dist = INF;
-//			v->path = NULL;
-//		}
-//	}
-//
-//	while (!q.empty()) {
-//		Vertex* v = q.extractMin();
-//
-//		if(v == vdest)
-//			return;
-//
-//		for(auto w : v->adj) {
-//
-//			//			cout << "origem -> " << v->id << "   ";
-//			//			cout << "dest -> " << w->dest->id <<  "   ";
-//			//			cout << "weight -> " << w->getWeight() << endl;
-//
-//			if(w->dest->dist > v->dist + w->getWeight()) {
-//				double oldDist = w->dest->dist;
-//
-//				w->dest->dist = v->dist + w->getWeight();
-//				w->dest->path = v;
-//
-//				if(oldDist == INF)
-//					q.insert(w->dest);
-//				else
-//					q.decreaseKey(w->dest);
-//			}
-//		}
-//	}
-//}
 
 
 void Graph::bfs(Vertex *origin) {
-	// Check args
-	if (origin == nullptr) return;
-
-	for (auto v : vertexSet) {
-		v->dist = 0;
-		v->path = nullptr;
-	}
-	//origin->dist = 0;
-	//origin->path = nullptr;
+	clear();
 
 	deque<Vertex*> q;
 	q.push_back(origin);
@@ -1529,18 +1438,10 @@ void Graph::bfs(Vertex *origin) {
  * is not necessarily the best (shortest) path.
  */
 void Graph::gbfsDist(Vertex *vsource, Vertex *vdest, microtime *time) {
-	auto start = chrono::high_resolution_clock::now();
-
-	// Check args
-	if (vsource == nullptr || vdest == nullptr) return;
-	if (vsource->isAccidented() || vdest->isAccidented()) return;
-
-	for (auto v : vertexSet) {
-		v->dist = INF;
-		v->path = nullptr;
-	}
+	clear();
 	vsource->dist = 0;
-	//origin->path = nullptr;
+
+	auto start = chrono::high_resolution_clock::now();
 
 	MutablePriorityQueue<Vertex> q;
 	q.insert(vsource);
@@ -1577,18 +1478,10 @@ void Graph::gbfsDist(Vertex *vsource, Vertex *vdest, microtime *time) {
  * so it finds the best path for all reachable vertices.
  */
 void Graph::dijkstraDist(Vertex *vsource, microtime *time) {
-	auto start = chrono::high_resolution_clock::now();
-
-	// Check args
-	if (vsource == nullptr) return;
-	if (vsource->isAccidented()) return;
-
-	for (auto v : vertexSet) {
-		v->dist = INF;
-		v->path = nullptr;
-	}
+	clear();
 	vsource->dist = 0;
-	//origin->path = nullptr;
+
+	auto start = chrono::high_resolution_clock::now();
 
 	MutablePriorityQueue<Vertex> q;
 	q.insert(vsource);
@@ -1624,18 +1517,10 @@ void Graph::dijkstraDist(Vertex *vsource, microtime *time) {
  * path from vsource to vdest is found.
  */
 void Graph::dijkstraDist(Vertex *vsource, Vertex *vdest, microtime *time) {
-	auto start = chrono::high_resolution_clock::now();
-
-	// Check args
-	if (vsource == nullptr || vdest == nullptr) return;
-	if (vsource->isAccidented() || vdest->isAccidented()) return;
-
-	for (auto v : vertexSet) {
-		v->dist = INF;
-		v->path = nullptr;
-	}
+	clear();
 	vsource->dist = 0;
-	//origin->path = nullptr;
+
+	auto start = chrono::high_resolution_clock::now();
 
 	MutablePriorityQueue<Vertex> q;
 	q.insert(vsource);
@@ -1670,18 +1555,10 @@ void Graph::dijkstraDist(Vertex *vsource, Vertex *vdest, microtime *time) {
  * stopping once the best path from vsource to vdest is found.
  */
 void Graph::AstarDist(Vertex *vsource, Vertex *vdest, microtime *time) {
-	auto start = chrono::high_resolution_clock::now();
-
-	// Check args
-	if (vsource == nullptr || vdest == nullptr) return;
-	if (vsource->isAccidented() || vdest->isAccidented()) return;
-
-	for (auto v : vertexSet) {
-		v->dist = INF;
-		v->path = nullptr;
-	}
+	clear();
 	vsource->dist = 0;
-	//origin->path = nullptr;
+
+	auto start = chrono::high_resolution_clock::now();
 
 	MutablePriorityQueue<Vertex> q;
 	q.insert(vsource);
@@ -1717,18 +1594,10 @@ void Graph::AstarDist(Vertex *vsource, Vertex *vdest, microtime *time) {
  * of travel time, given source and destination vertices.
  */
 void Graph::dijkstraSimulation(Vertex *vsource, Vertex *vdest, microtime *time) {
-	auto start = chrono::high_resolution_clock::now();
-
-	// Check args
-	if (vsource == nullptr || vdest == nullptr) return;
-	if (vsource->isAccidented() || vdest->isAccidented()) return;
-
-	for (auto v : vertexSet) {
-		v->dist = INF;
-		v->path = nullptr;
-	}
+	clear();
 	vsource->dist = 0;
-	//origin->path = nullptr;
+
+	auto start = chrono::high_resolution_clock::now();
 
 	MutablePriorityQueue<Vertex> q;
 	q.insert(vsource);

@@ -1,4 +1,4 @@
-#include "FunctionsPrototypes.h"
+#include "Interface.h"
 
 //////////////////////////
 // Functions Prototypes //
@@ -9,68 +9,16 @@ void addCars(Edge* edge);
 void removeCars(Edge* edge);
 void printEdgeInfo(Edge* edge);
 
-
-
-//////////////////////
-// Global Variables //
-//////////////////////
-
-int startingNode { };
-int destinationNode { };
-
 void editRoadInfo() {
-
-	system("cls");
-
-	string option;
-	Vertex *origin { };
-	Vertex *destination { };
+	Edge *edge = nullptr;
 
 	cout << "Edit road information " << endl << endl;
 
 	// Get origin
-	while(1) {
+	edge = selectEdge(true);
+	if (edge == nullptr) return;
 
-		cout << "Select starting node: ";
-		cin >> option;
-
-		if (validIDInput(option)) {
-			int node = stoi(option);
-			origin = graph->findVertex(node);
-			if (origin == nullptr)
-				cout << "Invalid node (" << option << "). Try again !" << endl << endl;
-			else
-				break;
-		}
-		else
-			cout << "Invalid node (" << option << "). Try again !" << endl << endl;
-	}
-
-	// Get destination
-	while(1) {
-
-		cout << endl << "Select destination node: ";
-		cin >> option;
-
-		if(validIDInput(option)) {
-			int node = stoi(option);
-			destination = graph->findVertex(node);
-			if (destination == nullptr) {
-				cout << "Invalid node (" << option << "). Try again !" << endl << endl;
-			}
-			else if (!origin->isAdjacentTo(destination)) {
-				cout << "Node " << option << " is not adjacent to " << origin->getID() << endl << endl;
-			}
-			else {
-				break;
-			}
-		}
-		else
-			cout << "Invalid node (" << option << ") Try again !" << endl;
-	}
-
-	Edge *edge = origin->findEdge(destination);
-	graph->setEdgeColor(edge, EDGE_SELECTED_COLOR);
+	graph->setEdgeColor(edge, SELECTED_COLOR);
 	graph->rearrange();
 	editRoadInformationInterface(edge);
 	graph->setEdgeDefaultColor(edge);
@@ -79,35 +27,21 @@ void editRoadInfo() {
 
 
 void editRoadInformationInterface(Edge* edge) {
-	system("cls");
+	int option;
 
-	string option;
-	int value {};
-
-	do {
+	while (1) {
 		cout << "Edit road information " << endl << endl;
 
 		cout << "1 - Add cars" << endl;
 		cout << "2 - Remove cars" << endl;
 		cout << "3 - Return" << endl;
 
-		while(1)
-		{
-			cout << endl << "Enter an option (1-3): ";
-			cin >> option;
-
-			if(validIDInput(option,3)) {
-				value = stoi(option);
-				break;
-			}
-			else
-				cout << "Invalid option (" << option << "). Try again !" << endl << endl;
-
-		};
+		option = getOption(3);
+		if (option == 3) return;
 
 		system("cls");
 
-		switch (value)
+		switch (option)
 		{
 		case 1:
 			if(edge->getActualCapacity() == edge->getMaxCapacity())
@@ -122,14 +56,9 @@ void editRoadInformationInterface(Edge* edge) {
 				removeCars(edge);
 			break;
 		}
-		if(value != 3) {
-			graph->rearrange();
-			cout << endl;
-			system("pause");
-		}
-		system("cls");
 
-	}while(value != 3);
+		system("cls");
+	}
 }
 
 
@@ -148,7 +77,7 @@ void addCars(Edge* edge) {
 		cout << "Number of cars to be added: ";
 		cin >> option;
 
-		if(validIDInput(option, maxCap - actualCap)) {
+		if(validNumberInput(option, maxCap - actualCap)) {
 			edge->setActualCapacity(actualCap + stoi(option)); // this should relabel the edge
 			break;
 		}
@@ -171,7 +100,7 @@ void removeCars(Edge* edge) {
 		cout << "Number of cars to be removed: ";
 		cin >> option;
 
-		if(validIDInput(option,actualCap)) {
+		if(validNumberInput(option,actualCap)) {
 			edge->setActualCapacity(actualCap - stoi(option)); // this should relabel the edge
 			break;
 		}
@@ -185,9 +114,9 @@ void printEdgeInfo(Edge* edge) {
 	cout << "Edge information:" << endl;
 	cout << "ID -> " << edge->getID() << endl;
 	if(road->getName().empty())
-		cout << "Name -> -----" << endl;
+		cout << "Road Name -> -----" << endl;
 	else
-		cout << "Name -> " << road->getName() << endl;
+		cout << "Road Name -> " << road->getName() << endl;
 	cout << "Average speed -> " << edge->calculateAverageSpeed() << endl;
 	cout << "Distance -> " << edge->getDistance() << " meters" << endl;
 	cout << "Amount of cars -> " << edge->getActualCapacity() << " cars" << endl;
