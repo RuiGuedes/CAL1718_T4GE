@@ -1450,7 +1450,6 @@ void Graph::dijkstraDist(Vertex *vsource, microtime *time) {
 	q.insert(vsource);
 	while (!q.empty()) {
 		auto current = q.extractMin();
-		cout << current->getID() << "   " << current->cost << endl;
 		// if (v == vdest) break; <- Single source
 		for (auto e : current->adj) { // Non-accidented only
 			auto next = e->dest;
@@ -1494,7 +1493,6 @@ void Graph::dijkstraDist(Vertex *vsource, Vertex *vdest, microtime *time) {
 	q.insert(vsource);
 	while (!q.empty()) {
 		auto current = q.extractMin();
-		cout << current->getID() << "   " << current->cost << endl;
 		if (current == vdest) break;
 		for (auto e : current->adj) { // Non-accidented only
 			auto next = e->dest;
@@ -1537,7 +1535,6 @@ void Graph::AstarDist(Vertex *vsource, Vertex *vdest, microtime *time) {
 	q.insert(vsource);
 	while (!q.empty()) {
 		auto current = q.extractMin();
-		cout << current->getID() << "   " << current->cost << endl;
 		if (current == vdest) break;
 		for (auto e : current->adj) { // Non-accidented only
 			auto next = e->dest;
@@ -1580,7 +1577,6 @@ void Graph::dijkstraSimulation(Vertex *vsource, Vertex *vdest, microtime *time) 
 	q.insert(vsource);
 	while (!q.empty()) {
 		auto current = q.extractMin();
-		cout << current->getID() << "   " << current->cost << endl;
 		if (current == vdest) break;
 		for (auto e : current->adj) { // Non-accidented only
 			auto next = e->dest;

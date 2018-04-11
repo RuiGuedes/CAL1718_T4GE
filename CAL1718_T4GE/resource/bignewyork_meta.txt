@@ -9,7 +9,7 @@ EDGES=11261;
 
 BOUNDARIES=1;
 
-BACKGROUND=newyork_large.png;
+BACKGROUND=newyork.png;
 
 ---------------------------
 

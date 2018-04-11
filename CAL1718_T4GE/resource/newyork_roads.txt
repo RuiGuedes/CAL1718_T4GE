@@ -1,21 +1,21 @@
-5696609;Cauldwell Avenue;False
+5696609;Cauldwell Avenue;True
 5697482;East 161st Street;False
-5698427;Jackson Avenue;False
-5698782;East 159th Street;False
-5699016;Trinity Avenue;False
-5699447;Forest Avenue;False
-5699529;East 160th Street;False
-5699682;East 158th Street;False
+5698427;Jackson Avenue;True
+5698782;East 159th Street;True
+5699016;Trinity Avenue;True
+5699447;Forest Avenue;True
+5699529;East 160th Street;True
+5699682;East 158th Street;True
 5699683;East 158th Street;False
-223892611;Saint Ann's Avenue;False
-273592558;East 156th Street;False
+223892611;Saint Ann's Avenue;True
+273592558;East 156th Street;True
 274366643;Tinton Avenue;False
-536792009;Eagle Avenue;False
+536792009;Eagle Avenue;True
 570227108;;False
-570227109;;False
+570227109;;True
 570227110;;False
-570227111;;False
-570227112;;False
-570227135;;False
-570227137;;False
+570227111;;True
+570227112;;True
+570227135;;True
+570227137;;True
 570227138;;False
