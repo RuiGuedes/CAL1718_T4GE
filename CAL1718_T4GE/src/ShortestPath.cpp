@@ -7,14 +7,12 @@
 
 void colorUnreachableNodes(Vertex* origin) {
 	graph->bfs(origin);
-	vector<Vertex*> unreachableNodes;
 
 	cout << endl << "Checking for unreachable nodes ..." << endl << endl;
 
 	for (auto v : graph->getVertexSet()) { // Non-accidented vertices
 		if (v->getPath() == nullptr) {
 			graph->setVertexColor(v, UNREACHABLE_COLOR);
-			unreachableNodes.push_back(v);
 		}
 	}
 
@@ -98,7 +96,9 @@ void gbfs(Vertex *origin, Vertex *destination) {
 	if (equal(path.begin(), path.end(), astarpath.begin(), astarpath.end())) {
 		cout << "The path found is the best path." << endl;
 	} else {
-		cout << "The path found is not the best path." << endl;
+		cout << "The path found is NOT the best path. We show the best path next." << endl;
+		system("pause");
+		graph->animatePath(astarpath, 0, NEXT_PATH_COLOR, true);
 	}
 }
 

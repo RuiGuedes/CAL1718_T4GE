@@ -23,6 +23,8 @@ using namespace std;
 
 #define VERTEX_SIZE            20
 
+#define MAX_WAIT               10000 // 10 seconds
+
 
 #define INF std::numeric_limits<double>::max()
 
