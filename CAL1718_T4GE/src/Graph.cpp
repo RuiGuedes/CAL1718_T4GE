@@ -109,11 +109,13 @@ void Graph::moveToAccidentedVertexSet(Vertex *v) {
  */
 void Graph::clear() const {
 	for (auto v : vertexSet) {
-		v->dist = INF;
+		v->priority = 0;
+		v->cost = 0;
 		v->path = nullptr;
 	}
 	for (auto v : accidentedVertexSet) {
-		v->dist = INF;
+		v->priority = 0;
+		v->cost = 0;
 		v->path = nullptr;
 	}
 }
@@ -582,12 +584,15 @@ vector<Vertex*> Graph::getAllVertexSet() const {
  */
 vector<Vertex*> Graph::getPath(Vertex* origin, Vertex* dest) const {
 	vector<Vertex*> res;
-	//auto v = this->findVertex(dest->getID()); // wtf?
-	if (origin == nullptr || dest == nullptr || dest->dist == INF || origin == dest)
+
+	if (origin == nullptr || dest == nullptr || dest->path == nullptr || origin == dest)
 		return res;
+
 	for (; dest != nullptr && dest != origin; dest = dest->path)
 		res.push_back(dest);
+
 	if (dest == origin) res.push_back(origin);
+
 	if (res.back() != origin) {
 		res.clear();
 		return res;
@@ -605,8 +610,8 @@ double Graph::distance(Vertex* v1, Vertex* v2) const {
 		throw std::invalid_argument("Vertex not found");
 	}
 	// long long because of overflow precautions
-	long long x1 = v1->getX(), y1 = v1->getY();
-	long long x2 = v2->getX(), y2 = v2->getY();
+	long double x1 = v1->getX(), y1 = v1->getY();
+	long double x2 = v2->getX(), y2 = v2->getY();
 	return scale * sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
 }
 
@@ -934,21 +939,7 @@ int Vertex::getY() const {
  * @brief Return the distance to the previous vertex "path".
  */
 double Vertex::getDist() const {
-	return this->dist;
-}
-
-/*
- * @brief Return the vertex's cartesian distance
- * to vertex dest
- * @throws invalid_argument if Vertex is nullptr
- */
-double Vertex::distanceTo(Vertex* dest) const {
-	if (dest == nullptr) {
-		throw std::invalid_argument("Vertex not found");
-	}
-	long long x1 = x, y1 = y;
-	long long x2 = dest->getX(), y2 = dest->getY();
-	return graph->scale * sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
+	return this->priority;
 }
 
 /*
@@ -998,16 +989,6 @@ vector<Edge*> Vertex::getAdj() const {
  */
 vector<Edge*> Vertex::getAccidentedAdj() const {
 	return accidentedAdj;
-}
-
-/*
- * @brief Return the vertex predecessor
- * (used after application of a pathing algorithm)
- * @return The found path's predecessor vertex, or nullptr
- */
-Vertex* Vertex::getPredecessor() const {
-	return nullptr; // TODO
-	//Add data member to Vertex Class in order to save the vertex predecessor and basically return it in this function
 }
 
 /*
@@ -1229,7 +1210,7 @@ void Vertex::removeEdge(Edge* edge) {
  * @brief Return true if "vertex" have greater distance
  */
 bool Vertex::operator<(Vertex vertex) const {
-	return this->dist < vertex.dist;
+	return this->priority < vertex.priority;
 }
 
 
@@ -1410,7 +1391,7 @@ void Graph::bfs(Vertex *origin) {
 			if (vertex->isAccidented()) continue;
 			if (!vertex->path) {
 				vertex->path = v;
-				vertex->dist = v->dist + 1;
+				vertex->priority = v->priority + 1;
 				q.push_back(vertex);
 			}
 		}
@@ -1427,30 +1408,25 @@ void Graph::bfs(Vertex *origin) {
  */
 void Graph::gbfsDist(Vertex *vsource, Vertex *vdest, microtime *time) {
 	clear();
-	vsource->dist = 0;
 
 	auto start = chrono::high_resolution_clock::now();
 
 	MutablePriorityQueue<Vertex> q;
 	q.insert(vsource);
 	while (!q.empty()) {
-		auto v = q.extractMin();
-		if (v == vdest) break;
-		for (auto e : v->adj) { // Non-accidented only
-			auto vertex = e->dest;
-			// If vertex is accidented, skip
-			if (vertex->isAccidented()) continue;
-			double oldDist = vertex->dist;
-			double newDist = v->dist
-					+ distance(vertex, vdest); // <- Greedy
-			if (newDist < oldDist) {
-				vertex->dist = newDist;
-				vertex->path = v;
-				if (oldDist == INF)
-					q.insert(vertex);
-				else
-					q.decreaseKey(vertex);
-			}
+		auto current = q.extractMin();
+		if (current == vdest) break;
+
+		for (auto e : current->adj) { // Non-accidented only
+			auto next = e->dest;
+			if (next->path != nullptr) continue; // If visited, skip
+			if (next->isAccidented()) continue; // If accidented, skip
+
+			next->priority = distance(next, vdest); // <- Greedy Best-First
+			// priority = heuristic(next, vdest) = distance(next, vdest)
+
+			next->path = current;
+			q.insert(next);
 		}
 	}
 
@@ -1467,28 +1443,33 @@ void Graph::gbfsDist(Vertex *vsource, Vertex *vdest, microtime *time) {
  */
 void Graph::dijkstraDist(Vertex *vsource, microtime *time) {
 	clear();
-	vsource->dist = 0;
 
 	auto start = chrono::high_resolution_clock::now();
 
 	MutablePriorityQueue<Vertex> q;
 	q.insert(vsource);
 	while (!q.empty()) {
-		auto v = q.extractMin();
+		auto current = q.extractMin();
+		cout << current->getID() << "   " << current->cost << endl;
 		// if (v == vdest) break; <- Single source
-		for (auto e : v->adj) { // Non-accidented only
-			auto vertex = e->dest;
-			// If vertex is accidented, skip
-			if (vertex->isAccidented()) continue;
-			double oldDist = vertex->dist;
-			double newDist = v->dist + distance(v, vertex);
-			if (newDist < oldDist) {
-				vertex->dist = newDist;
-				vertex->path = v;
-				if (oldDist == INF)
-					q.insert(vertex);
-				else
-					q.decreaseKey(vertex);
+		for (auto e : current->adj) { // Non-accidented only
+			auto next = e->dest;
+			if (next->isAccidented()) continue; // If accidented, skip
+
+			long double newcost = current->cost + distance(current, next); // <- Dijkstra
+			// newcost[next] = cost[current] + cost(current, next) = current->cost + distance(current, next)
+
+			if (next->path == nullptr) {
+				next->cost = newcost;
+				next->priority = newcost;
+				next->path = current;
+				q.insert(next);
+			}
+			else if (newcost < next->cost) {
+				next->cost = newcost;
+				next->priority = newcost;
+				next->path = current;
+				q.decreaseKey(next);
 			}
 		}
 	}
@@ -1506,28 +1487,33 @@ void Graph::dijkstraDist(Vertex *vsource, microtime *time) {
  */
 void Graph::dijkstraDist(Vertex *vsource, Vertex *vdest, microtime *time) {
 	clear();
-	vsource->dist = 0;
 
 	auto start = chrono::high_resolution_clock::now();
 
 	MutablePriorityQueue<Vertex> q;
 	q.insert(vsource);
 	while (!q.empty()) {
-		auto v = q.extractMin();
-		if (v == vdest) break;
-		for (auto e : v->adj) { // Non-accidented only
-			auto vertex = e->dest;
-			// If vertex is accidented, skip
-			if (vertex->isAccidented()) continue;
-			double oldDist = vertex->dist;
-			double newDist = v->dist + distance(v, vertex);
-			if (newDist < oldDist) {
-				vertex->dist = newDist;
-				vertex->path = v;
-				if (oldDist == INF)
-					q.insert(vertex);
-				else
-					q.decreaseKey(vertex);
+		auto current = q.extractMin();
+		cout << current->getID() << "   " << current->cost << endl;
+		if (current == vdest) break;
+		for (auto e : current->adj) { // Non-accidented only
+			auto next = e->dest;
+			if (next->isAccidented()) continue; // If accidented, skip
+
+			long double newcost = current->cost + distance(current, next); // <- Dijkstra
+			// newcost[next] = cost[current] + cost(current, next) = current->cost + distance(current, next)
+
+			if (next->path == nullptr) {
+				next->cost = newcost;
+				next->priority = newcost;
+				next->path = current;
+				q.insert(next);
+			}
+			else if (newcost < next->cost) {
+				next->cost = newcost;
+				next->priority = newcost;
+				next->path = current;
+				q.decreaseKey(next);
 			}
 		}
 	}
@@ -1544,29 +1530,33 @@ void Graph::dijkstraDist(Vertex *vsource, Vertex *vdest, microtime *time) {
  */
 void Graph::AstarDist(Vertex *vsource, Vertex *vdest, microtime *time) {
 	clear();
-	vsource->dist = 0;
 
 	auto start = chrono::high_resolution_clock::now();
 
 	MutablePriorityQueue<Vertex> q;
 	q.insert(vsource);
 	while (!q.empty()) {
-		auto v = q.extractMin();
-		if (v == vdest) break;
-		for (auto e : v->adj) { // Non-accidented only
-			auto vertex = e->dest;
-			// If vertex is accidented, skip
-			if (vertex->isAccidented()) continue;
-			double oldDist = vertex->dist;
-			double newDist = v->dist + distance(v, vertex)
-					+ distance(vertex, vdest); // <- A*
-			if (newDist < oldDist) {
-				vertex->dist = newDist;
-				vertex->path = v;
-				if (oldDist == INF)
-					q.insert(vertex);
-				else
-					q.decreaseKey(vertex);
+		auto current = q.extractMin();
+		cout << current->getID() << "   " << current->cost << endl;
+		if (current == vdest) break;
+		for (auto e : current->adj) { // Non-accidented only
+			auto next = e->dest;
+			if (next->isAccidented()) continue; // If accidented, skip
+
+			long double newcost = current->cost + distance(current, next);
+			// newcost[next] = cost[current] + cost(current, next) = current->cost + distance(current, next)
+
+			if (next->path == nullptr) {
+				next->cost = newcost;
+				next->priority = newcost + distance(next, vdest); // <- A*
+				next->path = current;
+				q.insert(next);
+			}
+			else if (newcost < next->cost) {
+				next->cost = newcost;
+				next->priority = newcost + distance(next, vdest); // <- A*
+				next->path = current;
+				q.decreaseKey(next);
 			}
 		}
 	}
@@ -1583,28 +1573,33 @@ void Graph::AstarDist(Vertex *vsource, Vertex *vdest, microtime *time) {
  */
 void Graph::dijkstraSimulation(Vertex *vsource, Vertex *vdest, microtime *time) {
 	clear();
-	vsource->dist = 0;
 
 	auto start = chrono::high_resolution_clock::now();
 
 	MutablePriorityQueue<Vertex> q;
 	q.insert(vsource);
 	while (!q.empty()) {
-		auto v = q.extractMin();
-		if (v == vdest) break;
-		for (auto e : v->adj) { // Non-accidented only
-			auto vertex = e->dest;
-			// If vertex is accidented, skip
-			if (vertex->isAccidented()) continue;
-			double oldDist = vertex->dist;
-			double newDist = v->dist + e->getWeight();
-			if (newDist < oldDist) {
-				vertex->dist = newDist;
-				vertex->path = v;
-				if (oldDist == INF)
-					q.insert(vertex);
-				else
-					q.decreaseKey(vertex);
+		auto current = q.extractMin();
+		cout << current->getID() << "   " << current->cost << endl;
+		if (current == vdest) break;
+		for (auto e : current->adj) { // Non-accidented only
+			auto next = e->dest;
+			if (next->isAccidented()) continue; // If accidented, skip
+
+			long double newcost = current->cost + e->getWeight(); // <- Dijkstra
+			// newcost[next] = cost[current] + cost(current, next) = current->cost + weight(current->next)
+
+			if (next->path == nullptr) {
+				next->cost = newcost;
+				next->priority = newcost;
+				next->path = current;
+				q.insert(next);
+			}
+			else if (newcost < next->cost) {
+				next->cost = newcost;
+				next->priority = newcost;
+				next->path = current;
+				q.decreaseKey(next);
 			}
 		}
 	}

@@ -25,9 +25,6 @@ using namespace std;
 
 #define MAX_WAIT               10000 // 10 seconds
 
-
-#define INF std::numeric_limits<double>::max()
-
 class Edge;
 class Graph;
 class Vertex;
@@ -181,7 +178,8 @@ class Vertex {
 	const int id;
 	const int x, y;
 	bool accidented;
-	double dist = 0;
+	long double cost = 0;
+	long double priority = 0;
 	Vertex* path = nullptr;
 	vector<Edge*> adj;
 	vector<Edge*> accidentedAdj;
@@ -203,13 +201,11 @@ public:
 	int getX() const; // could also make x a const public
 	int getY() const; // could also make y a const public
 	double getDist() const;
-	double distanceTo(Vertex *dest) const;
 	bool isAdjacentTo(Vertex *dest) const;
 	bool connectsTo(Vertex *dest) const;
 	bool isAccidented() const;
 	vector<Edge*> getAdj() const;
 	vector<Edge*> getAccidentedAdj() const;
-	Vertex *getPredecessor() const;
 	Vertex *getPath() const;
 	/////
 

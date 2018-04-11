@@ -6,20 +6,23 @@
 
 #define FILENAME_PREFIX "./resource/"
 
-string files = "Select map file"
-"Available by default:"
-" NODES  SUBROADS     Name"
-"                     gporto"
-"    1K     1.2K      coimbra"
-"    2K     2K        porto"
-"    4K     4K        sydney"
-"    8K    10K        tokyo"
-"   16K    18K        paris";
+string files = "Select map file\n"
+"Available by default:\n"
+" NODES  ~SUBROADS    NAME\n"
+"    40      30       feup\n"
+"   100     125       newyork\n"
+"   270     300       madrid\n"
+"   500     500       faro\n"
+"    1K     1K        coimbra\n"
+"    2K     2K        porto\n"
+"    4K     4K        sydney\n"
+"    8K    10K        tokyo\n"
+"   16K    18K        paris\n";
 
 Graph* graph;
 
 static void getFilename(string &filename) {
-	cout << files;
+	cout << files << endl;
 
 	while (1) {
 		cout << "Filename: ";
