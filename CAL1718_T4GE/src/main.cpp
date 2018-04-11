@@ -9,12 +9,12 @@ Graph* graph;
 
 int main(int argc, char* argv[]) {
 	srand(time(0));
-try {
+
 	ifstream file;
 	string filename;
 
 	cout << "Select map file" << endl;
-	cout << "Available by default: small, gporto, newyork, newyork_large" << endl << endl;
+	cout << "Available by default: small, corvo, gporto, newyork, newyork_large" << endl << endl;
 
 	while(1) {
 		cout << "Filename: ";
@@ -39,9 +39,5 @@ try {
 
 	delete graph;
 
-} catch (exception &e) {
-	cout << "ERROR: " << e.what() << endl;
-	system("pause");
-}
 	return 0;
 }
