@@ -40,11 +40,11 @@ bool Road::setTotalDistance(double distance) {
 	if (totalDistance != 0 || distance <= 0) return false;
 	totalDistance = distance;
 
-	if (distance > 1000)
+	if (distance > 1500)
 		maxSpeed = 120;
-	else if (distance > 500)
+	else if (distance > 1000)
 		maxSpeed = 90;
-	else if (distance > 250)
+	else if (distance > 750)
 		maxSpeed = 70;
 	else
 		maxSpeed = 50;
@@ -90,10 +90,10 @@ int Subroad::calculateAverageSpeed() const {
 		return maxSpeed*0.75;
 	else if(((double)actualCapacity/maxCapacity)*100 <= 75)
 		return (double)maxSpeed*0.5;
-	else if((actualCapacity/maxCapacity)*100 <= 90)
-		return maxSpeed*0.2;
+	else if(((double)actualCapacity/maxCapacity)*100 <= 90)
+		return (double)maxSpeed*0.2;
 
-	return maxSpeed*0.1;
+	return (double)maxSpeed*0.1;
 }
 
 bool Subroad::setActualCapacity(int capacity) {

@@ -1300,9 +1300,9 @@ void Graph::generateGraphNewStatus(vector<Vertex*> path) {
 
 	for (auto vertex : everyVextex) {
 		if ((vertex != path[0]) || (vertex != path[1]) || (vertex != path[path.size()-1])){
-			int newStatus = rand() % 100;
+			int newStatus = rand() % 501;
 
-			if(newStatus == 99){
+			if(newStatus > 498){
 				if(vertex->isAccidented())
 					vertex->fix();
 				else

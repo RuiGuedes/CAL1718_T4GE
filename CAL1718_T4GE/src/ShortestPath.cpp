@@ -101,10 +101,10 @@ void gbfs(Vertex *origin, Vertex *destination) {
 
 	if (equal(path.begin(), path.end(), astarpath.begin(), astarpath.end())) {
 		cout << "The path found is the best path. " << endl;
-		cout << "Time of travel : " << timeTravel*60 << " minutes. ";
+		cout << "Time of travel : " << timeTravel*3600 << " seconds. " << endl;
 	} else {
 		cout << "The path found is NOT the best path. We show the best path next." << endl;
-		cout << "Time of travel : " << timeTravel*60 << " minutes. " << endl << endl;
+		cout << "Time of travel : " << timeTravel*3600 << " seconds. " << endl << endl;
 		system("pause");
 		cout << endl;
 		graph->animatePath(astarpath, 0, NEXT_PATH_COLOR, true);
@@ -126,7 +126,7 @@ void dijkstraSource(Vertex *origin, Vertex *destination) {
 	for(unsigned int i=1 ; i< path.size(); i++) {
 		timeTravel += path[i-1]->findEdge(path[i])->getWeight();
 	}
-	cout << "Time of travel : " << timeTravel*60 << " minutes. " << endl << endl;
+	cout << "Time of travel : " << timeTravel*3600 << " seconds. " << endl << endl;
 }
 
 void dijkstraSourceDest(Vertex *origin, Vertex *destination) {
@@ -144,7 +144,7 @@ void dijkstraSourceDest(Vertex *origin, Vertex *destination) {
 		for(unsigned int i=1 ; i< path.size(); i++) {
 			timeTravel += path[i-1]->findEdge(path[i])->getWeight();
 		}
-	cout << "Time of travel : " << timeTravel*60 << " minutes. " << endl << endl;
+	cout << "Time of travel : " << timeTravel*3600 << " seconds. " << endl << endl;
 }
 
 void Astar(Vertex *origin, Vertex *destination) {
@@ -162,7 +162,7 @@ void Astar(Vertex *origin, Vertex *destination) {
 		for(unsigned int i=1 ; i< path.size(); i++) {
 			timeTravel += path[i-1]->findEdge(path[i])->getWeight();
 		}
-	cout << "Time of travel : " << timeTravel*60 << " minutes. " << endl << endl;
+	cout << "Time of travel : " << timeTravel*3600 << " seconds. "<< endl << endl;
 }
 
 void subroadSimulation(Vertex *origin, Vertex *destination) {
@@ -211,7 +211,7 @@ void subroadSimulation(Vertex *origin, Vertex *destination) {
 		graph->showEdgeSimulationLabels();
 	};
 
-	cout << "Time of travel : " << timeTravel*60 << " minutes. " << endl << endl;
+	cout << "Time of travel : " << timeTravel*3600 << " seconds. " << endl << endl;
 
 	graph->hideAllEdgeLabels();
 	graph->rearrange();
@@ -263,7 +263,7 @@ void roadSimulation(Vertex *origin, Vertex *destination) {
 		graph->showEdgeSimulationLabels();
 	};
 
-	cout << "Time of travel : " << timeTravel*60 << " minutes. " << endl << endl;
+	cout << "Time of travel : " << timeTravel*3600 << " seconds. " << endl << endl;
 
 	graph->hideAllEdgeLabels();
 	graph->rearrange();
