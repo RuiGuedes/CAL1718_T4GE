@@ -175,7 +175,7 @@ void subroadSimulation(Vertex *origin, Vertex *destination) {
 	while (true) {
 		// Perform algorithm
 		microtime time;
-		graph->bfs(origin);
+		graph->bfs(current);
 
 		for (auto v : graph->getVertexSet()) {
 			if (v->getPath() == nullptr)
@@ -227,7 +227,7 @@ void roadSimulation(Vertex *origin, Vertex *destination) {
 	while (true) {
 		// Perform algorithm
 		microtime time;
-		graph->bfs(origin);
+		graph->bfs(current);
 
 		for (auto v : graph->getVertexSet()) {
 			if (v->getPath() == nullptr)
