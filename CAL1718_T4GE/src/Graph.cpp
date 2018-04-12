@@ -875,8 +875,8 @@ int Vertex::getY() const {
 /*
  * @brief Return the distance to the previous vertex "path".
  */
-double Vertex::getDist() const {
-	return this->priority;
+double Vertex::getCost() const {
+	return this->cost;
 }
 
 /*
@@ -1203,7 +1203,7 @@ int Edge::getID() const {
  * along the edge given the amount of cars in it.
  */
 double Edge::getWeight() const {
-	return subroad->getDistance()/subroad->calculateAverageSpeed();
+	return (subroad->getDistance()/(double)1000)/subroad->calculateAverageSpeed();
 }
 
 /*
@@ -1299,11 +1299,22 @@ bool Edge::setActualCapacity(int capacity) {
 
 
 
-void Graph::generateGraphNewStatus() {
+void Graph::generateGraphNewStatus(vector<Vertex*> path) {
 	//For every edge generate new capacity
 	vector<Vertex*> everyVextex = getAllVertexSet();
 
 	for (auto vertex : everyVextex) {
+		if ((vertex != path[0]) || (vertex != path[1]) || (vertex != path[path.size()-1])){
+			int newStatus = rand() % 50;
+
+			if(newStatus >= 48){
+				if(vertex->isAccidented())
+					vertex->fix();
+				else
+					vertex->accident();
+			}
+		}
+
 		for (auto edge : vertex->adj) {
 			if (edge != nullptr) {
 				int newActualCapacity = (rand() % edge->getMaxCapacity());

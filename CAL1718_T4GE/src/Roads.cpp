@@ -32,22 +32,22 @@ double Road::getTotalDistance() const {
 	return totalDistance;
 }
 
-int Road::getAverageSpeed() const {
-	return averageSpeed;
+int Road::getMaxSpeed() const {
+	return maxSpeed;
 }
 
 bool Road::setTotalDistance(double distance) {
 	if (totalDistance != 0 || distance <= 0) return false;
 	totalDistance = distance;
 
-	if (distance > 1.0)
-		averageSpeed = 120;
-	else if (distance > 0.5)
-		averageSpeed = 90;
-	else if (distance > 0.25)
-		averageSpeed = 70;
+	if (distance > 1000)
+		maxSpeed = 120;
+	else if (distance > 500)
+		maxSpeed = 90;
+	else if (distance > 250)
+		maxSpeed = 70;
 	else
-		averageSpeed = 50;
+		maxSpeed = 50;
 
 	return true;
 }
@@ -82,18 +82,18 @@ int Subroad::getMaxCapacity() const {
 }
 
 int Subroad::calculateAverageSpeed() const {
-	int averageSpeed = road->getAverageSpeed();
+	int maxSpeed = road->getMaxSpeed();
 
-	if(((double)actualCapacity/maxCapacity)*100 <= 20)
-		return averageSpeed;
+	if(((double)actualCapacity/maxCapacity)*100 <= 25)
+		return maxSpeed;
 	else if(((double)actualCapacity/maxCapacity)*100 <= 50)
-		return averageSpeed*0.75;
+		return maxSpeed*0.75;
 	else if(((double)actualCapacity/maxCapacity)*100 <= 75)
-		return (double)averageSpeed*0.5;
+		return (double)maxSpeed*0.5;
 	else if((actualCapacity/maxCapacity)*100 <= 90)
-		return averageSpeed*0.2;
+		return maxSpeed*0.2;
 
-	return averageSpeed*0.1;
+	return maxSpeed*0.1;
 }
 
 bool Subroad::setActualCapacity(int capacity) {

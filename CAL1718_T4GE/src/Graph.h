@@ -138,7 +138,7 @@ public:
 	void removeEdge(Edge *e);
 	/////
 
-	void generateGraphNewStatus();
+	void generateGraphNewStatus(vector<Vertex*> path);
 
 	///// ***** Algorithms
 	void clear() const;
@@ -201,7 +201,7 @@ public:
 	int getID() const;
 	int getX() const; // could also make x a const public
 	int getY() const; // could also make y a const public
-	double getDist() const;
+	double getCost() const;
 	bool isAdjacentTo(Vertex *dest) const;
 	bool connectsTo(Vertex *dest) const;
 	bool isAccidented() const;
@@ -293,7 +293,7 @@ class Road {
 	const string name;
 	const bool bothways;
 	double totalDistance = 0;
-	int averageSpeed = 0;
+	int maxSpeed = 0;
 
 public:
 	explicit Road(int rid, string name, bool bothways = false);
@@ -302,7 +302,7 @@ public:
 	string getName() const;
 	bool isBidirectional() const;
 	double getTotalDistance() const;
-	int getAverageSpeed() const;
+	int getMaxSpeed() const;
 
 	bool setTotalDistance(double distance);
 

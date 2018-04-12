@@ -89,14 +89,22 @@ void gbfs(Vertex *origin, Vertex *destination) {
 	vector<Vertex*> path = graph->getPath(origin, destination);
 	graph->animatePath(path, 200, PATH_COLOR, true);
 
+	double timeTravel = 0;
+
+	for(unsigned int i=1 ; i< path.size(); i++) {
+		timeTravel += path[i-1]->findEdge(path[i])->getWeight();
+	}
+
 	// Perform A* to verify it is the correct path
 	graph->AstarDist(origin, destination);
 	vector<Vertex*> astarpath = graph->getPath(origin, destination);
 
 	if (equal(path.begin(), path.end(), astarpath.begin(), astarpath.end())) {
-		cout << "The path found is the best path. ";
+		cout << "The path found is the best path. " << endl;
+		cout << "Time of travel : " << timeTravel*60 << " minutes. ";
 	} else {
-		cout << "The path found is NOT the best path. We show the best path next." << endl << endl;
+		cout << "The path found is NOT the best path. We show the best path next." << endl;
+		cout << "Time of travel : " << timeTravel*60 << " minutes. " << endl << endl;
 		system("pause");
 		cout << endl;
 		graph->animatePath(astarpath, 0, NEXT_PATH_COLOR, true);
@@ -112,6 +120,13 @@ void dijkstraSource(Vertex *origin, Vertex *destination) {
 	// Get shortest path and animate
 	vector<Vertex*> path = graph->getPath(origin, destination);
 	graph->animatePath(path, 200, PATH_COLOR, true);
+
+	double timeTravel = 0;
+
+	for(unsigned int i=1 ; i< path.size(); i++) {
+		timeTravel += path[i-1]->findEdge(path[i])->getWeight();
+	}
+	cout << "Time of travel : " << timeTravel*60 << " minutes. " << endl << endl;
 }
 
 void dijkstraSourceDest(Vertex *origin, Vertex *destination) {
@@ -123,6 +138,13 @@ void dijkstraSourceDest(Vertex *origin, Vertex *destination) {
 	// Get shortest path and animate
 	vector<Vertex*> path = graph->getPath(origin, destination);
 	graph->animatePath(path, 200, PATH_COLOR, true);
+
+	double timeTravel = 0;
+
+		for(unsigned int i=1 ; i< path.size(); i++) {
+			timeTravel += path[i-1]->findEdge(path[i])->getWeight();
+		}
+	cout << "Time of travel : " << timeTravel*60 << " minutes. " << endl << endl;
 }
 
 void Astar(Vertex *origin, Vertex *destination) {
@@ -134,10 +156,18 @@ void Astar(Vertex *origin, Vertex *destination) {
 	// Get shortest path and animate
 	vector<Vertex*> path = graph->getPath(origin, destination);
 	graph->animatePath(path, 200, PATH_COLOR, true);
+
+	double timeTravel = 0;
+
+		for(unsigned int i=1 ; i< path.size(); i++) {
+			timeTravel += path[i-1]->findEdge(path[i])->getWeight();
+		}
+	cout << "Time of travel : " << timeTravel*60 << " minutes. " << endl << endl;
 }
 
 void subroadSimulation(Vertex *origin, Vertex *destination) {
 	Vertex* current = origin;
+	double timeTravel = 0;
 
 	graph->showEdgeSimulationLabels();
 	graph->rearrange();
@@ -145,6 +175,17 @@ void subroadSimulation(Vertex *origin, Vertex *destination) {
 	while (true) {
 		// Perform algorithm
 		microtime time;
+		graph->bfs(origin);
+
+		for (auto v : graph->getVertexSet()) {
+			if (v->getPath() == nullptr)
+				graph->setVertexColor(v, UNREACHABLE_COLOR);
+		}
+		if (!destination->getPath()) { // Unreachable vertex
+			cout << "Node not reachable (" << destination->getID() << "). An accident occurred!" << endl << endl;
+			break;
+		}
+
 		graph->dijkstraSimulation(current, destination, &time);
 		cout << endl << "Elapsed time: " << time << " microseconds." << endl << endl;
 
@@ -155,6 +196,8 @@ void subroadSimulation(Vertex *origin, Vertex *destination) {
 		// by Subroad
 		animateOneSubroad(path, current);
 
+		timeTravel = current->getCost();
+
 		system("pause");
 		cout << endl;
 		if (current == destination) break;
@@ -164,9 +207,11 @@ void subroadSimulation(Vertex *origin, Vertex *destination) {
 		graph->clearPath(path, 0, true);
 
 		// Else move cars
-		graph->generateGraphNewStatus();
+		graph->generateGraphNewStatus(path);
 		graph->showEdgeSimulationLabels();
 	};
+
+	cout << "Time of travel : " << timeTravel*60 << " minutes. " << endl << endl;
 
 	graph->hideAllEdgeLabels();
 	graph->rearrange();
@@ -174,6 +219,7 @@ void subroadSimulation(Vertex *origin, Vertex *destination) {
 
 void roadSimulation(Vertex *origin, Vertex *destination) {
 	Vertex* current = origin;
+	double timeTravel = 0;
 
 	graph->showEdgeSimulationLabels();
 	graph->rearrange();
@@ -181,6 +227,17 @@ void roadSimulation(Vertex *origin, Vertex *destination) {
 	while (true) {
 		// Perform algorithm
 		microtime time;
+		graph->bfs(origin);
+
+		for (auto v : graph->getVertexSet()) {
+			if (v->getPath() == nullptr)
+				graph->setVertexColor(v, UNREACHABLE_COLOR);
+		}
+		if (!destination->getPath()) { // Unreachable vertex
+			cout << "Node not reachable (" << destination->getID() << "). An accident occurred!" << endl << endl;
+			break;
+		}
+
 		graph->dijkstraSimulation(current, destination, &time);
 		cout << endl << "Elapsed time: " << time << " microseconds." << endl << endl;
 
@@ -191,6 +248,8 @@ void roadSimulation(Vertex *origin, Vertex *destination) {
 		// by Road
 		animateOneRoad(path, current);
 
+		timeTravel = current->getCost();
+
 		system("pause");
 		cout << endl;
 		if (current == destination) break;
@@ -200,9 +259,11 @@ void roadSimulation(Vertex *origin, Vertex *destination) {
 		graph->clearPath(path, 0, true);
 
 		// Else move cars
-		graph->generateGraphNewStatus();
+		graph->generateGraphNewStatus(path);
 		graph->showEdgeSimulationLabels();
 	};
+
+	cout << "Time of travel : " << timeTravel*60 << " minutes. " << endl << endl;
 
 	graph->hideAllEdgeLabels();
 	graph->rearrange();

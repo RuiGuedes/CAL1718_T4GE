@@ -41,18 +41,23 @@ void editRoadInformationInterface(Edge* edge) {
 		if (option == 3) return;
 
 		system("cls");
+		cout << "Edit road information " << endl << endl;
 
 		switch (option)
 		{
 		case 1:
-			if(edge->getActualCapacity() == edge->getMaxCapacity())
-				cout << "There are no cars to be added (the edge is saturated)" << endl;
+			if(edge->getActualCapacity() == edge->getMaxCapacity()){
+				cout << "There are no cars to be added (the edge is saturated)" << endl << endl;
+				system("pause");
+			}
 			else
 				addCars(edge);
 			break;
 		case 2:
-			if(edge->getActualCapacity() == 0)
-				cout << "There are no cars to be removed (the edge is empty)" << endl;
+			if(edge->getActualCapacity() == 0){
+				cout << "There are no cars to be removed (the edge is empty)" << endl << endl;
+				system("pause");
+			}
 			else
 				removeCars(edge);
 			break;
