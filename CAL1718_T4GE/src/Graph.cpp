@@ -1367,7 +1367,6 @@ void Graph::gbfsDist(Vertex *vsource, Vertex *vdest, microtime *time) {
 			if (next->isAccidented()) continue; // If accidented, skip
 
 			next->priority = distance(next, vdest); // <- Greedy Best-First
-			// priority = heuristic(next, vdest) = distance(next, vdest)
 
 			next->path = current;
 			q.insert(next);
@@ -1394,13 +1393,11 @@ void Graph::dijkstraDist(Vertex *vsource, microtime *time) {
 	q.insert(vsource);
 	while (!q.empty()) {
 		auto current = q.extractMin();
-		// if (v == vdest) break; <- Single source
 		for (auto e : current->adj) { // Non-accidented only
 			auto next = e->dest;
 			if (next->isAccidented()) continue; // If accidented, skip
 
 			long double newcost = current->cost + distance(current, next); // <- Dijkstra
-			// newcost[next] = cost[current] + cost(current, next) = current->cost + distance(current, next)
 
 			if (next->path == nullptr) {
 				next->cost = newcost;
@@ -1443,7 +1440,6 @@ void Graph::dijkstraDist(Vertex *vsource, Vertex *vdest, microtime *time) {
 			if (next->isAccidented()) continue; // If accidented, skip
 
 			long double newcost = current->cost + distance(current, next); // <- Dijkstra
-			// newcost[next] = cost[current] + cost(current, next) = current->cost + distance(current, next)
 
 			if (next->path == nullptr) {
 				next->cost = newcost;
@@ -1485,7 +1481,6 @@ void Graph::AstarDist(Vertex *vsource, Vertex *vdest, microtime *time) {
 			if (next->isAccidented()) continue; // If accidented, skip
 
 			long double newcost = current->cost + distance(current, next);
-			// newcost[next] = cost[current] + cost(current, next) = current->cost + distance(current, next)
 
 			if (next->path == nullptr) {
 				next->cost = newcost;
@@ -1527,7 +1522,6 @@ void Graph::dijkstraSimulation(Vertex *vsource, Vertex *vdest, microtime *time) 
 			if (next->isAccidented()) continue; // If accidented, skip
 
 			long double newcost = current->cost + e->getWeight(); // <- Dijkstra
-			// newcost[next] = cost[current] + cost(current, next) = current->cost + weight(current->next)
 
 			if (next->path == nullptr) {
 				next->cost = newcost;

@@ -9,19 +9,19 @@
 string files = "Select map file\n\n"
 "Map files available:\n"
 "NAME         SUBROADS     NODES\n"
-"fep          64           52\n"	// Minor check
-"newyork      125          100\n"	// Minor check
-"madrid       300          270\n"	// Minor check
-"vilareal     1914         1756\n"	// Minor check
-"graciosa     6278         6123\n"	// Minor check
-"bignewyork   11261        9917\n"	// Good
+"fep          64           52\n"
+"newyork      125          100\n"
+"madrid       300          270\n"
+"vilareal     1914         1756\n"
+"graciosa     6278         6123\n"
+"bignewyork   11261        9917\n"
 "\n"
-"faro         500          500\n"		// Decent
-"coimbra      1K           1K\n"		// Good
-"porto        2K           2K\n"		// Good
-"sydney       4K           4K\n"		// Good
-"tokyo        10K          8K\n"		// Good
-"paris        18K          16K\n";		// Good
+"faro         500          500\n"
+"coimbra      1K           1K\n"
+"porto        2K           2K\n"
+"sydney       4K           4K\n"
+"tokyo        10K          8K\n"
+"paris        18K          16K\n";
 
 Graph* graph;
 

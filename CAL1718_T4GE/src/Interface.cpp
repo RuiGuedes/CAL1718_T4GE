@@ -104,7 +104,7 @@ Vertex* selectVertex(bool maybeAccidented) {
 					cout << "Accidented node (" << v->getID() << "). Try again !" << endl << endl;
 					continue;
 				}
-				else { // All goochy
+				else {
 					selected = v;
 					break;
 				}
@@ -160,7 +160,7 @@ Vertex* selectOriginVertex(bool maybeAccidented) {
 					cout << "There are no reachable nodes at the moment from " << v->getID() << "." << endl << endl;
 					continue;
 				}
-				else { // All goochy
+				else {
 					selected = v;
 					break;
 				}
@@ -220,7 +220,7 @@ Vertex* selectDestinationVertex(Vertex* origin, bool maybeAccidented, bool mustB
 					cout << "Node not reachable (" << v->getID() << "). Try again !" << endl << endl;
 					continue;
 				}
-				else { // All goochy
+				else {
 					selected = v;
 					break;
 				}
@@ -273,7 +273,7 @@ Edge* selectEdge(bool maybeAccidented) {
 					cout << "Accidented edge (" << input << "). Try again !" << endl << endl;
 					continue;
 				}
-				else { // All goochy
+				else {
 					selected = e;
 					break;
 				}
