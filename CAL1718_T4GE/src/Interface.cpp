@@ -314,8 +314,9 @@ void mainMenu() {
 		cout << "2 - Fix accident" << endl;
 		cout << "3 - Edit road information" << endl;
 		cout << "4 - Get shortest path" << endl;
-		cout << "5 - System information" << endl;
-		cout << "6 - Exit" << endl << endl;
+		cout << "5 - Emergency line" << endl;
+		cout << "6 - System information" << endl;
+		cout << "7 - Exit" << endl << endl;
 
 		option = selectOption(6);
 		if (option == 6) return;
@@ -337,6 +338,9 @@ void mainMenu() {
 			shortestPathUI();
 			break;
 		case 5:
+			//Emergency line TODO
+			break;
+		case 6:
 			systemInformation();
 			break;
 		}
