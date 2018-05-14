@@ -58,6 +58,8 @@ void causeIntersectionAccident() {
  * Cause Edge accident UI
  */
 void causeRoadAccident() {
+	system("cls");
+
 	Edge *edge = nullptr;
 
 	cout << "Cause an accident" << endl << endl;
