@@ -11,7 +11,7 @@ using namespace std;
 //////////////////////////////////////
 
 bool naiveAlgorithm(string text, string pattern);
-void computeFiniteAutomata(string pattern, int TF[][ALPHABET]);
+void computeFiniteAutomata(string pattern, int FT[][ALPHABET]);
 bool finiteAutomataAlgorithm(string text, string pattern);
 bool rabinKarpAlgorithm(string text, string pattern, int primeNumber = 101);
 void computePrefixFunction(string pattern, int * prefix);
