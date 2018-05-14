@@ -338,7 +338,7 @@ void mainMenu() {
 			shortestPathUI();
 			break;
 		case 5:
-			//Emergency line TODO
+			emergencyLine();
 			break;
 		case 6:
 			systemInformation();

@@ -16,7 +16,9 @@ void causeAccident();
 void fixAccident();
 void editRoadInfo();
 void shortestPathUI();
+void emergencyLine();
 void systemInformation();
+
 
 bool validNumberInput(string input, int max = 0);
 

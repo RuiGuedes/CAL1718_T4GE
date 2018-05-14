@@ -1,6 +1,7 @@
 #include "LoadMap.h"
 #include "Graph.h"
 #include "Interface.h"
+#include <windows.h>
 
 #include <stdlib.h>
 
@@ -45,6 +46,9 @@ int main(int argc, char* argv[]) {
 	srand(time(0));
 
 	string filename;
+
+	SetConsoleCP(1252);
+	SetConsoleOutputCP(1252);
 
 	// Process args
 	if (argc > 1) {

@@ -10,6 +10,7 @@ static const string roads_suffix = "_roads.txt";
 static const string subroads_suffix = "_subroads.txt";
 static constexpr long double default_density = 0.000100;
 
+
 struct MetaData {
 	long double min_longitude, max_longitude;
 	long double min_latitude, max_latitude;

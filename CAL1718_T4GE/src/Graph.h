@@ -5,7 +5,7 @@
 
 #include <limits>
 #include <chrono>
-
+#include <map>
 
 using namespace std;
 
@@ -165,6 +165,9 @@ public:
 	///// ***** Operations
 	friend class Vertex;
 	friend class Edge;
+
+	//unordered_map<string,Road *> roadsInfo;
+	map<string,Road *> roadsInfo;
 };
 
 

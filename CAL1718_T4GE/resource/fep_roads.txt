@@ -1,18 +1,18 @@
 35078501;Rua do Doutor Manuel Laranjeira;True
 35105021;Rua do Guadiana;False
 35997812;Rua do Mondego;True
-37141983;Rua do Actor Eduardo BrazÃ£o;False
+37141983;Rua do Actor Eduardo Brazão;False
 37141985;Rua do Corgo;True
 37937529;Rua do Tejo;True
-37937530;Rua do TÃ¢mega;False
-37937531;Rua do CÃ´a;True
+37937530;Rua do Tãmega;False
+37937531;Rua do Carmo;True
 37937534;Rua do Sado;True
-106334858;PraÃ§a do CÃ¡vado;True
+106334858;Praça do Cavado;True
 106334859;Rua do Neiva;True
 106334860;Rua do Vouga;False
-106334863;Rua do ZÃªzere;True
+106334863;Rua do Zêzere;True
 197100020;Rua do Tua;True
 461925683;Rua do Vez;True
-461925684;Rua do BaÃ§a;False
+461925684;Rua do Baça;False
 461925685;Rua do Liz;True
 463835634;;False
