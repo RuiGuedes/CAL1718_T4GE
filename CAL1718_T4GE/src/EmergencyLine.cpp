@@ -5,18 +5,21 @@
 // Global variables //
 //////////////////////
 
-Road * startRoad;
-Road * endRoad;
 int algorithm;
+Road * startRoad = NULL;
+Road * endRoad = NULL;
 
 //////////////////////////
 // Functions Prototypes //
 //////////////////////////
 
 void evacuateClient();
-void exactSearch();
-void approximateSearch();
-
+Road * exactSearch(string pattern);
+Road * approximateSearch(string pattern);
+Vertex * selectRoad(Road *& road);
+Vertex * selectNode(Road * road, int position, int direction);
+void pathFinder(Vertex *origin, Vertex *destination);
+void benchmarking();
 
 void emergencyLine() {
 
@@ -38,12 +41,20 @@ void emergencyLine() {
 	cout << "#################################" << endl << endl;
 	cout << "5 - Edit Distance Algorithm" << endl;
 	cout << "6 - Hamming Distance Algorithm" << endl << endl;
+	cout << "##################" << endl;
+	cout << "## Benchmarking ##" << endl;
+	cout << "##################" << endl << endl;
+	cout << "7 - Benchmark Algorithms" << endl << endl;
 
-	option = selectOption(6);
-	if (option == 7) return;
+	option = selectOption(7);
+	if (option == 8) return;
 
 	algorithm = option;
-	evacuateClient();
+
+	if(option == 7)
+		benchmarking();
+	else
+		evacuateClient();
 
 	return emergencyLine();
 
@@ -51,29 +62,36 @@ void emergencyLine() {
 
 void evacuateClient() {
 
-	if(algorithm == 5 || algorithm == 6)
-		approximateSearch();
-	else
-		exactSearch();
-
-
-}
-
-void exactSearch() {
-
 	system("cls");
 	cout << "Emergency Line" << endl << endl;
 
 	//Local variables
-	int option, posMeters, direction;
-	string pattern  = "";
+	Vertex * startingNode;
+	Vertex * reachingNode;
+
+	cout << "Evacuate From: " << endl << endl;
+
+	startingNode = selectRoad(startRoad);
+
+	if(startRoad == NULL)
+		return;
+
+	system("cls");
+	cout << "Emergency Line" << endl << endl;
+	cout << "Evacuate To" << endl << endl;
+
+	reachingNode = selectRoad(endRoad);
+
+	pathFinder(startingNode, reachingNode);
+
+}
+
+Road * exactSearch(string pattern) {
+
+	//Local variables
+	int option;
 	vector<string> availableRoads;
 	map<string,Road *>::iterator it = graph->getRoadsInfo().begin();
-	availableRoads.push_back("");
-
-	cout << "Location name: ";
-	cin.ignore(1000,'\n');
-	getline(cin, pattern);
 
 	//Check pattern existence
 	while(it != graph->getRoadsInfo().end()) {
@@ -94,54 +112,88 @@ void exactSearch() {
 			break;
 		}
 
-		if(result && ((startRoad == NULL) || (startRoad != endRoad)))
+		if(result && ((startRoad == NULL) || (startRoad != endRoad))) {
 			availableRoads.push_back(it->first);
+			if(availableRoads.size() >= 20)
+				break;
+		}
 
 		it++;
 	}
 
-	for(unsigned int i = 1; i < availableRoads.size(); i++)
-		cout << i << " - " << availableRoads.at(i) << endl;
+	if(availableRoads.empty())
+		return NULL;
+
+	for(unsigned int i = 0; i < availableRoads.size(); i++)
+		cout << i + 1 << " - " << availableRoads.at(i) << endl;
 
 	cout << endl;
-	if(availableRoads.size() == 1) {
-		cout << "Dont exist roads with containing exactly " << pattern << endl << endl;
-		system("pause"); return;
-	}
-
 	option = selectOption(availableRoads.size() - 1);
 
-	startRoad = graph->getRoadsInfo().find(availableRoads.at(option))->second;
-
-	cout << endl << "Road selected: " << startRoad->getName() << endl << endl;
-
-	approximateSearch();
-
-	cout << "Position in meters: ";
-	posMeters = selectOption(9999);
-
-	cout << endl << endl << "Direction:" << endl;
-	cout << "1 - Begin to End" << endl;
-	cout << "2 - End to Begin" << endl << endl;
-	direction =  selectOption(2);
-
-	system("pause");
+	return graph->getRoadsInfo().find(availableRoads.at(option - 1))->second;
 }
 
-void approximateSearch() {
+bool orderLessDiff(pair<int,string> pair1, pair<int,string> pair2) {
+	return pair1.first < pair2.first;
+}
 
+Road * approximateSearch(string pattern) {
+
+	//Local variables
+	int option;
+	vector<pair<int,string>> availableRoads;
+	map<string,Road *>::iterator it = graph->getRoadsInfo().begin();
+
+	//Check pattern existence
+	while(it != graph->getRoadsInfo().end()) {
+		int result = -1;
+
+		if(!it->first.empty()) {
+			switch(algorithm) {
+			case 5:
+				result = editDistanceAlgorithm(it->first, pattern);
+				break;
+			case 6:
+				result = hammingDistanceAlgorithm(it->first, pattern);
+				break;
+			}
+
+			if((startRoad == NULL) || (startRoad != endRoad)) {
+				availableRoads.push_back(pair<int,string>(result,it->first));
+				if(availableRoads.size() >= 20)
+					break;
+			}
+		}
+
+		it++;
+	}
+
+	if(availableRoads.empty())
+		return NULL;
+
+	sort(availableRoads.begin(), availableRoads.end(), orderLessDiff);
+
+	for(unsigned int i = 0; i < availableRoads.size(); i++)
+		cout << i + 1 << " - " << availableRoads.at(i).second << endl;
+
+	cout << endl;
+	option = selectOption(availableRoads.size() - 1);
+
+	return graph->getRoadsInfo().find(availableRoads.at(option - 1).second)->second;
+
+}
+
+Vertex * selectNode(Road * road, int position, int direction) {
+
+	//Local variables
 	int nextID = 1;
+	unsigned int i;
+	double totalDistance = 0;
 	map<int, Edge *>::iterator it = graph->getSubRoadsInfo().begin();
 	vector<int> edgeIDs;
-	int distance = 100;
-	int sum = 0;
-
-	cout << startRoad->getTotalDistance() << endl;
 
 	while(it != graph->getSubRoadsInfo().end()) {
-
-
-		if(startRoad->getName() == it->second->getRoad()->getName())
+		if(road->getName() == it->second->getRoad()->getName())
 			edgeIDs.push_back(it->second->getID());
 
 		it++;
@@ -149,37 +201,209 @@ void approximateSearch() {
 
 	sort(edgeIDs.begin(), edgeIDs.end());
 
-	if(startRoad->isBidirectional())
+	if(road->isBidirectional())
 		nextID = 2;
 
-	//begin to end
-	/*for(int i = 0; i < edgeIDs.size(); i += nextID) {
-		sum += graph->findEdge(edgeIDs.at(i))->getDistance();
+	if(direction == 1) {
+		for(i = 0; i < edgeIDs.size(); i += nextID) {
+			totalDistance += graph->findEdge(edgeIDs.at(i))->getDistance();
 
-		if(distance <= sum)
-		{
-			graph->setVertexColor(graph->findEdge(edgeIDs.at(i))->getDest(), RED);
-			graph->accidentEdge(graph->findEdge(edgeIDs.at(i + nextID)));
-			break;
+			if(position <= totalDistance)
+				break;
 		}
-	}*/
+	}
+	else {
+		for(i = edgeIDs.size() - 1; i >= 0; i -= nextID) {
+			totalDistance += graph->findEdge(edgeIDs.at(i))->getDistance();
 
-
-	//End to begin
-	for(int i = edgeIDs.size() - 1; i >= 0; i -= nextID)
-	{
-		sum += graph->findEdge(edgeIDs.at(i))->getDistance();
-
-		if(distance <= sum)
-		{
-			graph->setVertexColor(graph->findEdge(edgeIDs.at(i))->getDest(), RED);
-			graph->accidentEdge(graph->findEdge(edgeIDs.at(i - nextID)));
-			break;
+			if(position <= totalDistance)
+				break;
 		}
 	}
 
-
+	graph->setVertexColor(graph->findEdge(edgeIDs.at(i))->getDest(), SELECTED_COLOR);
+	if(endRoad == NULL)
+		graph->accidentEdge(graph->findEdge(edgeIDs.at(i + nextID)));
 	graph->update();
+
+	return graph->findEdge(edgeIDs.at(i))->getDest();
+}
+
+Vertex * selectRoad(Road *& road) {
+
+	//Local variables
+	int posMeters, direction;
+	string pattern;
+
+	//Select road name
+	cout << "Location name: ";
+	cin.ignore(1000,'\n');
+	getline(cin, pattern);
+
+	if(algorithm == 5 || algorithm == 6)
+		road = approximateSearch(pattern);
+	else
+		road = exactSearch(pattern);
+
+	//Check road validity
+	if(road == NULL) {
+		cout << "Dont exist any road containing " << pattern;
+		system("pause");
+		return NULL;
+	}
+
+	//Select position in meters
+	cout << endl << "Road " << road->getName() << " total distance: " << road->getTotalDistance() << " meters" << endl << endl;
+	while (1) {
+		string input;
+		cout << "Position in meters: ";
+		cin >> input;
+
+		if (validNumberInput(input, road->getTotalDistance())) {
+			posMeters = stoi(input);
+			break;
+		}
+		else
+			cout << "Unavailable position (" << input << "). Try again !" << endl << endl;
+	}
+
+	cout << endl << "Direction:" << endl;
+	cout << "1 - Begin to End" << endl;
+	cout << "2 - End to Begin" << endl << endl;
+	direction =  selectOption(2);
+
 	cout << endl;
+	system("pause");
+
+	return selectNode(road, posMeters, direction);
+}
+
+void pathFinder(Vertex *origin, Vertex *destination) {
+	// Perform algorithm
+	microtime time;
+	graph->AstarDist(origin, destination, &time);
+
+	// Get shortest path and animate
+	vector<Vertex*> path = graph->getPath(origin, destination);
+	graph->animatePath(path, 200, PATH_COLOR, true);
+
+	double timeTravel = 0;
+
+	for(unsigned int i=1 ; i< path.size(); i++) {
+		timeTravel += path[i-1]->findEdge(path[i])->getWeight();
+	}
+
+	return;
+}
+
+void benchmarking() {
+
+	//Local variables
+	int N = 2000;
+	string pattern;
+	map<string,Road *>::iterator it = graph->getRoadsInfo().begin();
+
+	//Select location name
+	cout << "Location name: ";
+	cin.ignore(1000,'\n');
+	getline(cin, pattern);
+
+	// Time of all N iterations
+	microtime external;
+
+	cout << "===== Benchmark " << N << " Iterations =====" << endl;
+
+	// Benchmark Naive Algorithm
+	{
+
+		auto start = chrono::high_resolution_clock::now();
+		for(int i = 1; i < N; i++) {
+			while(it != graph->getRoadsInfo().end()) {
+				naiveAlgorithm(it->first, pattern);
+				it++;
+			}
+		}
+		auto end = chrono::high_resolution_clock::now();
+		external = (end - start).count() / N;
+	}
+
+	cout << "--- (1) Naive Algorithm ---" << endl;
+	cout << "External Average Time: " << external << " microseconds." << endl;
+
+	// Benchmark Rabin Karp Algorithm
+	{
+		it = graph->getRoadsInfo().begin();
+		auto start = chrono::high_resolution_clock::now();
+		while(it != graph->getRoadsInfo().end()) {
+			rabinKarpAlgorithm(it->first, pattern);
+			it++;
+		}
+		auto end = chrono::high_resolution_clock::now();
+		external = (end - start).count() / N;
+	}
+
+	cout << "--- (2) Rabin Karp Algorithm ---" << endl;
+	cout << "External Average Time: " << external << " microseconds." << endl;
+
+	// Benchmark Finite Automata Algorithm
+	{
+		it = graph->getRoadsInfo().begin();
+		auto start = chrono::high_resolution_clock::now();
+		while(it != graph->getRoadsInfo().end()) {
+			finiteAutomataAlgorithm(it->first, pattern);
+			it++;
+		}
+		auto end = chrono::high_resolution_clock::now();
+		external = (end - start).count() / N;
+	}
+
+	cout << "--- (3) Knuth Morris Pratt Algorithm ---" << endl;
+	cout << "External Average Time: " << external << " microseconds." << endl;
+
+	// Benchmark Knuth Morris Pratt Algorithm Algorithm
+	{
+		it = graph->getRoadsInfo().begin();
+		auto start = chrono::high_resolution_clock::now();
+		while(it != graph->getRoadsInfo().end()) {
+			knuthMorrisPrattAlgorithm(it->first, pattern);
+			it++;
+		}
+		auto end = chrono::high_resolution_clock::now();
+		external = (end - start).count() / N;
+	}
+
+	cout << "--- (4) Knuth Morris Pratt Algorithm ---" << endl;
+	cout << "External Average Time: " << external << " microseconds." << endl;
+
+	// Benchmark Edit Distance Algorithm
+	{
+		it = graph->getRoadsInfo().begin();
+		auto start = chrono::high_resolution_clock::now();
+		while(it != graph->getRoadsInfo().end()) {
+			editDistanceAlgorithm(it->first, pattern);
+			it++;
+		}
+		auto end = chrono::high_resolution_clock::now();
+		external = (end - start).count() / N;
+	}
+
+	cout << "--- (5) Edit Distance Algorithm ---" << endl;
+	cout << "External Average Time: " << external << " microseconds." << endl;
+
+	// Benchmark Hamming Distance Algorithm
+	{
+		it = graph->getRoadsInfo().begin();
+		auto start = chrono::high_resolution_clock::now();
+		while(it != graph->getRoadsInfo().end()) {
+			hammingDistanceAlgorithm(it->first, pattern);
+			it++;
+		}
+		auto end = chrono::high_resolution_clock::now();
+		external = (end - start).count() / N;
+	}
+
+	cout << "--- (6) Hamming Distance Algorithm ---" << endl;
+	cout << "External Average Time: " << external << " microseconds." << endl << endl;
+
 	system("pause");
 }
