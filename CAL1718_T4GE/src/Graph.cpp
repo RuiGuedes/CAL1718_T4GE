@@ -670,6 +670,7 @@ bool Graph::addEdge(int eid, Vertex* vsource, Vertex* vdest,
 		throw std::logic_error("Repeated edge id");
 	}
 	Edge* e = new Edge(eid, vsource, vdest, subroad, accidented);
+	subRoadsInfo.insert({eid, e});
 	// Delegate to vertex
 	if (vsource->addEdge(e)) {
 		return true;
@@ -800,6 +801,14 @@ void Graph::removeEdge(Edge* e) {
 	}
 	// Delegate to vertex
 	e->getSource()->removeEdge(e);
+}
+
+map<string, Road *> & Graph::getRoadsInfo() {
+	return roadsInfo;
+}
+
+map<int,Edge *> & Graph::getSubRoadsInfo() {
+	return subRoadsInfo;
 }
 
 

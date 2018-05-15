@@ -47,6 +47,8 @@ class Graph {
 	vector<Vertex*> accidentedVertexSet;
 	GraphViewer *gv;
 	double scale;
+	map<string,Road *> roadsInfo;
+	map<int, Edge *> subRoadsInfo;
 
 	mutable struct Mode {
 		bool vertexLabels = false;
@@ -163,11 +165,11 @@ public:
 	/////
 
 	///// ***** Operations
+	map<string, Road *> & getRoadsInfo();
+	map<int, Edge *> & getSubRoadsInfo();
 	friend class Vertex;
 	friend class Edge;
 
-	//unordered_map<string,Road *> roadsInfo;
-	map<string,Road *> roadsInfo;
 };
 
 

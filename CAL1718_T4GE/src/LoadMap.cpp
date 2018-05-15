@@ -457,8 +457,8 @@ int loadRoads(string filename, MetaData &meta, Graph* graph) {
 				Road* road = new Road(lineID, name, bothways);
 
 				// Add road information to map if dont exist already
-				if (graph->roadsInfo.find(name) == graph->roadsInfo.end())
-					graph->roadsInfo.insert({name, road});
+				if (graph->getRoadsInfo().find(name) == graph->getRoadsInfo().end())
+					graph->getRoadsInfo().insert({name, road});
 
 				roadMap[lineID] = road;
 				++newRoads;
