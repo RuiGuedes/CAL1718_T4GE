@@ -287,10 +287,15 @@ Vertex * selectNode(Road * road, int position, int direction) {
 		for(i = 0; i < edgeIDs.size(); i += nextID) {
 			totalDistance += graph->findEdge(edgeIDs.at(i))->getDistance();
 
-			if((position <= totalDistance))
+			if((position <= totalDistance)){
+				if((endRoad == NULL))
+					graph->accidentEdge(graph->findEdge(edgeIDs.at(i + nextID)));
 				break;
+			}
 			else if((i + nextID) >= edgeIDs.size()) {
 				i = edgeIDs.size() - 1;
+				if((endRoad == NULL))
+					graph->accidentEdge(graph->findEdge(edgeIDs.at(i)));
 				break;
 			}
 		}
@@ -300,10 +305,15 @@ Vertex * selectNode(Road * road, int position, int direction) {
 		for(i = edgeIDs.size() - 1; i >= 0; i -= nextID) {
 			totalDistance += graph->findEdge(edgeIDs.at(i))->getDistance();
 
-			if(position <= totalDistance)
+			if(position <= totalDistance) {
+				if((endRoad == NULL))
+					graph->accidentEdge(graph->findEdge(edgeIDs.at(i - nextID)));
 				break;
+			}
 			else if((i - nextID) < 0) {
 				i = 0;
+				if((endRoad == NULL))
+					graph->accidentEdge(graph->findEdge(edgeIDs.at(i)));
 				break;
 			}
 		}
@@ -311,10 +321,9 @@ Vertex * selectNode(Road * road, int position, int direction) {
 
 	//Change graph state according to options chosen
 	graph->setVertexColor(graph->findEdge(edgeIDs.at(i))->getDest(), SELECTED_COLOR);
-	if(endRoad == NULL)
-		graph->accidentEdge(graph->findEdge(edgeIDs.at(i + nextID)));
-	graph->update();
 
+
+	graph->update();
 	system("pause");
 	return graph->findEdge(edgeIDs.at(i))->getDest();
 }
@@ -436,6 +445,11 @@ void checkUnreachableNodes(Vertex* origin) {
  */
 void benchmarking(int N) {
 
+	system("cls");
+	cout << "##################" << endl;
+	cout << "## Benchmarking ##" << endl;
+	cout << "##################" << endl << endl;
+
 	//Local variables
 	string text = "";
 	string pattern;
@@ -525,6 +539,6 @@ void benchmarking(int N) {
 		cout << "External Average Time: " << duration.count()/N << " microseconds." << endl;
 	}
 
-
+	cout << endl << endl;
 	system("pause");
 }

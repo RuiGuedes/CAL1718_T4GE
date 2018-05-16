@@ -11,7 +11,7 @@
 73554449;Rua Pedro Roberto;False
 73554472;;False
 73554482;;False
-73554536;Rua do Galeão;False
+73554536;Rua do Galego;False
 73554618;;False
 73554626;;False
 73554674;;False
