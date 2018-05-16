@@ -69,7 +69,7 @@ int selectOption(int max) {
 			return stoi(input);
 		}
 		else if (regex_match(input, esc)) {
-			return max;
+			return max+1;
 		}
 		else {
 			cout << "Unavailable option (" << input << "). Try again !" << endl << endl;
@@ -318,8 +318,8 @@ void mainMenu() {
 		cout << "6 - System information" << endl;
 		cout << "7 - Exit" << endl << endl;
 
-		option = selectOption(6);
-		if (option == 6) return;
+		option = selectOption(7);
+		if ((option == 7) || (option == 8))  return;
 
 		system("cls");
 

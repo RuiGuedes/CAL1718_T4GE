@@ -18,7 +18,7 @@ void fixAccident() {
 	cout << "1 - Intersection accident" << endl;
 	cout << "2 - Road accident" << endl << endl;
 
-	option = selectOption(3);
+	option = selectOption(2);
 	if (option == 3) return;
 
 	system("cls");

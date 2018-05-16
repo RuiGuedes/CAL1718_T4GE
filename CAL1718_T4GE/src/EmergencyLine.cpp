@@ -19,6 +19,7 @@ Road * approximateSearch(string pattern);
 Vertex * selectRoad(Road *& road);
 Vertex * selectNode(Road * road, int position, int direction);
 void pathFinder(Vertex *origin, Vertex *destination);
+void checkUnreachableNodes(Vertex* origin);
 void benchmarking();
 
 void emergencyLine() {
@@ -73,8 +74,10 @@ void evacuateClient() {
 
 	startingNode = selectRoad(startRoad);
 
-	if(startRoad == NULL)
+	if(startRoad == NULL || startingNode == NULL)
 		return;
+	else
+		checkUnreachableNodes(startingNode);
 
 	system("cls");
 	cout << "Emergency Line" << endl << endl;
@@ -82,8 +85,20 @@ void evacuateClient() {
 
 	reachingNode = selectRoad(endRoad);
 
+	if(endRoad == NULL || reachingNode == NULL)
+		return;
+
+	system("cls");
+	cout << "Emergency Line" << endl << endl;
+	cout << "Evacuate From: " << startRoad->getName() << endl << endl;
+	cout << "Evacuate To: " << endRoad->getName() << endl << endl;
+
 	pathFinder(startingNode, reachingNode);
 
+	system("pause");
+	graph->resetEdgeColors();
+	graph->resetVertexColors();
+	graph->rearrange();
 }
 
 Road * exactSearch(string pattern) {
@@ -121,16 +136,22 @@ Road * exactSearch(string pattern) {
 		it++;
 	}
 
-	if(availableRoads.empty())
+	if(availableRoads.empty()) {
+		cout << endl << "Road <" << pattern << "> unknown" << endl << endl;
+		system("pause");
 		return NULL;
+	}
 
 	for(unsigned int i = 0; i < availableRoads.size(); i++)
 		cout << i + 1 << " - " << availableRoads.at(i) << endl;
 
 	cout << endl;
-	option = selectOption(availableRoads.size() - 1);
+	option = selectOption(availableRoads.size());
 
-	return graph->getRoadsInfo().find(availableRoads.at(option - 1))->second;
+	if(option < 1 || option > (int)(availableRoads.size()))
+		return NULL;
+	else
+		return graph->getRoadsInfo().find(availableRoads.at(option - 1))->second;
 }
 
 bool orderLessDiff(pair<int,string> pair1, pair<int,string> pair2) {
@@ -168,9 +189,6 @@ Road * approximateSearch(string pattern) {
 		it++;
 	}
 
-	if(availableRoads.empty())
-		return NULL;
-
 	sort(availableRoads.begin(), availableRoads.end(), orderLessDiff);
 
 	for(unsigned int i = 0; i < availableRoads.size(); i++)
@@ -179,8 +197,10 @@ Road * approximateSearch(string pattern) {
 	cout << endl;
 	option = selectOption(availableRoads.size() - 1);
 
-	return graph->getRoadsInfo().find(availableRoads.at(option - 1).second)->second;
-
+	if(option < 1 || option > (int)(availableRoads.size()))
+		return NULL;
+	else
+		return graph->getRoadsInfo().find(availableRoads.at(option - 1).second)->second;
 }
 
 Vertex * selectNode(Road * road, int position, int direction) {
@@ -226,6 +246,7 @@ Vertex * selectNode(Road * road, int position, int direction) {
 		graph->accidentEdge(graph->findEdge(edgeIDs.at(i + nextID)));
 	graph->update();
 
+	system("pause");
 	return graph->findEdge(edgeIDs.at(i))->getDest();
 }
 
@@ -246,14 +267,11 @@ Vertex * selectRoad(Road *& road) {
 		road = exactSearch(pattern);
 
 	//Check road validity
-	if(road == NULL) {
-		cout << "Dont exist any road containing " << pattern;
-		system("pause");
+	if(road == NULL)
 		return NULL;
-	}
 
 	//Select position in meters
-	cout << endl << "Road " << road->getName() << " total distance: " << road->getTotalDistance() << " meters" << endl << endl;
+	cout << endl << "Road <" << road->getName() << "> total distance: " << road->getTotalDistance() << " meters" << endl << endl;
 	while (1) {
 		string input;
 		cout << "Position in meters: ";
@@ -272,8 +290,10 @@ Vertex * selectRoad(Road *& road) {
 	cout << "2 - End to Begin" << endl << endl;
 	direction =  selectOption(2);
 
+	if(direction < 1 || direction > 2)
+		return NULL;
+
 	cout << endl;
-	system("pause");
 
 	return selectNode(road, posMeters, direction);
 }
@@ -285,21 +305,35 @@ void pathFinder(Vertex *origin, Vertex *destination) {
 
 	// Get shortest path and animate
 	vector<Vertex*> path = graph->getPath(origin, destination);
-	graph->animatePath(path, 200, PATH_COLOR, true);
 
-	double timeTravel = 0;
-
-	for(unsigned int i=1 ; i< path.size(); i++) {
-		timeTravel += path[i-1]->findEdge(path[i])->getWeight();
+	if(path.size() == 0)
+		cout << "Not possible to evacuate to the location specified" << endl << endl;
+	else {
+		cout << "Evacuating to the location specified" << endl << endl;
+		graph->animatePath(path, 200, PATH_COLOR, true);
 	}
 
 	return;
 }
 
+void checkUnreachableNodes(Vertex* origin) {
+	graph->bfs(origin);
+
+	for (auto v : graph->getVertexSet()) { // Non-accidented vertices
+		if (v->getPath() == nullptr) {
+			graph->setVertexColor(v, UNREACHABLE_COLOR);
+		}
+	}
+
+	graph->rearrange();
+	graph->clear();
+}
+
+//TODO
 void benchmarking() {
 
 	//Local variables
-	int N = 2000;
+	int N = 20000;
 	string pattern;
 	map<string,Road *>::iterator it = graph->getRoadsInfo().begin();
 
@@ -357,7 +391,7 @@ void benchmarking() {
 		external = (end - start).count() / N;
 	}
 
-	cout << "--- (3) Knuth Morris Pratt Algorithm ---" << endl;
+	cout << "--- (3) Finite Automata Algorithm ---" << endl;
 	cout << "External Average Time: " << external << " microseconds." << endl;
 
 	// Benchmark Knuth Morris Pratt Algorithm Algorithm

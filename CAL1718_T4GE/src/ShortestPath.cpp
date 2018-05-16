@@ -141,9 +141,9 @@ void dijkstraSourceDest(Vertex *origin, Vertex *destination) {
 
 	double timeTravel = 0;
 
-		for(unsigned int i=1 ; i< path.size(); i++) {
-			timeTravel += path[i-1]->findEdge(path[i])->getWeight();
-		}
+	for(unsigned int i=1 ; i< path.size(); i++) {
+		timeTravel += path[i-1]->findEdge(path[i])->getWeight();
+	}
 	cout << "Time of travel : " << timeTravel*3600 << " seconds. " << endl << endl;
 }
 
@@ -159,9 +159,9 @@ void Astar(Vertex *origin, Vertex *destination) {
 
 	double timeTravel = 0;
 
-		for(unsigned int i=1 ; i< path.size(); i++) {
-			timeTravel += path[i-1]->findEdge(path[i])->getWeight();
-		}
+	for(unsigned int i=1 ; i< path.size(); i++) {
+		timeTravel += path[i-1]->findEdge(path[i])->getWeight();
+	}
 	cout << "Time of travel : " << timeTravel*3600 << " seconds. "<< endl << endl;
 }
 
@@ -376,17 +376,22 @@ void shortestPathUI() {
 
 	cout << "Get Shortest Path" << endl << endl;
 
-	cout << "Available algorithms:" << endl;
+	cout << "##########################" << endl;
+	cout << "## Available algorithms ##" << endl;
+	cout << "##########################" << endl << endl;
 	cout << "1 - Greedy Best-First Search <source,destination>" << endl;
 	cout << "2 - Dijkstra <source>" << endl;
 	cout << "3 - Dijkstra <source,destination>" << endl;
 	cout << "4 - A* <source,destination>" << endl;
 	cout << "5 - Simulation [edge - edge]" << endl;
-	cout << "6 - Simulation [road - road]" << endl;
+	cout << "6 - Simulation [road - road]" << endl << endl;
+	cout << "##################" << endl;
+	cout << "## Benchmarking ##" << endl;
+	cout << "##################" << endl << endl;
 	cout << "7 - Benchmark  [1 through 4]" << endl << endl;
 
 	// Choose Algorithm
-	option = selectOption(8);
+	option = selectOption(7);
 	if (option == 8) return;
 
 	// Choose origin
