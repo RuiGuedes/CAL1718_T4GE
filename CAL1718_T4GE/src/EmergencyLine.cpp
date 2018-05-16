@@ -283,20 +283,23 @@ Vertex * selectNode(Road * road, int position, int direction) {
 		nextID = 2;
 
 
+	//Change graph state according to options chosen
 	if(direction == 1) //Begin to end
 	{
 		for(i = 0; i < (int)edgeIDs.size(); i += nextID) {
 			totalDistance += graph->findEdge(edgeIDs.at(i))->getDistance();
 
 			if((position <= totalDistance)){
-				if((endRoad == NULL) && ((i + nextID) < edgeIDs.size()))
-					graph->accidentEdge(graph->findEdge(edgeIDs.at(i + nextID)));
+				graph->setVertexColor(graph->findEdge(edgeIDs.at(i))->getDest(), SELECTED_COLOR);
+				if(endRoad == NULL) {
+					if((i + nextID) < edgeIDs.size())
+						graph->accidentEdge(graph->findEdge(edgeIDs.at(i + nextID)));
+				}
 				break;
 			}
 			else if((i + nextID) >= edgeIDs.size()) {
 				i = edgeIDs.size() - 1;
-				if((endRoad == NULL))
-					graph->accidentEdge(graph->findEdge(edgeIDs.at(i)));
+				graph->setVertexColor(graph->findEdge(edgeIDs.at(i))->getDest(), SELECTED_COLOR);
 				break;
 			}
 		}
@@ -307,22 +310,20 @@ Vertex * selectNode(Road * road, int position, int direction) {
 			totalDistance += graph->findEdge(edgeIDs.at(i))->getDistance();
 
 			if(position <= totalDistance) {
-				if((endRoad == NULL) && ((i-nextID) >= 0))
-					graph->accidentEdge(graph->findEdge(edgeIDs.at(i - nextID)));
+				graph->setVertexColor(graph->findEdge(edgeIDs.at(i))->getDest(), SELECTED_COLOR);
+				if(endRoad == NULL) {
+					if((i - nextID) < edgeIDs.size())
+						graph->accidentEdge(graph->findEdge(edgeIDs.at(i - nextID)));
+				}
 				break;
 			}
 			else if((i - nextID) < 0) {
 				i = 0;
-				if((endRoad == NULL))
-					graph->accidentEdge(graph->findEdge(edgeIDs.at(i)));
+				graph->setVertexColor(graph->findEdge(edgeIDs.at(i))->getDest(), SELECTED_COLOR);
 				break;
 			}
 		}
 	}
-
-	//Change graph state according to options chosen
-	graph->setVertexColor(graph->findEdge(edgeIDs.at(i))->getDest(), SELECTED_COLOR);
-
 
 	graph->update();
 	system("pause");
@@ -468,7 +469,7 @@ void benchmarking(int N) {
 
 	cout << "===== Benchmark " << N << " Iterations =====" << endl;
 
-	// Benchmark Naive Algorithm
+	// Naíve Algorithm
 	{
 		auto start = chrono::high_resolution_clock::now();
 		for(int i = 0; i < N; i++)
@@ -476,7 +477,7 @@ void benchmarking(int N) {
 		auto end = chrono::high_resolution_clock::now();
 		auto duration = duration_cast<microseconds>(end - start);
 
-		cout << "--- (1) Naive Algorithm ---" << endl;
+		cout << "--- (2) Naive Algorithm ---" << endl;
 		cout << "External Average Time: " << duration.count()/N << " microseconds." << endl;
 	}
 

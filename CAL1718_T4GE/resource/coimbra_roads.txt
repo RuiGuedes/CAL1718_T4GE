@@ -19,8 +19,8 @@
 107628091;Rua Doutor Calado;False
 107628093;Rua do Hospital;False
 107628095;Rua Almeida Garrett;False
-107628096;Rua João Gaspar SimÃµes;False
-107628097;Travessa II de SÃ£o LourenÃ§o;False
+107628096;Rua João Gaspar Simões;False
+107628097;Travessa II de São Lourenção;False
 107628098;Rua Cãndido dos Reis;False
 107628549;Rua Autor Dias;False
 107628551;Rua Fernão Magalhães;False
@@ -108,7 +108,7 @@
 176881296;Travessa da Rua Fernandes Tomãs;True
 176881297;;False
 176881298;Rua Vasco da Gama;False
-176881302;2Âª Travessa das Rosas;False
+176881302;2a Travessa das Rosas;False
 176881304;Rua 10 de Agosto;False
 176881305;Rua Dr José Jardim;False
 176881306;;False
