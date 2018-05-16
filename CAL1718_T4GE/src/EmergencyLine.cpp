@@ -263,7 +263,8 @@ Vertex * selectNode(Road * road, int position, int direction) {
 	//Local variables
 	vector<int> edgeIDs;
 	double totalDistance = 0;
-	unsigned int i = 0, nextID = 1;
+	unsigned int nextID = 1;
+	int i = 0;
 	map<int, Edge *>::iterator it = graph->getSubRoadsInfo().begin();
 
 	//Stores on edgeIDS the edge id of every edge that belongs to selected road
@@ -284,11 +285,11 @@ Vertex * selectNode(Road * road, int position, int direction) {
 
 	if(direction == 1) //Begin to end
 	{
-		for(i = 0; i < edgeIDs.size(); i += nextID) {
+		for(i = 0; i < (int)edgeIDs.size(); i += nextID) {
 			totalDistance += graph->findEdge(edgeIDs.at(i))->getDistance();
 
 			if((position <= totalDistance)){
-				if((endRoad == NULL))
+				if((endRoad == NULL) && ((i + nextID) < edgeIDs.size()))
 					graph->accidentEdge(graph->findEdge(edgeIDs.at(i + nextID)));
 				break;
 			}
@@ -306,7 +307,7 @@ Vertex * selectNode(Road * road, int position, int direction) {
 			totalDistance += graph->findEdge(edgeIDs.at(i))->getDistance();
 
 			if(position <= totalDistance) {
-				if((endRoad == NULL))
+				if((endRoad == NULL) && ((i-nextID) >= 0))
 					graph->accidentEdge(graph->findEdge(edgeIDs.at(i - nextID)));
 				break;
 			}
