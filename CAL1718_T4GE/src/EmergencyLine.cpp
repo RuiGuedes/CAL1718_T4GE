@@ -1,6 +1,8 @@
 #include "Interface.h"
 #include "SearchAlgorithms.h"
 
+using namespace std::chrono;
+
 //////////////////////
 // Global variables //
 //////////////////////
@@ -21,7 +23,7 @@ Vertex * selectNode(Road * road, int position, int direction);
 Vertex * selectRoad(Road *& road);
 void pathFinder(Vertex *origin, Vertex *destination);
 void checkUnreachableNodes(Vertex* origin);
-void benchmarking();
+void benchmarking(int N);
 
 /**
  * @brief Emergency line interface that allows user to choose algorithm to be used
@@ -55,8 +57,12 @@ void emergencyLine() {
 
 	if (algorithm == 8)
 		return;
-	else if(algorithm == 7)
-		benchmarking();
+	else if(algorithm == 7) {
+		int iterations = selectIterations();
+		cout << endl << endl;
+		if (iterations == 0) return emergencyLine();
+		benchmarking(iterations);
+	}
 	else
 		evacuateClient();
 
@@ -399,7 +405,7 @@ void pathFinder(Vertex *origin, Vertex *destination) {
 	else {
 		cout << "Evacuating to the location specified ";
 		graph->animatePath(path, 200, PATH_COLOR, true);
-		cout << endl << endl;
+		cout << endl << endl << "Done." << endl << endl;
 	}
 }
 
@@ -426,13 +432,12 @@ void checkUnreachableNodes(Vertex* origin) {
 }
 
 /**
- *
+ * @brief Function used to check algorithms performance
  */
-//TODO
-void benchmarking() {
+void benchmarking(int N) {
 
 	//Local variables
-	int N = 20000;
+	string text = "";
 	string pattern;
 	map<string,Road *>::iterator it = graph->getRoadsInfo().begin();
 
@@ -441,102 +446,85 @@ void benchmarking() {
 	cin.ignore(1000,'\n');
 	getline(cin, pattern);
 
-	// Time of all N iterations
-	microtime external;
+	while(it != graph->getRoadsInfo().end()) {
+		text += it->first + " ";
+		it++;
+	}
 
 	cout << "===== Benchmark " << N << " Iterations =====" << endl;
 
 	// Benchmark Naive Algorithm
 	{
-
 		auto start = chrono::high_resolution_clock::now();
-		for(int i = 1; i < N; i++) {
-			while(it != graph->getRoadsInfo().end()) {
-				naiveAlgorithm(it->first, pattern);
-				it++;
-			}
-		}
+		for(int i = 0; i < N; i++)
+			naiveAlgorithm(text,pattern);
 		auto end = chrono::high_resolution_clock::now();
-		external = (end - start).count() / N;
+		auto duration = duration_cast<microseconds>(end - start);
+
+		cout << "--- (1) Naive Algorithm ---" << endl;
+		cout << "External Average Time: " << duration.count()/N << " microseconds." << endl;
 	}
 
-	cout << "--- (1) Naive Algorithm ---" << endl;
-	cout << "External Average Time: " << external << " microseconds." << endl;
-
-	// Benchmark Rabin Karp Algorithm
+	// Rabin Karp Algorithm
 	{
-		it = graph->getRoadsInfo().begin();
 		auto start = chrono::high_resolution_clock::now();
-		while(it != graph->getRoadsInfo().end()) {
-			rabinKarpAlgorithm(it->first, pattern);
-			it++;
-		}
+		for(int i = 0; i < N; i++)
+			rabinKarpAlgorithm(text,pattern);
 		auto end = chrono::high_resolution_clock::now();
-		external = (end - start).count() / N;
+		auto duration = duration_cast<microseconds>(end - start);
+
+		cout << "--- (2) Rabin Karp Algorithm ---" << endl;
+		cout << "External Average Time: " << duration.count()/N << " microseconds." << endl;
 	}
 
-	cout << "--- (2) Rabin Karp Algorithm ---" << endl;
-	cout << "External Average Time: " << external << " microseconds." << endl;
-
-	// Benchmark Finite Automata Algorithm
+	// Finite Automata Algorithm
 	{
-		it = graph->getRoadsInfo().begin();
 		auto start = chrono::high_resolution_clock::now();
-		while(it != graph->getRoadsInfo().end()) {
-			finiteAutomataAlgorithm(it->first, pattern);
-			it++;
-		}
+		for(int i = 0; i < N; i++)
+			finiteAutomataAlgorithm(text,pattern);
 		auto end = chrono::high_resolution_clock::now();
-		external = (end - start).count() / N;
+		auto duration = duration_cast<microseconds>(end - start);
+
+		cout << "--- (3) Finit Automata Algorithm ---" << endl;
+		cout << "External Average Time: " << duration.count()/N << " microseconds." << endl;
 	}
 
-	cout << "--- (3) Finite Automata Algorithm ---" << endl;
-	cout << "External Average Time: " << external << " microseconds." << endl;
-
-	// Benchmark Knuth Morris Pratt Algorithm Algorithm
+	// Knuth Morris Pratt Algorithm
 	{
-		it = graph->getRoadsInfo().begin();
 		auto start = chrono::high_resolution_clock::now();
-		while(it != graph->getRoadsInfo().end()) {
-			knuthMorrisPrattAlgorithm(it->first, pattern);
-			it++;
-		}
+		for(int i = 0; i < N; i++)
+			knuthMorrisPrattAlgorithm(text,pattern);
 		auto end = chrono::high_resolution_clock::now();
-		external = (end - start).count() / N;
+		auto duration = duration_cast<microseconds>(end - start);
+
+		cout << "--- (4) Knuth Morris Pratt Algorithm ---" << endl;
+		cout << "External Average Time: " << duration.count()/N << " microseconds." << endl;
 	}
 
-	cout << "--- (4) Knuth Morris Pratt Algorithm ---" << endl;
-	cout << "External Average Time: " << external << " microseconds." << endl;
-
-	// Benchmark Edit Distance Algorithm
+	// Edit Distance Algorithm
 	{
-		it = graph->getRoadsInfo().begin();
 		auto start = chrono::high_resolution_clock::now();
-		while(it != graph->getRoadsInfo().end()) {
-			editDistanceAlgorithm(it->first, pattern);
-			it++;
-		}
+		for(int i = 0; i < N; i++)
+			editDistanceAlgorithm(text,pattern);
 		auto end = chrono::high_resolution_clock::now();
-		external = (end - start).count() / N;
+		auto duration = duration_cast<microseconds>(end - start);
+
+		cout << "--- (5) Edit Distance Algorithm ---" << endl;
+		cout << "External Average Time: " << duration.count()/N << " microseconds." << endl;
 	}
 
-	cout << "--- (5) Edit Distance Algorithm ---" << endl;
-	cout << "External Average Time: " << external << " microseconds." << endl;
-
-	// Benchmark Hamming Distance Algorithm
+	// Hamming Distance Algorithm
 	{
-		it = graph->getRoadsInfo().begin();
 		auto start = chrono::high_resolution_clock::now();
-		while(it != graph->getRoadsInfo().end()) {
-			hammingDistanceAlgorithm(it->first, pattern);
-			it++;
-		}
+		for(int i = 0; i < N; i++)
+			hammingDistanceAlgorithm(text,pattern);
 		auto end = chrono::high_resolution_clock::now();
-		external = (end - start).count() / N;
+		auto duration = duration_cast<microseconds>(end - start);
+
+		cout << "--- (6) Hamming Distance Algorithm ---" << endl;
+		cout << "External Average Time: " << duration.count()/N << " microseconds." << endl;
 	}
 
-	cout << "--- (6) Hamming Distance Algorithm ---" << endl;
-	cout << "External Average Time: " << external << " microseconds." << endl << endl;
 
 	system("pause");
 }
