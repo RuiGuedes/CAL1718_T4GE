@@ -67,7 +67,7 @@
 182763163;Rua Primeiro de Maio;False
 182763164;Rua Primeiro de Maio;False
 182763168;Rua do Capitao Mor;False
-182763169;Praça de Ferreira de Almeida;True
+182763169;Praca de Ferreira de Almeida;True
 182763174;Rua do Compromisso;True
 182765839;;True
 182767856;Rua Primeiro de Maio;False
@@ -84,7 +84,7 @@
 182771796;Rua do Sol;True
 182845650;Largo do Carmo;False
 182885261;Rua Doutor Manuel Arriaga;False
-182888749;Rua da Policia de Segurança Publica;False
+182888749;Rua da Policia de Seguranca Publica;False
 182969935;;False
 182969938;;False
 182969939;Praca de Ferreira de Almeida;True

@@ -1,10 +1,5 @@
 #include "SearchAlgorithms.h"
 
-//Faro 50
-//Coimbra 149
-//Sydney 533
-//Newyork 296
-
 //////////////////////////////////////
 // EXACT STRING MATCHING ALGORITHMS //
 //////////////////////////////////////
