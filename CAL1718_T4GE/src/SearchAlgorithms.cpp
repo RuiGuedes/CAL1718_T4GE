@@ -1,5 +1,10 @@
 #include "SearchAlgorithms.h"
 
+//Faro 50
+//Coimbra 149
+//Sydney 533
+//Newyork 296
+
 //////////////////////////////////////
 // EXACT STRING MATCHING ALGORITHMS //
 //////////////////////////////////////
@@ -11,7 +16,6 @@
  */
 bool naiveAlgorithm(string text, string pattern) {
 
-	/*
 	//Local variables
 	int m = text.length();
 	int n = pattern.length();
@@ -45,23 +49,7 @@ bool naiveAlgorithm(string text, string pattern) {
 		else if(m == n)
 			return false;
 	}
-	 */
 
-	int M = pattern.length();
-	int N = text.length();
-
-	/* A loop to slide pat[] one by one */
-	for (int i = 0; i <= N - M; i++) {
-		int j;
-
-		/* For current index i, check for pattern match */
-		for (j = 0; j < M; j++)
-			if (text[i + j] != pattern[j])
-				break;
-
-		if (j == M) // if pat[0...M-1] = txt[i, i+1, ...i+M-1]
-			return true;
-	}
 	return false;
 }
 
@@ -120,6 +108,7 @@ bool finiteAutomataAlgorithm(string text, string pattern) {
 
 	//Process text over FA <TF>.
 	for(int i = 0; i < N; i++) {
+
 		j = TF[j][(int)text[i]];
 
 		if (j == M)
@@ -143,7 +132,7 @@ bool rabinKarpAlgorithm(string text, string pattern, int primeNumber) {
 	int M = pattern.length();
 	int j;
 	int p = 0; // hash value for pattern
-	int t = 0; // hash value for txt
+	int t = 0; // hash value for text
 	int h = 1; // ALPHABET^(M-1) % primeNumber
 
 	for (int i = 0; i < M-1; i++)
