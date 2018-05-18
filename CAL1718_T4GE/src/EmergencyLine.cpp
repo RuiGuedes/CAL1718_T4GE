@@ -8,6 +8,7 @@ using namespace std::chrono;
 //////////////////////
 
 int algorithm;
+int accidentedEdgeID = 1;
 Road * startRoad = NULL;
 Road * endRoad = NULL;
 
@@ -31,13 +32,14 @@ void benchmarking(int N);
  */
 void emergencyLine() {
 
-	system("cls");
 	//Reset graph state
+	startRoad = NULL; endRoad = NULL;
+	graph->fixEdge(graph->findEdge(accidentedEdgeID));
 	graph->resetEdgeColors();
 	graph->resetVertexColors();
 	graph->rearrange();
 
-
+	system("cls");
 	cout << "Emergency Line" << endl << endl;
 
 	cout << "###########################" << endl;
@@ -117,11 +119,6 @@ void evacuateClient() {
 	pathFinder(startingNode, reachingNode);
 
 	system("pause");
-
-	//Reset graph state
-	graph->resetEdgeColors();
-	graph->resetVertexColors();
-	graph->rearrange(); return;
 }
 
 /**
@@ -304,8 +301,10 @@ Vertex * selectNode(Road * road, int position, int direction) {
 			if((position <= totalDistance)){
 				graph->setVertexColor(graph->findEdge(edgeIDs.at(i))->getDest(), SELECTED_COLOR);
 				if(endRoad == NULL) {
-					if((i + nextID) < edgeIDs.size())
+					if((i + nextID) < edgeIDs.size()) {
+						accidentedEdgeID = graph->findEdge(edgeIDs.at(i + nextID))->getID();
 						graph->accidentEdge(graph->findEdge(edgeIDs.at(i + nextID)));
+					}
 				}
 				break;
 			}
@@ -324,8 +323,10 @@ Vertex * selectNode(Road * road, int position, int direction) {
 			if(position <= totalDistance) {
 				graph->setVertexColor(graph->findEdge(edgeIDs.at(i))->getDest(), SELECTED_COLOR);
 				if(endRoad == NULL) {
-					if((i - nextID) >= 0)
+					if((i - nextID) >= 0) {
+						accidentedEdgeID = graph->findEdge(edgeIDs.at(i + nextID))->getID();
 						graph->accidentEdge(graph->findEdge(edgeIDs.at(i - nextID)));
+					}
 				}
 				break;
 			}
