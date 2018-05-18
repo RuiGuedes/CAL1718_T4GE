@@ -32,6 +32,11 @@ void benchmarking(int N);
 void emergencyLine() {
 
 	system("cls");
+	//Reset graph state
+	graph->resetEdgeColors();
+	graph->resetVertexColors();
+	graph->rearrange();
+
 
 	cout << "Emergency Line" << endl << endl;
 
@@ -155,9 +160,11 @@ Road * exactSearch(string pattern) {
 		}
 
 		if(result && ((startRoad == NULL) || (startRoad != endRoad))) {
-			availableRoads.push_back(it->first);
-			if(availableRoads.size() >= 20)
-				break;
+			if(!it->first.empty()) {
+				availableRoads.push_back(it->first);
+				if(availableRoads.size() >= 20)
+					break;
+			}
 		}
 
 		it++;
@@ -222,9 +229,11 @@ Road * approximateSearch(string pattern) {
 			}
 
 			if((result >= 0) && ((startRoad == NULL) || (startRoad != endRoad))) {
-				availableRoads.push_back(pair<int,string>(result,it->first));
-				if(availableRoads.size() >= 20)
-					break;
+				if(!it->first.empty()) {
+					availableRoads.push_back(pair<int,string>(result,it->first));
+					if(availableRoads.size() >= 20)
+						break;
+				}
 			}
 		}
 
@@ -315,7 +324,7 @@ Vertex * selectNode(Road * road, int position, int direction) {
 			if(position <= totalDistance) {
 				graph->setVertexColor(graph->findEdge(edgeIDs.at(i))->getDest(), SELECTED_COLOR);
 				if(endRoad == NULL) {
-					if((i - nextID) < edgeIDs.size())
+					if((i - nextID) >= 0)
 						graph->accidentEdge(graph->findEdge(edgeIDs.at(i - nextID)));
 				}
 				break;
