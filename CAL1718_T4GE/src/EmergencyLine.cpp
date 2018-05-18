@@ -154,8 +154,11 @@ Road * exactSearch(string pattern) {
 			break;
 		}
 
-		if(result && ((startRoad == NULL) || (startRoad != endRoad)))
+		if(result && ((startRoad == NULL) || (startRoad != endRoad))) {
 			availableRoads.push_back(it->first);
+			if(availableRoads.size() >= 20)
+				break;
+		}
 
 		it++;
 	}
