@@ -32,13 +32,6 @@ void benchmarking(int N);
  */
 void emergencyLine() {
 
-	//Reset graph state
-	startRoad = NULL; endRoad = NULL;
-	graph->fixEdge(graph->findEdge(accidentedEdgeID));
-	graph->resetEdgeColors();
-	graph->resetVertexColors();
-	graph->rearrange();
-
 	system("cls");
 	cout << "Emergency Line" << endl << endl;
 
@@ -58,6 +51,13 @@ void emergencyLine() {
 	cout << "## Benchmarking ##" << endl;
 	cout << "##################" << endl << endl;
 	cout << "7 - Benchmark Algorithms" << endl << endl;
+
+	//Reset graph state
+	startRoad = NULL; endRoad = NULL;
+	graph->fixEdge(graph->findEdge(accidentedEdgeID));
+	graph->resetEdgeColors();
+	graph->resetVertexColors();
+	graph->rearrange();
 
 	//Stores option in global variable to be used to determine algorithm to be used in road search
 	algorithm = selectOption(7);
@@ -226,11 +226,9 @@ Road * approximateSearch(string pattern) {
 			}
 
 			if((result >= 0) && ((startRoad == NULL) || (startRoad != endRoad))) {
-				if(!it->first.empty()) {
+				if(!it->first.empty())
 					availableRoads.push_back(pair<int,string>(result,it->first));
-					if(availableRoads.size() >= 20)
-						break;
-				}
+
 			}
 		}
 
@@ -245,13 +243,13 @@ Road * approximateSearch(string pattern) {
 	else
 		sort(availableRoads.begin(), availableRoads.end(), orderLessDiff);
 
-	for(unsigned int i = 0; i < availableRoads.size(); i++)
+	for(unsigned int i = 0; i < 20; i++)
 		cout << i + 1 << " - " << availableRoads.at(i).second << endl;
 
 	cout << endl;
-	option = selectOption(availableRoads.size());
+	option = selectOption(20);
 
-	if(option > (int)(availableRoads.size()))
+	if(option > 20)
 		return NULL;
 	else
 		return graph->getRoadsInfo().find(availableRoads.at(option - 1).second)->second;
@@ -317,14 +315,14 @@ Vertex * selectNode(Road * road, int position, int direction) {
 	}
 	else if(direction == 2) //End to begin
 	{
-		for(i = edgeIDs.size() - 1; i >= 0; i -= nextID) {
+		for(i = (edgeIDs.size() - 1); i >= 0; i -= nextID) {
 			totalDistance += graph->findEdge(edgeIDs.at(i))->getDistance();
 
 			if(position <= totalDistance) {
 				graph->setVertexColor(graph->findEdge(edgeIDs.at(i))->getDest(), SELECTED_COLOR);
 				if(endRoad == NULL) {
 					if((i - nextID) >= 0) {
-						accidentedEdgeID = graph->findEdge(edgeIDs.at(i + nextID))->getID();
+						accidentedEdgeID = graph->findEdge(edgeIDs.at(i - nextID))->getID();
 						graph->accidentEdge(graph->findEdge(edgeIDs.at(i - nextID)));
 					}
 				}
